@@ -14,9 +14,10 @@ function getSelectedIndex(cpuData, selectedOption) { //logs the indexes of the s
 
 export default function CpuChart() {
     const { sarData, selectedOption } = useContext(DataContext);
-
+    
     let cpuData = {};
     if(sarData) {
+      
       cpuData = sarData.cpuObject;
     }
 
@@ -30,9 +31,9 @@ export default function CpuChart() {
       return createChartOptions()
     }, []);
 
-    const chartPlugins = useMemo (() => {
-      return createChartPlugins()
-    }, [])
+    // const chartPlugins = useMemo (() => {
+    //   return createChartPlugins()
+    // }, [])
     
 
     useEffect(() => {
@@ -47,7 +48,7 @@ export default function CpuChart() {
     
     return (
       <>
-        {sarData ? <LineChart options={chartOptions} data={chartData} plugins={chartPlugins} /> : null}
+        {sarData ? <LineChart options={chartOptions} data={chartData} /> : null}
         {sarData ? <ItemList items={sarData.cpuObject.uniqCPU} placeHolderText="Select CPU" /> : null}
       </>
     );
@@ -161,24 +162,24 @@ export function createChartOptions() {
   };
 }
 
-function createChartPlugins() {
-  return {
-    options: {
-      id: 'toolTipLine',
-      beforeDraw: chart => {
+// function createChartPlugins() {
+//   return {
+//     options: {
+//       id: 'toolTipLine',
+//       beforeDraw: chart => {
 
-        if (chart.tooltip._active && chart.tooltip._active.length) {
-          const ctx = chart.ctx;
-          ctx.save();
-          const activePoint = chart.tooltip._active[0];
+//         if (chart.tooltip._active && chart.tooltip._active.length) {
+//           const ctx = chart.ctx;
+//           ctx.save();
+//           const activePoint = chart.tooltip._active[0];
 
-          ctx.beginPath();
-          ctx.setLineDash([5, 7]);
-          ctx.moveTo(activePoint.element.x, chart.chartArea.top);
+//           ctx.beginPath();
+//           ctx.setLineDash([5, 7]);
+//           ctx.moveTo(activePoint.element.x, chart.chartArea.top);
 
-        }
+//         }
       
-      }
-    }
-  }
-}
+//       }
+//     }
+//   }
+// }

@@ -6,7 +6,7 @@ import { Line } from "react-chartjs-2";
 
 
 export default function LineChart(props) {
-  Chart.register(props.plugins)
+  // Chart.register(props.plugins)
 
   return (
     <>
