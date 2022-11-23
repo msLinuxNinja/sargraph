@@ -1,0 +1,183 @@
+@import 'antd/dist/antd.dark.css';
+html {
+    box-sizing: border-box;
+    background-color: rgba(17, 17, 17, 0.836);
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html {
+    background-color: rgb(66, 66, 66);
+    color: white;
+    position: relative;
+    -webkit-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+}
+
+body {
+  background-color: rgb(66, 66, 66);
+}
+
+a {
+  padding: 10px;
+}
+.chart-container {
+    margin: auto;
+    width: 80vw;
+    height: 50vh;
+}
+
+.charts {
+    position: relative;
+    /* margin: auto; */
+    padding: 10px;
+
+}
+
+.centered {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: fixed;
+  margin: auto;
+}
+
+.drop_zone {
+    background-color: rgb(107, 107, 107);
+    /* position: fixed; */
+    padding: 50px;
+    text-align: center;
+    border: 1px outset rgba(0, 70, 159, 0.32);
+    width: 40vw;
+    height: 30vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); */
+    -webkit-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+    
+}
+
+.drop_zone:hover {
+    background-color: rgba(175, 218, 255, 0.2);
+    color: white;
+    border: 4px dotted rgba(255, 163, 163, 0.32);
+    -webkit-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+
+}
+
+.hidden {
+  display: none !important;
+
+}
+
+
+.dragging {
+    border: 4px dashed rgb(255, 128, 128) !important;
+    background-color: rgb(49, 49, 49) !important;
+    color: white !important;
+    -webkit-transition: background-color 1000ms linear;
+    -ms-transition: background-color 1000ms linear;
+    transition: background-color 1000ms linear;
+}
+
+.darker {
+    background-color: black !important;
+}
+
+#refresh-btn {    
+  display: flex;
+  position: relative;
+  justify-content: center;
+  margin: auto;
+  margin-top: 10px;
+  flex-direction: column;
+  align-items: center;
+
+}
+
+
+
+/* CSS for shiny button */
+.button-85 {
+  padding: 0.6em 2em;
+  border: none;
+  outline: none;
+  color: rgb(255, 255, 255);
+  background: #111;
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  border-radius: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-85:before {
+  content: "";
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  animation: glowing-button-85 20s linear infinite;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 10px;
+}
+
+@keyframes glowing-button-85 {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.button-85:after {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #222;
+  left: 0;
+  top: 0;
+  border-radius: 10px;
+}
+
+select {
+  padding: 10px;
+  margin-bottom: 10px;
+}
