@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useState, useContext } from "react";
 
 const DataContext = createContext({
   cpuData: undefined,

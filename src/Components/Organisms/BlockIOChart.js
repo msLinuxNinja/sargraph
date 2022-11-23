@@ -1,10 +1,10 @@
-import React, { useContext, useMemo } from "react";
+import React, { useMemo } from "react";
 import LineChart from "../Molecules/LineChart";
-import { DataContext } from "../Contexts/DataContext";
+import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 
 export default function BlockIOChart(props) {
-  const { blockData } = useContext(DataContext);
+  const { blockData } = useDataContext();
 
   function createChartData() {
     return {

@@ -1,8 +1,7 @@
-import { DataContext } from "../Contexts/DataContext";
-import { useContext } from "react";
+import { useDataContext } from "../Contexts/DataContext";
 
 export default function ChartContainer({ children }) {
-  const { hasData } = useContext(DataContext);
+  const { hasData } = useDataContext();
 
   function getStyle() {
     return hasData ? "block" : "none";

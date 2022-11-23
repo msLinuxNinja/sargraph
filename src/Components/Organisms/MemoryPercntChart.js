@@ -1,10 +1,9 @@
-import React, { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import LineChart from "../Molecules/LineChart";
-import { DataContext } from "../Contexts/DataContext";
+import { useDataContext } from "../Contexts/DataContext";
 
 export default function MemoryPercntChart(props) {
-  const { memoryData } = useContext(DataContext);
-
+  const { memoryData } = useDataContext();
   function createChartData() {
     return {
       labels: memoryData.xlables,

@@ -1,6 +1,6 @@
-import React, { useContext, useMemo, useEffect } from "react";
+import { useContext, useMemo, useEffect } from "react";
 import LineChart from "../Molecules/LineChart";
-import { DataContext } from "../Contexts/DataContext";
+import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 
 function getSelectedIndex(cpuData, selectedOption) {
@@ -16,7 +16,7 @@ function getSelectedIndex(cpuData, selectedOption) {
 }
 
 export default function CpuChart() {
-  const { cpuData, selectedOption } = useContext(DataContext);
+  const { cpuData, selectedOption } = useDataContext();
 
   function createChartData() {
     return {
