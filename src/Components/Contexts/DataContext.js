@@ -9,6 +9,7 @@ const DataContext = createContext({
   setBlockData: () => {},
   selectedOption: undefined,
   setSelectedOption: () => {},
+  hasData: false,
 });
 
 export const DataContextProvider = ({ children }) => {
@@ -16,6 +17,8 @@ export const DataContextProvider = ({ children }) => {
   const [memoryData, setMemoryData] = useState(undefined);
   const [blockData, setBlockData] = useState(undefined);
   const [selectedOption, setSelectedOption] = useState();
+
+  const hasData = cpuData || memoryData || blockData;
 
   const contextValue = {
     cpuData,
@@ -26,6 +29,7 @@ export const DataContextProvider = ({ children }) => {
     setBlockData,
     selectedOption,
     setSelectedOption,
+    hasData,
   };
 
   return (

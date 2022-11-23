@@ -6,7 +6,7 @@ import { DataContext, useDataContext } from "../Contexts/DataContext";
 export function DropBox() {
   // Dropbox component
   const [dragClass, setdragClass] = useState(false);
-  const { setCpuData, setMemoryData, setBlockData } = useDataContext();
+  const { setCpuData, setMemoryData, setBlockData, hasData } = useDataContext();
 
   function handleDragOver(e) {
     e.stopPropagation();
@@ -53,7 +53,7 @@ export function DropBox() {
   }
 
   function getStyles() {
-    return sarData ? "hidden" : "centered drop_zone";
+    return hasData ? "hidden" : "centered drop_zone";
   }
 
   return (
