@@ -5,7 +5,7 @@ import { useDataContext } from "../Contexts/DataContext";
 
 import { InboxOutlined } from '@ant-design/icons';
 import { message, Upload } from 'antd';
-import data from "../env/data";
+
 
 const { Dragger } = Upload;
 
@@ -51,7 +51,7 @@ export function DropBox() {
         <p className="ant-upload-text">Click or drag file to this area to upload</p>
         <p className="ant-upload-hint">
 
-          Select a sar file that contains the text output from systat (sa files are binary and won’t be read).
+          Select a sar file that contains the text output from sysstat (sa files are binary and won’t be read).
           
         </p>
       </Dragger>
