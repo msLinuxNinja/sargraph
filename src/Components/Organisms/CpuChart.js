@@ -1,4 +1,4 @@
-import { useContext, useMemo, useEffect } from "react";
+import React, { useContext, useMemo, useEffect, useRef } from "react";
 
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -25,20 +25,79 @@ ChartJS.register(
   Legend
 )
 
-function getSelectedIndex(cpuData, selectedOption) {
-  //logs the indexes of the selected value (CPU)
-  console.log(selectedOption);
-  console.log(cpuData);
 
-  const dataIndex = cpuData.cpuNumber
-    .map((x, index) => (x.includes(selectedOption) ? index : null))
-    .filter((item) => item !== null);
-
-  console.log(dataIndex);
-}
 
 export default function CpuChart() {
   const { cpuData, selectedOption } = useDataContext();
+  const chartRef = useRef();
+
+
+  function getSelectedIndex(chart) {
+    //logs the indexes of the selected value (CPU)
+    console.log(chart.data.datasets)
+    // console.log(chart.data.labels)
+
+  
+    const dataIndex = cpuData.cpuNumber
+      .map((x, index) => (x.includes(selectedOption) ? index : null))
+      .filter((item) => item !== null);
+
+  
+    const newXLables = dataIndex.map(index => {
+
+      return cpuData.xlables[index]
+    })
+    
+    const newCpuUsr = dataIndex.map(index => {
+
+      return cpuData.ycpuUsr[index]
+    })
+    
+    const newCpuNice = dataIndex.map(index => {
+
+      return cpuData.ycpuNice[index]
+    })
+    
+    const newCpuSys = dataIndex.map(index => {
+
+      return cpuData.ycpuSys[index]
+    })
+    
+    const newCpuIowait = dataIndex.map(index => {
+
+      return cpuData.ycpuIowait[index]
+    })
+    
+    const newCpuIrq = dataIndex.map(index => {
+
+      return cpuData.ycpuIrq[index]
+    })
+    
+    const newCpuSoft = dataIndex.map(index => {
+
+      return cpuData.ycpuSoft[index]
+    })
+    
+    const newCpuIdle = dataIndex.map(index => {
+
+      return cpuData.ycpuIdle[index]
+    })
+    
+    
+    // console.log(newTime)
+
+    chart.data.labels = newXLables
+    chart.data.datasets[0].data = newCpuUsr
+    chart.data.datasets[1].data = newCpuNice
+    chart.data.datasets[2].data = newCpuSys
+    chart.data.datasets[3].data = newCpuIowait
+    chart.data.datasets[4].data = newCpuIrq
+    chart.data.datasets[5].data = newCpuSoft
+    chart.data.datasets[6].data = newCpuIdle
+
+    
+    chart.update()
+  }
 
   function createChartData() {
     return {
@@ -158,14 +217,18 @@ export default function CpuChart() {
   }, []);
 
   useEffect(() => {
+    const chart = chartRef.current
+
     if (cpuData) {
-      getSelectedIndex(cpuData, selectedOption);
+      getSelectedIndex(chart);
     }
   }, [selectedOption]);
 
+
+
   return (
     <>
-      {cpuData ? <Line options={chartOptions} data={chartData} /> : null}
+      {cpuData ? <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  /> : null}
       {cpuData ? (
         <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU" />
       ) : null}
