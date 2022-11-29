@@ -1,7 +1,29 @@
 import { useContext, useMemo, useEffect } from "react";
-import LineChart from "../Molecules/LineChart";
+
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 function getSelectedIndex(cpuData, selectedOption) {
   //logs the indexes of the selected value (CPU)
@@ -143,7 +165,7 @@ export default function CpuChart() {
 
   return (
     <>
-      {cpuData ? <LineChart options={chartOptions} data={chartData} /> : null}
+      {cpuData ? <Line options={chartOptions} data={chartData} /> : null}
       {cpuData ? (
         <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU" />
       ) : null}
