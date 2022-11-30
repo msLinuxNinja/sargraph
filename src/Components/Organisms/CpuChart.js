@@ -34,8 +34,9 @@ export default function CpuChart() {
 
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
-    console.log(chart.data.datasets)
+    console.log(chart.data.datasets[0].data)
     // console.log(chart.data.labels)
+    
 
   
     const dataIndex = cpuData.cpuNumber
