@@ -28,7 +28,7 @@ ChartJS.register(
 
 
 export default function CpuChart() {
-  const { cpuData, selectedOption } = useDataContext();
+  const { cpuData, selectedCPU, setSelectedCPU } = useDataContext();
   const chartRef = useRef();
 
 
@@ -40,7 +40,7 @@ export default function CpuChart() {
 
   
     const dataIndex = cpuData.cpuNumber
-      .map((x, index) => (x.includes(selectedOption) ? index : null))
+      .map((x, index) => (x.includes(selectedCPU) ? index : null))
       .filter((item) => item !== null);
 
   
@@ -223,7 +223,7 @@ export default function CpuChart() {
     if (cpuData) {
       getSelectedIndex(chart);
     }
-  }, [selectedOption]);
+  }, [selectedCPU]);
 
 
 
@@ -231,7 +231,7 @@ export default function CpuChart() {
     <>
       {cpuData ? <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  /> : null}
       {cpuData ? (
-        <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU" />
+        <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU" setValue={setSelectedCPU}/>
       ) : null}
     </>
   );

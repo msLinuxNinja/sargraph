@@ -1,11 +1,11 @@
 import { Select } from "antd";
-import { useDataContext } from "../Contexts/DataContext";
+
 
 export default function ItemList(props) {
-  const { setSelectedOption } = useDataContext();
+
 
   function handleChange(selectedOption) {
-    setSelectedOption(selectedOption);
+    props.setValue(selectedOption);
   }
 
   const options = [];

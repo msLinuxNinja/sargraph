@@ -26,7 +26,7 @@ ChartJS.register(
 )
 
 export default function BlockIOChart(props) {
-  const { blockData, selectedOption } = useDataContext();
+  const { blockData, selectedBlock, setSelectedBlock } = useDataContext();
   const chartRef = useRef();
 
   function getSelectedIndex(chart) {
@@ -35,7 +35,7 @@ export default function BlockIOChart(props) {
     // console.log(chart.data.labels)
   
     const dataIndex = blockData.blockDevices
-      .map((x, index) => (x.includes(selectedOption) ? index : null))
+      .map((x, index) => (x.includes(selectedBlock) ? index : null))
       .filter((item) => item !== null);
 
   
@@ -184,16 +184,13 @@ export default function BlockIOChart(props) {
     if (blockData) {
       getSelectedIndex(chart);
     }
-  }, [selectedOption]);
+  }, [selectedBlock]);
 
   return (
     <>
       {blockData ? <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} /> : null}
       {blockData ? (
-        <ItemList
-          items={blockData.uniqDev}
-          placeHolderText="Select Block Device"
-        />
+        <ItemList items={blockData.uniqDev} placeHolderText="Select Block Device" setValue={setSelectedBlock}/>
       ) : null}
     </>
   );
