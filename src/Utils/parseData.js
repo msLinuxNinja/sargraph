@@ -111,8 +111,8 @@ export function parseDiskIO (sarFileData) {
     const yavgRQz = [];
     const yavgQz = [];
     const yawaitMS = [];
-    let blockDevices = [];
-    let uniqDev = [];
+    const blockDevices = [];
+    const uniqDev = [];
 
 
     const prasedData = sarFileData;
@@ -129,24 +129,26 @@ export function parseDiskIO (sarFileData) {
     const filteredArray = ioData.filter(row => !row.includes('DEV')) // return everything that does not include the word "%usr" which indicates a header
     filteredArray.forEach(row =>{ //pushes values to the array
         const blockDev = row[1];
+        xlables.push(row[0]);
+        ytps.push(row[2])
+        yreadSec.push(parseInt((row[3] * 512) / 1048576)); // Calculate MB/s
+        ywriteSec.push(parseInt((row[4] * 512) / 1048576)); // Calculate MB/s
+        yavgRQz.push(parseInt((row[5] *512) / 1024)); // Calculate blocksize in KB
+        yavgQz.push(parseInt(row[6]));
+        yawaitMS.push(parseFloat(row[7]));
         blockDevices.push(blockDev); // Update found block devices
-        if (blockDev === 'dev8-16') {
-            xlables.push(row[0]);
-            ytps.push(row[2])
-            yreadSec.push(parseInt((row[3] * 512) / 1048576)); // Calculate MB/s
-            ywriteSec.push(parseInt((row[4] * 512) / 1048576)); // Calculate MB/s
-            yavgRQz.push(parseInt((row[5] *512) / 1024));
-            yavgQz.push(parseInt(row[6]));
-            yawaitMS.push(parseFloat(row[7]));
- 
-        }       
-    });
-    blockDevices.forEach(device => { //remove duplicates
-        if (!uniqDev.includes(device)) {
-            uniqDev.push(device);
+        
+        if (!uniqDev.includes(blockDev)) {
+            uniqDev.push(blockDev);
         }
-    })
+             
+    });
+    // blockDevices.forEach(device => { //remove duplicates
+    //     if (!uniqDev.includes(device)) {
+    //         uniqDev.push(device);
+    //     }
+    // })
 
 
-    return {xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, uniqDev}; //export object with arrays
+    return {xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, uniqDev, blockDevices}; //export object with arrays
 }
