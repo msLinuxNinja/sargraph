@@ -31,11 +31,14 @@ export default function BlockIOChart(props) {
 
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
-    console.log(chart.data.datasets[0].data)
+    // console.log(chart.data.datasets[0].data) 
     // console.log(chart.data.labels)
   
-    const dataIndex = blockData.blockDevices
-      .map((x, index) => (x.includes(selectedBlock) ? index : null))
+
+    const re =  new RegExp (`^${selectedCPU}$`) // Build RegExp
+
+    const dataIndex = blockData.blockDevices // Returns the indexes where the RegExp occurs
+      .map((x, index) => (x.match(re) ? index : null))
       .filter((item) => item !== null);
 
   

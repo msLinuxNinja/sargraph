@@ -34,16 +34,15 @@ export default function CpuChart() {
 
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
-    console.log(chart.data.datasets[0].data)
+    // console.log(chart.data.datasets[0].data)
     // console.log(chart.data.labels)
     
+    const re =  new RegExp (`^${selectedCPU}$`) // Build RegExp
 
-  
-    const dataIndex = cpuData.cpuNumber
-      .map((x, index) => (x.includes(selectedCPU) ? index : null))
+    const dataIndex = cpuData.cpuNumber // Returns the indexes where the RegExp occurs
+      .map((x, index) => (x.match(re) ? index : null))
       .filter((item) => item !== null);
 
-  
     const newXLables = dataIndex.map(index => {
 
       return cpuData.xlables[index]
