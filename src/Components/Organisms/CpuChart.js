@@ -208,6 +208,7 @@ export default function CpuChart() {
 
   const chartData = useMemo(() => {
     if (cpuData) {
+      setSelectedCPU("all") //sets default on first render
       return createChartData();
     }
   }, [cpuData]);
@@ -230,7 +231,7 @@ export default function CpuChart() {
     <>
       {cpuData ? <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  /> : null}
       {cpuData ? (
-        <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU" setValue={setSelectedCPU}/>
+        <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU}/>
       ) : null}
     </>
   );

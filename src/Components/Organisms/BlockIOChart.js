@@ -35,7 +35,7 @@ export default function BlockIOChart(props) {
     // console.log(chart.data.labels)
   
 
-    const re =  new RegExp (`^${selectedCPU}$`) // Build RegExp
+    const re =  new RegExp (`^${selectedBlock}$`) // Build RegExp
 
     const dataIndex = blockData.blockDevices // Returns the indexes where the RegExp occurs
       .map((x, index) => (x.match(re) ? index : null))
@@ -172,7 +172,7 @@ export default function BlockIOChart(props) {
 
   const chartData = useMemo(() => {
     if (blockData) {
-    
+      setSelectedBlock("dev8-0") //sets default on first render
       return createChartData();
     }
   }, [blockData]);
@@ -193,7 +193,7 @@ export default function BlockIOChart(props) {
     <>
       {blockData ? <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} /> : null}
       {blockData ? (
-        <ItemList items={blockData.uniqDev} placeHolderText="Select Block Device" setValue={setSelectedBlock}/>
+        <ItemList items={blockData.uniqDev} placeHolderText="Select Block Device (Selected Dev8-0)" setValue={setSelectedBlock}/>
       ) : null}
     </>
   );
