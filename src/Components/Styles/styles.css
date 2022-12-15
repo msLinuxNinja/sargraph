@@ -12,10 +12,6 @@ html {
 html {
     background-color: rgb(66, 66, 66);
     color: white;
-    position: relative;
-    -webkit-transition: background-color 500ms linear;
-    -ms-transition: background-color 500ms linear;
-    transition: background-color 500ms linear;
 }
 
 body {
