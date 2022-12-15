@@ -57,10 +57,26 @@ export default function MemoryPercntChart(props) {
             callback: function (value, index, ticks) {
               return value + "%";
             },
+            color: "rgba(180, 180, 180, 1)",
+          },
+
+          grid: {
+            color: "rgba(0, 0, 0, 0.2)",
           },
           responsive: true,
           min: 0,
           max: 100,
+          
+        },
+
+        x: {
+          ticks: {
+            color: "rgba(180, 180, 180, 1)",
+          },
+
+          grid: {
+            color: "rgba(0, 0, 0, 0.05)",
+          }
         },
       },
     };
