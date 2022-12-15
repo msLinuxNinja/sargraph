@@ -20,6 +20,9 @@ export default function ItemList(props) {
       placeholder={props.placeHolderText}
       size="large"
       bordered={true}
+      style={{
+        width: 400,
+      }}
     />
   );
 }
