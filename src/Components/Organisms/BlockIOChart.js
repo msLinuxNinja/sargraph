@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect } from "react";
 
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
@@ -159,12 +159,24 @@ export default function BlockIOChart(props) {
         y: {
           beginAtZero: true,
           ticks: {
+            color: "rgba(180, 180, 180, 1)",
             //   callback: function (value, index, ticks) {
             //     return value + "%";
             //   },
           },
+          
           responsive: true,
           min: 0,
+        },
+
+        x: {
+          ticks: {
+            color: "rgba(180, 180, 180, 1)",
+          },
+
+          grid: {
+            color: "rgba(0, 0, 0, 0.05)",
+          }
         },
       },
     };
@@ -178,8 +190,10 @@ export default function BlockIOChart(props) {
   }, [blockData]);
 
   const chartOptions = useMemo(() => {
-    createChartOptions()
-  }, []);
+    if (blockData) {
+      return createChartOptions()
+    }    
+  }, [blockData]);
 
   useEffect(() => {
     const chart = chartRef.current
