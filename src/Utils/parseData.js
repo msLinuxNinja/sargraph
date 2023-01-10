@@ -1,5 +1,6 @@
+
 // function to check if a string contains '%usr' to not include it in the array
-const returnDataPortion= (firstIndex, lastIndex, array) => {
+const returnDataPortion = (firstIndex, lastIndex, array) => {
     const resultingArray = array.slice(firstIndex, lastIndex);
     return resultingArray;
 }
@@ -7,28 +8,67 @@ const returnDataPortion= (firstIndex, lastIndex, array) => {
 // Figure how to parse RHEL8 + sar by doing something like
 // if index number === (difference between sar versions) do x for sar v1 y for sar v2
 
+const returnMatch = (re, array) => { // returns new array from matched lines based on regex defined when calling the function
+    const match = [];
+    const regex = new RegExp(re);
+    // console.log(regex)
+    array.forEach(element => {
+        if(element[1].match(regex)) {
+            match.push(element);
+        }
+    });
+
+    return match;
+}
+
 export function parseCPUData (sarFileData) { // Parse CPU details and return an object with 8 arrays
-    const xlables = [];
-    const cpuNumber = [];
-    const ycpuUsr = [];
-    const ycpuNice = [];
-    const ycpuSys = [];
-    const ycpuIowait = [];
-    const ycpuIrq = [];
-    const ycpuSoft = [];
-    const ycpuIdle = [];
-    const uniqCPU = [];
-    
-    const prasedData = sarFileData;
-    const rowIncludesUsr = sarFileData.map((row, index) => row.includes('%usr') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of '%usr'.
+    const [xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU, matchedData, parsedData] = [ [], [], [], [], [], [], [], [], [], [], [], [] ];
+
+
+    const rowIncludesUsr = sarFileData.map((row, index) => row.includes('CPU') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of '%usr'.
+    const rowIncludesAvg = sarFileData.map((row, index) => row.includes('Average:') ? index: null ).filter(index => typeof index === 'number');
     const firstIndex = rowIncludesUsr[0] + 1; // first index not including the first instance 
-    const lastIndex = rowIncludesUsr[rowIncludesUsr.length -1]; // Last index from the array
-    const cpuData = returnDataPortion(firstIndex, lastIndex, prasedData); // returns the portion of the data from firstIndex to lastIndex
-    const filteredArray = cpuData.filter(row => !row.includes('%usr')) // return everything that does not include the word "%usr" which indicates a header
+    console.log(rowIncludesUsr)
+    console.log(rowIncludesAvg)
 
-    // const row = cpuObject.split('\n').filter(checkFilterCPU); // split by line break and ignore the first 4 lines, also runs a filter to return rows that do not match '%usr'
+    const lastIndex = rowIncludesAvg[0]; // Last index from the array
+    const cpuData = returnDataPortion(firstIndex, lastIndex, sarFileData); // returns the portion of the data from firstIndex to lastIndex
+    const cpuFilter = cpuData.filter(row => {
+        if(!row.includes('%usr') ) {
+            
+            return true
+        }
 
-    filteredArray.forEach(row => {
+        return false
+    });
+
+   
+    cpuFilter.forEach(row => {
+        const cpuNum = row[1];
+
+        if (!uniqCPU.includes(cpuNum)) {
+            uniqCPU.push(cpuNum);
+            
+        }
+    });
+
+    const filteredArray = sarFileData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
+
+    uniqCPU.forEach(cpu => {
+        matchedData.push(returnMatch(`(^${cpu}$)`, cpuFilter));
+
+    });
+
+    matchedData.forEach(array => {
+
+        array.forEach(entry => {
+            parsedData.push(entry);
+        });
+
+    });
+
+    
+    parsedData.forEach(row => { // Logic to add each coulmn to the correct metric
 
         const time = row[0];
         const cpuNum = row[1];
@@ -48,11 +88,8 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
         ycpuIrq.push(cpuIrq);
         ycpuSoft.push(cpuSoft);
         ycpuIdle.push(cpuIdle);
-
-        if (!uniqCPU.includes(cpuNum)) {
-            uniqCPU.push(cpuNum);
-        }
     });
+
 
     return {xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU};
 }
