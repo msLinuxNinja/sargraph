@@ -21,29 +21,21 @@ const returnMatch = (re, array) => { // returns new array from matched lines bas
     return match;
 }
 
+
 export function parseCPUData (sarFileData) { // Parse CPU details and return an object with 8 arrays
     const [xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU, matchedData, parsedData] = [ [], [], [], [], [], [], [], [], [], [], [], [] ];
 
 
-    const rowIncludesUsr = sarFileData.map((row, index) => row.includes('CPU') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of '%usr'.
+    const rowIncludesUsr = sarFileData.map((row, index) => row.includes('CPU') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
     const rowIncludesAvg = sarFileData.map((row, index) => row.includes('Average:') ? index: null ).filter(index => typeof index === 'number');
     const firstIndex = rowIncludesUsr[0] + 1; // first index not including the first instance 
-    console.log(rowIncludesUsr)
-    console.log(rowIncludesAvg)
 
     const lastIndex = rowIncludesAvg[0]; // Last index from the array
+
     const cpuData = returnDataPortion(firstIndex, lastIndex, sarFileData); // returns the portion of the data from firstIndex to lastIndex
-    const cpuFilter = cpuData.filter(row => {
-        if(!row.includes('%usr') ) {
-            
-            return true
-        }
-
-        return false
-    });
-
+    const cpuFilter = cpuData.filter(row => !row.includes('%usr'))
    
-    cpuFilter.forEach(row => {
+    cpuFilter.forEach(row => { // Obtain list of unique CPUs to later use as an iterator and perform Regex
         const cpuNum = row[1];
 
         if (!uniqCPU.includes(cpuNum)) {
@@ -51,15 +43,14 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
             
         }
     });
+    
 
-    const filteredArray = sarFileData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
-
-    uniqCPU.forEach(cpu => {
-        matchedData.push(returnMatch(`(^${cpu}$)`, cpuFilter));
+    uniqCPU.forEach(cpu => { // With list of unique CPUs obtain data based on matched reges
+        matchedData.push(returnMatch(`(^${cpu}$)`, sarFileData));
 
     });
-
-    matchedData.forEach(array => {
+    
+    matchedData.forEach(array => { // remove nested arrays
 
         array.forEach(entry => {
             parsedData.push(entry);
@@ -67,8 +58,15 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
 
     });
 
-    
-    parsedData.forEach(row => { // Logic to add each coulmn to the correct metric
+    const filteredArray = parsedData.filter(row => { // After removing nested array, filter out rows with "CPU", "Average:" and that are less than or equal to 12
+        if(!row.includes('CPU') && !row.includes('Average:') && row.length >= 12){
+            return true;
+        }
+        return false;
+    });
+
+
+    filteredArray.forEach(row => { // Logic to add each coulmn to the correct metric
 
         const time = row[0];
         const cpuNum = row[1];
@@ -89,6 +87,12 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
         ycpuSoft.push(cpuSoft);
         ycpuIdle.push(cpuIdle);
     });
+
+    // const occurences = cpuNumber.reduce((acc, curr) => { // counts occurrence of CPUs
+    //     return acc[curr] ? ++acc[curr] : acc[curr] =1, acc
+    // }, {});
+  
+    // console.log(occurences)
 
 
     return {xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU};
