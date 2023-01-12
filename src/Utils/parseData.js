@@ -5,8 +5,6 @@ const returnDataPortion = (firstIndex, lastIndex, array) => {
     return resultingArray;
 }
 
-// Figure how to parse RHEL8 + sar by doing something like
-// if index number === (difference between sar versions) do x for sar v1 y for sar v2
 
 const returnMatch = (re, array) => { // returns new array from matched lines based on regex defined when calling the function
     const match = [];
@@ -99,29 +97,18 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
 }
 
 export function parseMemoryData (sarFileData) { 
-    const xlables = [];
-    const ykbmemFree = [];
-    const ykbMemUsed = [];
-    const ymemUsedPrcnt = [];
-    const ykbBuffers = [];
-    const ykbCached = [];
-    const ykbCommit = [];
-    const ycommitPrcnt = [];
-    const ytotalMemory = [];
-    
+    const [xlables, ykbmemFree, ykbMemUsed, ymemUsedPrcnt, ykbBuffers, ykbCached, ykbCommit, ycommitPrcnt, ytotalMemory] = [[], [], [], [], [], [], [], [], []] ;
 
-    const prasedData = sarFileData;
 
-    const rowIncludesMemoryIndex = sarFileData.map((row, index) => row.includes('kbmemfree') ? index : null ).filter(index => typeof index === 'number'); // Verify if row includes kbmemfree and returns index of matching pattern. Returns the index of the ocurrences of 'kbmemfree'.
 
-    const firstIndex = rowIncludesMemoryIndex[0] + 1; // first index not including the first instance which is the header
-    const averageIndex = sarFileData.map((row, index) => row.includes('Average:') ? index : null ).filter(index => typeof index === 'number'); // Obtains an array with the occurences of the Average: 
-    const lastIndexAvg = averageIndex.filter(element => element > rowIncludesMemoryIndex[0]); //Looks for values greater than the first index of kbmemfree and returns the array
-    const lastIndex = lastIndexAvg[0]; //Grabs the first element of the array
+    const prasedData = sarFileData.filter(row => { // Memory section is exactly 11 columns long, checks if the second column is not a number as the network section is also 11 columns long
+        if(row.length === 11 && !isNaN(row[1])) {
 
-    const memoryData = returnDataPortion(firstIndex, lastIndex, prasedData); // returns the portion of the data from firstIndex to lastIndex
+            return true;
+        }
+    }); // Note RHEL8+ sar files, memory section is 17 Columns
 
-    const filteredArray = memoryData.filter(row => !row.includes('%usr')) // return everything that does not include the word "%usr" which indicates a header
+    const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
   
 
     filteredArray.forEach(row =>{ //pushes values to the array
