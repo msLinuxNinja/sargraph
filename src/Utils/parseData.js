@@ -1,34 +1,70 @@
+
 // function to check if a string contains '%usr' to not include it in the array
-const returnDataPortion= (firstIndex, lastIndex, array) => {
+const returnDataPortion = (firstIndex, lastIndex, array) => {
     const resultingArray = array.slice(firstIndex, lastIndex);
     return resultingArray;
 }
 
-// Figure how to parse RHEL8 + sar by doing something like
-// if index number === (difference between sar versions) do x for sar v1 y for sar v2
+
+const returnMatch = (re, array) => { // returns new array from matched lines based on regex defined when calling the function
+    const match = [];
+    const regex = new RegExp(re);
+    // console.log(regex)
+    array.forEach(element => {
+        if(element[1].match(regex)) {
+            match.push(element);
+        }
+    });
+
+    return match;
+}
+
 
 export function parseCPUData (sarFileData) { // Parse CPU details and return an object with 8 arrays
-    const xlables = [];
-    const cpuNumber = [];
-    const ycpuUsr = [];
-    const ycpuNice = [];
-    const ycpuSys = [];
-    const ycpuIowait = [];
-    const ycpuIrq = [];
-    const ycpuSoft = [];
-    const ycpuIdle = [];
-    const uniqCPU = [];
-    
-    const prasedData = sarFileData;
-    const rowIncludesUsr = sarFileData.map((row, index) => row.includes('%usr') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of '%usr'.
+    const [xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU, matchedData, parsedData] = [ [], [], [], [], [], [], [], [], [], [], [], [] ];
+
+
+    const rowIncludesUsr = sarFileData.map((row, index) => row.includes('CPU') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
+    const rowIncludesAvg = sarFileData.map((row, index) => row.includes('Average:') ? index: null ).filter(index => typeof index === 'number');
     const firstIndex = rowIncludesUsr[0] + 1; // first index not including the first instance 
-    const lastIndex = rowIncludesUsr[rowIncludesUsr.length -1]; // Last index from the array
-    const cpuData = returnDataPortion(firstIndex, lastIndex, prasedData); // returns the portion of the data from firstIndex to lastIndex
-    const filteredArray = cpuData.filter(row => !row.includes('%usr')) // return everything that does not include the word "%usr" which indicates a header
 
-    // const row = cpuObject.split('\n').filter(checkFilterCPU); // split by line break and ignore the first 4 lines, also runs a filter to return rows that do not match '%usr'
+    const lastIndex = rowIncludesAvg[0]; // Last index from the array
 
-    filteredArray.forEach(row => {
+    const cpuData = returnDataPortion(firstIndex, lastIndex, sarFileData); // returns the portion of the data from firstIndex to lastIndex
+    const cpuFilter = cpuData.filter(row => !row.includes('%usr'))
+   
+    cpuFilter.forEach(row => { // Obtain list of unique CPUs to later use as an iterator and perform Regex
+        const cpuNum = row[1];
+
+        if (!uniqCPU.includes(cpuNum)) {
+            uniqCPU.push(cpuNum);
+            
+        }
+    });
+    
+
+    uniqCPU.forEach(cpu => { // With list of unique CPUs obtain data based on matched reges
+        matchedData.push(returnMatch(`(^${cpu}$)`, sarFileData));
+
+    });
+    
+    matchedData.forEach(array => { // remove nested arrays
+
+        array.forEach(entry => {
+            parsedData.push(entry);
+        });
+
+    });
+
+    const filteredArray = parsedData.filter(row => { // After removing nested array, filter out rows with "CPU", "Average:" and that are less than or equal to 12
+        if(!row.includes('CPU') && !row.includes('Average:') && row.length >= 12){
+            return true;
+        }
+        return false;
+    });
+
+
+    filteredArray.forEach(row => { // Logic to add each coulmn to the correct metric
 
         const time = row[0];
         const cpuNum = row[1];
@@ -48,39 +84,31 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
         ycpuIrq.push(cpuIrq);
         ycpuSoft.push(cpuSoft);
         ycpuIdle.push(cpuIdle);
-
-        if (!uniqCPU.includes(cpuNum)) {
-            uniqCPU.push(cpuNum);
-        }
     });
+
+    // const occurences = cpuNumber.reduce((acc, curr) => { // counts occurrence of CPUs
+    //     return acc[curr] ? ++acc[curr] : acc[curr] =1, acc
+    // }, {});
+  
+    // console.log(occurences)
+
 
     return {xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU};
 }
 
 export function parseMemoryData (sarFileData) { 
-    const xlables = [];
-    const ykbmemFree = [];
-    const ykbMemUsed = [];
-    const ymemUsedPrcnt = [];
-    const ykbBuffers = [];
-    const ykbCached = [];
-    const ykbCommit = [];
-    const ycommitPrcnt = [];
-    const ytotalMemory = [];
-    
+    const [xlables, ykbmemFree, ykbMemUsed, ymemUsedPrcnt, ykbBuffers, ykbCached, ykbCommit, ycommitPrcnt, ytotalMemory] = [[], [], [], [], [], [], [], [], []] ;
 
-    const prasedData = sarFileData;
 
-    const rowIncludesMemoryIndex = sarFileData.map((row, index) => row.includes('kbmemfree') ? index : null ).filter(index => typeof index === 'number'); // Verify if row includes kbmemfree and returns index of matching pattern. Returns the index of the ocurrences of 'kbmemfree'.
 
-    const firstIndex = rowIncludesMemoryIndex[0] + 1; // first index not including the first instance which is the header
-    const averageIndex = sarFileData.map((row, index) => row.includes('Average:') ? index : null ).filter(index => typeof index === 'number'); // Obtains an array with the occurences of the Average: 
-    const lastIndexAvg = averageIndex.filter(element => element > rowIncludesMemoryIndex[0]); //Looks for values greater than the first index of kbmemfree and returns the array
-    const lastIndex = lastIndexAvg[0]; //Grabs the first element of the array
+    const prasedData = sarFileData.filter(row => { // Memory section is exactly 11 columns long, checks if the second column is not a number as the network section is also 11 columns long
+        if(row.length === 11 && !isNaN(row[1])) {
 
-    const memoryData = returnDataPortion(firstIndex, lastIndex, prasedData); // returns the portion of the data from firstIndex to lastIndex
+            return true;
+        }
+    }); // Note RHEL8+ sar files, memory section is 17 Columns
 
-    const filteredArray = memoryData.filter(row => !row.includes('%usr')) // return everything that does not include the word "%usr" which indicates a header
+    const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
   
 
     filteredArray.forEach(row =>{ //pushes values to the array
@@ -115,18 +143,24 @@ export function parseDiskIO (sarFileData) {
     const uniqDev = [];
 
 
-    const prasedData = sarFileData;
 
-    const rowIncludesIOIndex = sarFileData.map((row, index) => row.includes('DEV') ? index : null ).filter(index => typeof index === 'number'); // Verify if row includes DEV and returns index of matching pattern. Returns the index of the ocurrences of 'DEV'.
+    const prasedData = sarFileData.filter(row => {
+        if(row.length === 10 && isNaN(row[1]) && !row.includes('pgpgin/s')) {
+            return true;
+        }
+    });
 
-    const firstIndex = rowIncludesIOIndex[0] + 1; // first index not including the first instance which is the header
-    const averageIndex = sarFileData.map((row, index) => row.includes('Average:') ? index : null ).filter(index => typeof index === 'number'); // Obtains an array with the occurences of the Average: 
-    const lastIndexAvg = averageIndex.filter(element => element > rowIncludesIOIndex[0]); //Looks for values greater than the first index of DEV and returns the array with the data between DEV and Average
-    const lastIndex = lastIndexAvg[0]; //Grabs the first element of the array which is the last index
+    // const rowIncludesIOIndex = sarFileData.map((row, index) => row.includes('DEV') ? index : null ).filter(index => typeof index === 'number'); // Verify if row includes DEV and returns index of matching pattern. Returns the index of the ocurrences of 'DEV'.
 
-    const ioData = returnDataPortion(firstIndex, lastIndex, prasedData); // returns the portion of the data from firstIndex to lastIndex
+    // const firstIndex = rowIncludesIOIndex[0] + 1; // first index not including the first instance which is the header
+    // const averageIndex = sarFileData.map((row, index) => row.includes('Average:') ? index : null ).filter(index => typeof index === 'number'); // Obtains an array with the occurences of the Average: 
+    // const lastIndexAvg = averageIndex.filter(element => element > rowIncludesIOIndex[0]); //Looks for values greater than the first index of DEV and returns the array with the data between DEV and Average
+    // const lastIndex = lastIndexAvg[0]; //Grabs the first element of the array which is the last index
 
-    const filteredArray = ioData.filter(row => !row.includes('DEV')) // return everything that does not include the word "%usr" which indicates a header
+    // const ioData = returnDataPortion(firstIndex, lastIndex, prasedData); // returns the portion of the data from firstIndex to lastIndex
+
+    const filteredArray = prasedData.filter(row => !row.includes('DEV') && !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
+
     filteredArray.forEach(row =>{ //pushes values to the array
         const blockDev = row[1];
         xlables.push(row[0]);
