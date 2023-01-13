@@ -9,7 +9,7 @@ const returnDataPortion = (firstIndex, lastIndex, array) => {
 const returnMatch = (re, array) => { // returns new array from matched lines based on regex defined when calling the function
     const match = [];
     const regex = new RegExp(re);
-    // console.log(regex)
+
     array.forEach(element => {
         if(element[1].match(regex)) {
             match.push(element);
@@ -150,14 +150,6 @@ export function parseDiskIO (sarFileData) {
         }
     });
 
-    // const rowIncludesIOIndex = sarFileData.map((row, index) => row.includes('DEV') ? index : null ).filter(index => typeof index === 'number'); // Verify if row includes DEV and returns index of matching pattern. Returns the index of the ocurrences of 'DEV'.
-
-    // const firstIndex = rowIncludesIOIndex[0] + 1; // first index not including the first instance which is the header
-    // const averageIndex = sarFileData.map((row, index) => row.includes('Average:') ? index : null ).filter(index => typeof index === 'number'); // Obtains an array with the occurences of the Average: 
-    // const lastIndexAvg = averageIndex.filter(element => element > rowIncludesIOIndex[0]); //Looks for values greater than the first index of DEV and returns the array with the data between DEV and Average
-    // const lastIndex = lastIndexAvg[0]; //Grabs the first element of the array which is the last index
-
-    // const ioData = returnDataPortion(firstIndex, lastIndex, prasedData); // returns the portion of the data from firstIndex to lastIndex
 
     const filteredArray = prasedData.filter(row => !row.includes('DEV') && !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
 
@@ -177,11 +169,6 @@ export function parseDiskIO (sarFileData) {
         }
              
     });
-    // blockDevices.forEach(device => { //remove duplicates
-    //     if (!uniqDev.includes(device)) {
-    //         uniqDev.push(device);
-    //     }
-    // })
 
 
     return {xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, uniqDev, blockDevices}; //export object with arrays
