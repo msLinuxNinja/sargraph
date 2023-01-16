@@ -13,8 +13,8 @@ export function DropBox() {
 
   
   // Dropbox component
-  const [dragClass, setdragClass] = useState(false);
-  const { setCpuData, setMemoryData, setBlockData, hasData } = useDataContext();
+
+  const { setCpuData, setMemoryData, setBlockData, hasData, setFileDetails } = useDataContext();
 
   const props = { // props for antd upload component
     multiple: false,
@@ -32,7 +32,7 @@ export function DropBox() {
       setCpuData(dataObj.cpuObject);
       setMemoryData(dataObj.memoryObject);
       setBlockData(dataObj.blockObject);
-
+      setFileDetails(dataObj.fileDetails);
       onSuccess()
     }
   }
