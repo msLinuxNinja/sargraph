@@ -1,5 +1,5 @@
-import { parseMemoryData, parseCPUData, parseDiskIO } from "./parseData";
-// import { chartItCPU, chartItMemory, chartItIO } from "./chartIt";
+import { parseMemoryData, parseCPUData, parseDiskIO, parseFileDetails } from "./parseData";
+
 import readData from "./readData";
 
 export function callParse(fileContent) {
@@ -8,6 +8,7 @@ export function callParse(fileContent) {
     const cpuObject = parseCPUData(sarFileData);
     const blockObject = parseDiskIO(sarFileData);
     const memoryObject = parseMemoryData(sarFileData);
+    const fileDetails = parseFileDetails(sarFileData);
 
-    return { cpuObject, memoryObject, blockObject }
+    return { cpuObject, memoryObject, blockObject, fileDetails }
 }

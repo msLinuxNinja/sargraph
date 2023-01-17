@@ -19,6 +19,15 @@ const returnMatch = (re, array) => { // returns new array from matched lines bas
     return match;
 }
 
+export function parseFileDetails (sarFileData) {
+
+    const header = sarFileData[0];
+    const kernel = header[1];
+    const hostname = header[2];
+    const date = header[3]
+
+    return {kernel, hostname, date};
+}
 
 export function parseCPUData (sarFileData) { // Parse CPU details and return an object with 8 arrays
     const [xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU, matchedData, parsedData] = [ [], [], [], [], [], [], [], [], [], [], [], [] ];
