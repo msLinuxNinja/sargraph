@@ -1,10 +1,9 @@
 import readFile from "../../Utils/readFile";
 import { callParse } from "../../Utils/callParse";
-import { useState } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 
 import { InboxOutlined } from '@ant-design/icons';
-import { message, Upload } from 'antd';
+import { Upload } from 'antd';
 
 
 const { Dragger } = Upload;
@@ -33,6 +32,12 @@ export function DropBox() {
       setMemoryData(dataObj.memoryObject);
       setBlockData(dataObj.blockObject);
       setFileDetails(dataObj.fileDetails);
+      setFileDetails(prev => {
+        return {
+          ...prev,
+          fileName: file.name,
+        }
+      });
       onSuccess()
     }
   }

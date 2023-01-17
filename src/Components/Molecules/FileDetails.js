@@ -1,18 +1,39 @@
 import { useDataContext } from "../Contexts/DataContext";
 import {  Card, Col, Row, Statistic } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLinux } from "@fortawesome/free-brands-svg-icons";
-import { faMicrochip, faCalendarDay, faServer } from "@fortawesome/free-solid-svg-icons";
+import { faLinux, faFedora, faRedhat } from "@fortawesome/free-brands-svg-icons";
+import { faMicrochip, faCalendarDay, faServer, faHardDrive, faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
 
 
 
 
 //Component to show the file details.
 export default function FileDetails() {
-    const { fileDetails, cpuData } = useDataContext();
+    const { fileDetails, cpuData, blockData } = useDataContext();
+    const [ icon, setIcon ] = useState(<FontAwesomeIcon icon={faLinux}/>);
+    const [ textColor, setTextColor ] = useState("");
+    console.log(fileDetails)
+    
+    function returnDistroIcon() { // detect ditro type
+        if (fileDetails.kernel.includes("fc")) {
+            setTextColor("#0B57A4")
+            return <FontAwesomeIcon icon={faFedora}/>
+        } else if (fileDetails.kernel.includes("el")) {
+            setTextColor("#cf1322")
+            return <FontAwesomeIcon icon={faRedhat}/>
+        } else {
+            return <FontAwesomeIcon icon={faLinux}/>
+        }
+    }
+    
+    useEffect(() =>{
+        setIcon(returnDistroIcon());
+
+    }, [])
     return (
         <>
-        <Row gutter={[24, 48]}>
+        <Row gutter={24}>
             <Col span={12}>
                 <Card bordered={false}>
                     <Statistic
@@ -32,15 +53,15 @@ export default function FileDetails() {
                         value={fileDetails.kernel}
                         precision={2}
                         valueStyle={{
-                            color: '#cf1322',
+                            color: textColor,
                         }}
-                        prefix={<FontAwesomeIcon icon={faLinux}/>}
+                        prefix={icon}
 
                     />
                 </Card>
             </Col>
         </Row>
-        <Row gutter={[24, 48]}>
+        <Row gutter={24}>
             <Col span={12}>
                 <Card bordered={false}>
                     <Statistic
@@ -59,7 +80,7 @@ export default function FileDetails() {
                         title="Total CPUs"
                         value={cpuData.uniqCPU.length -1}
                         valueStyle={{
-                            color: '#cf1322',
+                            color: textColor,
                         }}
                         prefix={<FontAwesomeIcon icon={faMicrochip} />}
 
@@ -68,28 +89,28 @@ export default function FileDetails() {
             </Col>
         </Row>
         
-        <Row gutter={[24, 248]}>
+        <Row gutter={24}>
             <Col span={12}>
                 <Card bordered={false}>
                     <Statistic
-                        title="File Date"
-                        value={fileDetails.date}
+                        title="File Name"
+                        value={fileDetails.fileName}
                         valueStyle={{
                             color: '#3f8600',
                         }}
-                        prefix={<FontAwesomeIcon icon={faCalendarDay} />}
+                        prefix={<FontAwesomeIcon icon={faFileArrowUp} />}
                     />
                 </Card>
             </Col>
             <Col span={12}>
                 <Card bordered={false}>
                     <Statistic
-                        title="Total CPUs"
-                        value={cpuData.uniqCPU.length -1}
+                        title="Total Block Devices (including logical)"
+                        value={blockData.uniqDev.length -1}
                         valueStyle={{
-                            color: '#cf1322',
+                            color: textColor,
                         }}
-                        prefix={<FontAwesomeIcon icon={faMicrochip} />}
+                        prefix={<FontAwesomeIcon icon={faHardDrive} />}
 
                     />
                 </Card>
