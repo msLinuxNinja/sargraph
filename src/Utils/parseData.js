@@ -23,7 +23,7 @@ export function parseFileDetails (sarFileData) {
 
     const header = sarFileData[0];
     const kernel = header[1];
-    const hostname = header[2];
+    const hostname = header[2].replace(/[()]/g, '');
     const date = header[3]
 
     return {kernel, hostname, date};
@@ -121,7 +121,6 @@ export function parseMemoryData (sarFileData) {
 
     const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
   
-    console.log(prasedData)
     filteredArray.forEach(row =>{ //pushes values to the array
 
         xlables.push(row[0]); //time
