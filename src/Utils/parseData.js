@@ -101,16 +101,18 @@ export function parseMemoryData (sarFileData) {
 
 
 
-    const prasedData = sarFileData.filter(row => { // Memory section is exactly 11 columns long, checks if the second column is not a number as the network section is also 11 columns long
-        if(row.length === 11 && !isNaN(row[1])) {
+    const prasedData = sarFileData.filter(row => { 
+        if(row.length === 17 && !isNaN(row[1])) { // Memory section is exactly 17 columns long, checks if the second column is not a number 
 
             return true;
+        } else if (row.length === 11 && !isNaN(row[1]) ) { // Memory section is exactly 11 columns long for RHEL7, checks if the second column is not a number as the network section is also 11 columns long
+            return true
         }
     }); // Note RHEL8+ sar files, memory section is 17 Columns
 
     const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
   
-
+    console.log(prasedData)
     filteredArray.forEach(row =>{ //pushes values to the array
 
         xlables.push(row[0]); //time
