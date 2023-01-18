@@ -20,7 +20,7 @@ export default function FileDetails() {
             setTextColor("#0B57A4")
             return <FontAwesomeIcon icon={faFedora}/>
         } else if (fileDetails.kernel.includes("el")) {
-            setTextColor("#cf1322")
+            setTextColor("#CC0000")
             return <FontAwesomeIcon icon={faRedhat}/>
         } else {
             return <FontAwesomeIcon icon={faLinux}/>
