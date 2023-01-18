@@ -13,7 +13,7 @@ export default function FileDetails() {
     const { fileDetails, cpuData, blockData } = useDataContext();
     const [ icon, setIcon ] = useState(<FontAwesomeIcon icon={faLinux}/>);
     const [ textColor, setTextColor ] = useState("");
-    console.log(fileDetails)
+
     
     function returnDistroIcon() { // detect ditro type
         if (fileDetails.kernel.includes("fc")) {
@@ -23,6 +23,7 @@ export default function FileDetails() {
             setTextColor("#CC0000")
             return <FontAwesomeIcon icon={faRedhat}/>
         } else {
+            setTextColor("#CC0000")
             return <FontAwesomeIcon icon={faLinux}/>
         }
     }
@@ -106,7 +107,7 @@ export default function FileDetails() {
                 <Card bordered={false}>
                     <Statistic
                         title="Total Block Devices (including logical)"
-                        value={blockData.uniqDev.length -1}
+                        value={blockData.uniqDev.length}
                         valueStyle={{
                             color: textColor,
                         }}

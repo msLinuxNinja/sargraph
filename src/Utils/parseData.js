@@ -21,10 +21,22 @@ const returnMatch = (re, array) => { // returns new array from matched lines bas
 
 export function parseFileDetails (sarFileData) {
 
+    let kernel = "";
+    let hostname = "";
+    let date = "";
+
     const header = sarFileData[0];
-    const kernel = header[1];
-    const hostname = header[2].replace(/[()]/g, '');
-    const date = header[3]
+    if (header.includes('Linux')) {
+        kernel = header[1];
+        hostname = header[2].replace(/[()]/g, '');
+        date = header[3];
+
+    } else {
+        kernel = "N/A";
+        hostname = "N/A";
+        date = "N/A";
+    }
+    
 
     return {kernel, hostname, date};
 }
