@@ -1,3 +1,4 @@
+import { file } from "@babel/types";
 
 // function to check if a string contains '%usr' to not include it in the array
 const returnDataPortion = (firstIndex, lastIndex, array) => {
@@ -124,17 +125,23 @@ export function parseMemoryData (sarFileData) {
 
     const prasedData = sarFileData.filter(row => { 
         if(row.length === 17 && !isNaN(row[1])) { // Memory section is exactly 17 columns long, checks if the second column is not a number 
-            fileVersion = "rhel8+";
+            
             return true;
         } else if (row.length === 11 && !isNaN(row[1]) ) { // Memory section is exactly 11 columns long for RHEL7, checks if the second column is not a number as the network section is also 11 columns long
-            fileVersion = "rhel7";
+            
             return true
         }
     }); // Note RHEL8+ sar files, memory section is 17 Columns
 
     const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
-    
-    if(fileVersion = "rhel8+") {
+
+    if ( filteredArray[0].length === 17 ) {
+        fileVersion = "rhel8+";
+    } else if ( filteredArray[0].length === 11 ) {
+        fileVersion = "rhel7";
+    }
+
+    if (fileVersion == "rhel8+") {
         filteredArray.forEach(row =>{ //pushes values to the array
 
             xlables.push(row[0]); //time
@@ -149,9 +156,9 @@ export function parseMemoryData (sarFileData) {
            
         });
 
-    } else {
+    } else if (fileVersion == "rhel7" ) {
         filteredArray.forEach(row =>{ //pushes values to the array
-
+            
             xlables.push(row[0]); //time
             ykbmemFree.push(parseInt(row[1] / 1048576)); //Dividing by 1048576 gives number in GB instead of KB
             ykbMemUsed.push(parseInt(row[2] / 1048576));
@@ -163,6 +170,7 @@ export function parseMemoryData (sarFileData) {
             ytotalMemory.push(ykbmemFree[0] + ykbMemUsed[0] + ykbBuffers[0] + ykbCached[0]);
            
         });
+
     }
     
 
