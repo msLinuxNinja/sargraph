@@ -7,15 +7,18 @@ import MemoryChart from "../Components/Organisms/MemoryChart";
 import MemoryPercntChart from "../Components/Organisms/MemoryPercntChart";
 import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
-
+import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
 
 
 
 
 
+
+
 export const HomePage = () => {
-  const { fileDetails, hasData } = useDataContext();
+  const { hasData } = useDataContext();
+  
 
   const tabItems = [
     {
@@ -24,13 +27,6 @@ export const HomePage = () => {
       children: (
         <>
           <HeadingOne heading="CPU" />
-          { hasData ?
-          <div> 
-            <p>Kernel:{fileDetails.kernel}</p> 
-            <p>Hostname:{fileDetails.hostname}</p> 
-            <p>Date:{fileDetails.date}</p>
-          </div> 
-          : null}
           <CpuChart />
         </>
       ),
@@ -65,6 +61,16 @@ export const HomePage = () => {
         </>
       ),
     },
+    {
+      label: "System Details",
+      key: "5",
+      children: (
+        <>
+          <HeadingOne heading="System Details" />
+          <FileDetails />
+        </>
+      ),
+    },
   ];
   
   return (
@@ -72,7 +78,7 @@ export const HomePage = () => {
       <DropBox />
       <ChartContainer>
         <Btn />
-        <Tabs type="card" items={tabItems} />        
+        { hasData ? <Tabs type="card" items={tabItems} /> : null}         
       </ChartContainer>
     </>
   );

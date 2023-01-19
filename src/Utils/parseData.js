@@ -21,10 +21,22 @@ const returnMatch = (re, array) => { // returns new array from matched lines bas
 
 export function parseFileDetails (sarFileData) {
 
+    let kernel = "";
+    let hostname = "";
+    let date = "";
+
     const header = sarFileData[0];
-    const kernel = header[1];
-    const hostname = header[2];
-    const date = header[3]
+    if (header.includes('Linux')) {
+        kernel = header[1];
+        hostname = header[2].replace(/[()]/g, '');
+        date = header[3];
+
+    } else {
+        kernel = "N/A";
+        hostname = "N/A";
+        date = "N/A";
+    }
+    
 
     return {kernel, hostname, date};
 }
@@ -121,7 +133,6 @@ export function parseMemoryData (sarFileData) {
 
     const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
   
-    console.log(prasedData)
     filteredArray.forEach(row =>{ //pushes values to the array
 
         xlables.push(row[0]); //time
