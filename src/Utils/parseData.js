@@ -119,33 +119,52 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
 
 export function parseMemoryData (sarFileData) { 
     const [xlables, ykbmemFree, ykbMemUsed, ymemUsedPrcnt, ykbBuffers, ykbCached, ykbCommit, ycommitPrcnt, ytotalMemory] = [[], [], [], [], [], [], [], [], []] ;
-
+    let fileVersion = "";
 
 
     const prasedData = sarFileData.filter(row => { 
         if(row.length === 17 && !isNaN(row[1])) { // Memory section is exactly 17 columns long, checks if the second column is not a number 
-
+            fileVersion = "rhel8+";
             return true;
         } else if (row.length === 11 && !isNaN(row[1]) ) { // Memory section is exactly 11 columns long for RHEL7, checks if the second column is not a number as the network section is also 11 columns long
+            fileVersion = "rhel7";
             return true
         }
     }); // Note RHEL8+ sar files, memory section is 17 Columns
 
     const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
-  
-    filteredArray.forEach(row =>{ //pushes values to the array
+    
+    if(fileVersion = "rhel8+") {
+        filteredArray.forEach(row =>{ //pushes values to the array
 
-        xlables.push(row[0]); //time
-        ykbmemFree.push(parseInt(row[1] / 1048576)); //Dividing by 1048576 gives number in GB instead of KB
-        ykbMemUsed.push(parseInt(row[2] / 1048576));
-        ymemUsedPrcnt.push(parseInt(row[3]));
-        ykbBuffers.push(parseInt(row[4] / 1048576));
-        ykbCached.push(parseInt(row[5] / 1048576));
-        ykbCommit.push(parseInt(row[6] / 1048576));
-        ycommitPrcnt.push(parseInt(row[7]));
-        ytotalMemory.push(ykbmemFree[0] + ykbMemUsed[0] + ykbBuffers[0] + ykbCached[0]);
-       
-    });
+            xlables.push(row[0]); //time
+            ykbmemFree.push(parseInt(row[1] / 1048576)); //Dividing by 1048576 gives number in GB instead of KB
+            ykbMemUsed.push(parseInt(row[3] / 1048576));
+            ymemUsedPrcnt.push(parseInt(row[4]));
+            ykbBuffers.push(parseInt(row[5] / 1048576));
+            ykbCached.push(parseInt(row[6] / 1048576));
+            ykbCommit.push(parseInt(row[7] / 1048576));
+            ycommitPrcnt.push(parseInt(row[8]));
+            ytotalMemory.push(ykbmemFree[0] + ykbMemUsed[0] + ykbBuffers[0] + ykbCached[0]);
+           
+        });
+
+    } else {
+        filteredArray.forEach(row =>{ //pushes values to the array
+
+            xlables.push(row[0]); //time
+            ykbmemFree.push(parseInt(row[1] / 1048576)); //Dividing by 1048576 gives number in GB instead of KB
+            ykbMemUsed.push(parseInt(row[2] / 1048576));
+            ymemUsedPrcnt.push(parseInt(row[3]));
+            ykbBuffers.push(parseInt(row[4] / 1048576));
+            ykbCached.push(parseInt(row[5] / 1048576));
+            ykbCommit.push(parseInt(row[6] / 1048576));
+            ycommitPrcnt.push(parseInt(row[7]));
+            ytotalMemory.push(ykbmemFree[0] + ykbMemUsed[0] + ykbBuffers[0] + ykbCached[0]);
+           
+        });
+    }
+    
 
     
 
