@@ -1,7 +1,6 @@
-import { file } from "@babel/types";
-
 // function to check if a string contains '%usr' to not include it in the array
 const returnDataPortion = (firstIndex, lastIndex, array) => {
+    // console.log(`First: ${firstIndex}, Last: ${lastIndex}`)
     const resultingArray = array.slice(firstIndex, lastIndex);
     return resultingArray;
 }
@@ -190,17 +189,51 @@ export function parseDiskIO (sarFileData) {
     const yawaitMS = [];
     const blockDevices = [];
     const uniqDev = [];
+    const matchedData = [];
+    const parsedData = [];
 
+    const rowIncludesDev = sarFileData.map((row, index) => row.includes('DEV') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
+    const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance 
 
+    const rowIncludesAvg = sarFileData.map((row, index) => row.includes('Average:') ? index: null ).filter(index => typeof index === 'number');
+    // console.log(rowIncludesAvg)
+    const tempLastIndex = rowIncludesAvg.filter(number => number > rowIncludesDev[0]); // Last index from the array
+    // console.log(tempLastIndex)
+    const lastIndex = tempLastIndex[0] -1;
+ 
+    
+    const diskData = returnDataPortion(firstIndex, lastIndex, sarFileData);
 
-    const prasedData = sarFileData.filter(row => {
-        if(row.length === 10 && isNaN(row[1]) && !row.includes('pgpgin/s')) {
-            return true;
+    
+    diskData.forEach(row => { // Obtain list of unique block devices to later use as an iterator and perform Regex
+        const block = row[1];
+
+        if (!uniqDev.includes(block)) {
+            console.log(block)
+            uniqDev.push(block);            
         }
     });
 
 
-    const filteredArray = prasedData.filter(row => !row.includes('DEV') && !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
+    // const prasedData = sarFileData.filter(row => {
+    //     if(row.length === 10 && isNaN(row[1]) && !row.includes('pgpgin/s')) {
+    //         return true;
+    //     }
+    // });
+
+    uniqDev.forEach(block => {
+        matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
+    });
+
+    matchedData.forEach(array => {
+        array.forEach(entry => {
+            parsedData.push(entry);
+        });
+    });
+
+
+
+    const filteredArray = parsedData.filter(row => !row.includes('DEV') && !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
 
     filteredArray.forEach(row =>{ //pushes values to the array
         const blockDev = row[1];
@@ -213,11 +246,12 @@ export function parseDiskIO (sarFileData) {
         yawaitMS.push(parseFloat(row[7]));
         blockDevices.push(blockDev); // Update found block devices
         
-        if (!uniqDev.includes(blockDev)) {
-            uniqDev.push(blockDev);
-        }
-             
+        // if (!uniqDev.includes(blockDev)) {
+        //     uniqDev.push(blockDev);
+        // }
+    
     });
+
 
 
     return {xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, uniqDev, blockDevices}; //export object with arrays
