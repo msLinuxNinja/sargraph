@@ -100,12 +100,6 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
         ycpuIdle.push(cpuIdle);
     });
 
-    // const occurences = cpuNumber.reduce((acc, curr) => { // counts occurrence of CPUs
-    //     return acc[curr] ? ++acc[curr] : acc[curr] =1, acc
-    // }, {});
-  
-    // console.log(occurences)
-
 
     return {xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU};
 }
@@ -189,7 +183,7 @@ export function parseDiskIO (sarFileData) {
     const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance 
 
     const rowIncludesAvg = sarFileData.map((row, index) => row.includes('Average:') ? index: null ).filter(index => typeof index === 'number');
-    
+
     const tempLastIndex = rowIncludesAvg.filter(number => number > rowIncludesDev[0]); // Last index from the array
 
     const lastIndex = tempLastIndex[0] -1;
