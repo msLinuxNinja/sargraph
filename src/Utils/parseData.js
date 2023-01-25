@@ -7,16 +7,9 @@ const returnDataPortion = (firstIndex, lastIndex, array) => {
 
 
 const returnMatch = (re, array) => { // returns new array from matched lines based on regex defined when calling the function
-    const match = [];
     const regex = new RegExp(re);
 
-    array.forEach(element => {
-        if(element[1].match(regex)) {
-            match.push(element);
-        }
-    });
-
-    return match;
+    return array.filter(element => element[1].match(regex));
 }
 
 export function parseFileDetails (sarFileData) {
@@ -196,9 +189,9 @@ export function parseDiskIO (sarFileData) {
     const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance 
 
     const rowIncludesAvg = sarFileData.map((row, index) => row.includes('Average:') ? index: null ).filter(index => typeof index === 'number');
-    // console.log(rowIncludesAvg)
+    
     const tempLastIndex = rowIncludesAvg.filter(number => number > rowIncludesDev[0]); // Last index from the array
-    // console.log(tempLastIndex)
+
     const lastIndex = tempLastIndex[0] -1;
  
     
@@ -214,12 +207,6 @@ export function parseDiskIO (sarFileData) {
         }
     });
 
-
-    // const prasedData = sarFileData.filter(row => {
-    //     if(row.length === 10 && isNaN(row[1]) && !row.includes('pgpgin/s')) {
-    //         return true;
-    //     }
-    // });
 
     uniqDev.forEach(block => {
         matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
@@ -245,10 +232,6 @@ export function parseDiskIO (sarFileData) {
         yavgQz.push(parseInt(row[6]));
         yawaitMS.push(parseFloat(row[7]));
         blockDevices.push(blockDev); // Update found block devices
-        
-        // if (!uniqDev.includes(blockDev)) {
-        //     uniqDev.push(blockDev);
-        // }
     
     });
 
