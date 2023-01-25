@@ -9,6 +9,7 @@ import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
+import { useEffect } from "react";
 
 
 
@@ -17,7 +18,7 @@ import { useDataContext } from "../Components/Contexts/DataContext";
 
 
 export const HomePage = () => {
-  const { hasData } = useDataContext();
+  const { hasData, fileDetails } = useDataContext();
   
 
   const tabItems = [
@@ -72,7 +73,11 @@ export const HomePage = () => {
       ),
     },
   ];
-  
+  useEffect(() =>{
+    {hasData ? document.title = `${fileDetails.date}|${fileDetails.fileName}` : document.title = "SarGRAPH"}
+  }, [fileDetails]);
+
+
   return (
     <>
       <DropBox />
