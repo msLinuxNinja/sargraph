@@ -201,7 +201,6 @@ export default function CpuChart() {
           },
           responsive: true,
           min: 0,
-          max: 100,
         },
 
         x: {
