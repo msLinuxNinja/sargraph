@@ -167,7 +167,7 @@ export function parseMemoryData (sarFileData) {
 }
 
 export function parseDiskIO (sarFileData) { 
-    const [xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, blockDevices, uniqDev, matchedData,parsedData] = [[], [], [], [], [], [], [], [], []];
+    const [xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, blockDevices, uniqDev, matchedData, parsedData] = [[], [], [], [], [], [], [], [], [], [], [] ];
 
     const rowIncludesDev = sarFileData.map((row, index) => row.includes('DEV') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
     const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance 
