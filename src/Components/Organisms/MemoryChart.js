@@ -1,4 +1,4 @@
-import { useContext, useMemo } from "react";
+import { useMemo } from "react";
 import LineChart from "../Molecules/LineChart";
 import { useDataContext } from "../Contexts/DataContext";
 

@@ -1,4 +1,4 @@
-// function to check if a string contains '%usr' to not include it in the array
+
 const returnDataPortion = (firstIndex, lastIndex, array) => {
     // console.log(`First: ${firstIndex}, Last: ${lastIndex}`)
     const resultingArray = array.slice(firstIndex, lastIndex);
@@ -167,17 +167,7 @@ export function parseMemoryData (sarFileData) {
 }
 
 export function parseDiskIO (sarFileData) { 
-    const xlables = [];
-    const ytps = [];
-    const yreadSec = [];
-    const ywriteSec = [];
-    const yavgRQz = [];
-    const yavgQz = [];
-    const yawaitMS = [];
-    const blockDevices = [];
-    const uniqDev = [];
-    const matchedData = [];
-    const parsedData = [];
+    const [xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, blockDevices, uniqDev, matchedData,parsedData] = [[], [], [], [], [], [], [], [], []];
 
     const rowIncludesDev = sarFileData.map((row, index) => row.includes('DEV') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
     const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance 
@@ -196,7 +186,6 @@ export function parseDiskIO (sarFileData) {
         const block = row[1];
 
         if (!uniqDev.includes(block)) {
-            console.log(block)
             uniqDev.push(block);            
         }
     });
