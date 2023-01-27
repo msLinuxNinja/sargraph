@@ -1,12 +1,20 @@
 import "./Components/Styles/styles.css";
 import { DataContextProvider } from "./Components/Contexts/DataContext";
+import { ConfigProvider, theme, Switch } from "antd";
 
 import { HomePage } from "./pages";
 
 export default function App() {
+
   return (
     <DataContextProvider>
-      <HomePage />
+      <ConfigProvider
+      theme={{
+        algorithm: theme.darkAlgorithm
+      }}
+      >
+        <HomePage />
+      </ConfigProvider>
     </DataContextProvider>
   );
 }
