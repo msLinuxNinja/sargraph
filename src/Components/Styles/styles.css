@@ -1,8 +1,5 @@
-@import 'antd/dist/antd.dark.css';
-
 html {
     box-sizing: border-box;
-    background-color: rgba(17, 17, 17, 0.836);
 }
 *,
 *::before,
@@ -12,18 +9,14 @@ html {
 
 html {
     background-color: rgb(66, 66, 66);
-    color: white;
-}
 
-body {
-  background-color: rgb(66, 66, 66);
 }
 
 a {
   padding: 10px;
 }
 .chart-container {
-    margin: auto;
+    /* margin: auto; */
     width: 80vw;
     height: 50vh;
 }

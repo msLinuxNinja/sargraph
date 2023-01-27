@@ -34,7 +34,7 @@ export default function FileDetails() {
     }, [])
     return (
         <>
-        <Row gutter={24}>
+        <Row gutter={[16, 24]}>
             <Col span={12}>
                 <Card bordered={false}>
                     <Statistic
@@ -61,36 +61,6 @@ export default function FileDetails() {
                     />
                 </Card>
             </Col>
-        </Row>
-        <Row gutter={24}>
-            <Col span={12}>
-                <Card bordered={false}>
-                    <Statistic
-                        title="File Date"
-                        value={fileDetails.date}
-                        valueStyle={{
-                            color: '#3f8600',
-                        }}
-                        prefix={<FontAwesomeIcon icon={faCalendarDay} />}
-                    />
-                </Card>
-            </Col>
-            <Col span={12}>
-                <Card bordered={false}>
-                    <Statistic
-                        title="Total CPUs"
-                        value={cpuData.uniqCPU.length -1}
-                        valueStyle={{
-                            color: textColor,
-                        }}
-                        prefix={<FontAwesomeIcon icon={faMicrochip} />}
-
-                    />
-                </Card>
-            </Col>
-        </Row>
-        
-        <Row gutter={24}>
             <Col span={12}>
                 <Card bordered={false}>
                     <Statistic
@@ -112,6 +82,31 @@ export default function FileDetails() {
                             color: textColor,
                         }}
                         prefix={<FontAwesomeIcon icon={faHardDrive} />}
+
+                    />
+                </Card>
+            </Col>
+            <Col span={12}>
+                <Card bordered={false}>
+                    <Statistic
+                        title="File Date"
+                        value={fileDetails.date}
+                        valueStyle={{
+                            color: '#3f8600',
+                        }}
+                        prefix={<FontAwesomeIcon icon={faCalendarDay} />}
+                    />
+                </Card>
+            </Col>
+            <Col span={12}>
+                <Card bordered={false}>
+                    <Statistic
+                        title="Total CPUs"
+                        value={cpuData.uniqCPU.length -1}
+                        valueStyle={{
+                            color: textColor,
+                        }}
+                        prefix={<FontAwesomeIcon icon={faMicrochip} />}
 
                     />
                 </Card>
