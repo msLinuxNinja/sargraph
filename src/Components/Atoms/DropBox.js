@@ -10,9 +10,6 @@ const { Dragger } = Upload;
 
 export function DropBox() {
 
-  
-  // Dropbox component
-
   const { setCpuData, setMemoryData, setBlockData, hasData, setFileDetails } = useDataContext();
 
   const props = { // props for antd upload component

@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef } from "react";
 
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
@@ -201,7 +201,6 @@ export default function CpuChart() {
           },
           responsive: true,
           min: 0,
-          max: 100,
         },
 
         x: {
