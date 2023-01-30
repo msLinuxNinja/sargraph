@@ -184,7 +184,7 @@ export default function BlockIOChart(props) {
 
   const chartData = useMemo(() => {
     if (blockData) {
-      setSelectedBlock("dev8-0") //sets default on first render
+      setSelectedBlock(blockData.uniqDev[0]) //sets default on first render
       return createChartData();
     }
   }, [blockData]);
@@ -207,7 +207,7 @@ export default function BlockIOChart(props) {
     <>
       {blockData ? <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} /> : null}
       {blockData ? (
-        <ItemList items={blockData.uniqDev} placeHolderText="Select Block Device (Selected Dev8-0)" setValue={setSelectedBlock}/>
+        <ItemList items={blockData.uniqDev.sort()} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
       ) : null}
     </>
   );
