@@ -23,6 +23,7 @@ export default function ItemList(props) {
       style={{
         width: 400,
       }}
+      showSearch={props.showSearch}
     />
   );
 }
