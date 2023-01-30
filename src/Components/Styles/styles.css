@@ -7,71 +7,26 @@ html {
   box-sizing: inherit;
 }
 
-html {
+/* html {
     background-color: rgb(66, 66, 66);
 
-}
+} */
 
 a {
   padding: 10px;
 }
-.chart-container {
-    /* margin: auto; */
-    width: 80vw;
-    height: 50vh;
-}
-
-.charts {
-    position: relative;
-    /* margin: auto; */
-    padding: 10px;
-
-}
 
 .centered {
-  /* top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  position: fixed;
-  margin: auto; */
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
 
-.antd-dropzone {
-  flex-grow: 1;
-  height: 100vh;
-}
-
-.drop_zone:hover {
-    background-color: rgba(175, 218, 255, 0.2);
-    color: white;
-    border: 4px dotted rgba(255, 163, 163, 0.32);
-    -webkit-transition: background-color 500ms linear;
-    -ms-transition: background-color 500ms linear;
-    transition: background-color 500ms linear;
-
-}
 
 .hidden {
   display: none !important;
 
-}
-
-
-.dragging {
-    border: 4px dashed rgb(255, 128, 128) !important;
-    background-color: rgb(49, 49, 49) !important;
-    color: white !important;
-    -webkit-transition: background-color 1000ms linear;
-    -ms-transition: background-color 1000ms linear;
-    transition: background-color 1000ms linear;
-}
-
-.darker {
-    background-color: black !important;
 }
 
 #refresh-btn {    

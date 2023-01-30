@@ -9,13 +9,14 @@ export default function ChartContainer({ children }) {
 
   return (
     <div
-      className="chart-container"
       id="chart-container"
       style={{
         width: "80vw",
+        height: "94vh",
         textAlign: "center",
-        margin: "auto",
+        // margin: "auto",
         display: getStyle(),
+        position: 'fixed'
       }}
     >
       {children}
