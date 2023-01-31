@@ -28,7 +28,8 @@ ChartJS.register(
 
 
 export default function CpuChart() {
-  const { cpuData, selectedCPU, setSelectedCPU } = useDataContext();
+  const t0 = Date.now();
+  const { cpuData, selectedCPU, setSelectedCPU, setLoadTime, setIsLoading } = useDataContext();
   const chartRef = useRef();
 
 
@@ -235,6 +236,11 @@ export default function CpuChart() {
     }
   }, [selectedCPU]);
 
+  useEffect(() => {
+    const t1 = Date.now();
+    setLoadTime(t1 - t0);
+    setIsLoading(false);
+  }, [])
 
 
   return (

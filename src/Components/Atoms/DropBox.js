@@ -4,13 +4,15 @@ import { useDataContext } from "../Contexts/DataContext";
 
 import { InboxOutlined } from '@ant-design/icons';
 import { Upload } from 'antd';
+import { useEffect } from "react";
+
 
 
 const { Dragger } = Upload;
 
 export function DropBox() {
-
-  const { setCpuData, setMemoryData, setBlockData, hasData, setFileDetails } = useDataContext();
+  const { setCpuData, setMemoryData, setBlockData, hasData, setFileDetails, setDataLoaded, dataLoaded } = useDataContext();
+  
 
   const props = { // props for antd upload component
     multiple: false,
@@ -19,6 +21,8 @@ export function DropBox() {
   }
 
   async function handleCustomRequest({onError, onSuccess, file}) {
+    const t0 = Date.now();
+    
     if(file) {
       
       const fileContent = await readFile(file);
@@ -35,17 +39,16 @@ export function DropBox() {
           fileName: file.name,
         }
       });
-      onSuccess()
+      onSuccess(setDataLoaded(true))
+      const t1 = Date.now();
+      console.log(t1 - t0)
     }
   }
 
 
-  function getStyles() {
-    return hasData ? "hidden" : "centered";
-  }
 
   return (
-    <div className={getStyles()}>
+    <div className="centered">
       <Dragger {...props}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />

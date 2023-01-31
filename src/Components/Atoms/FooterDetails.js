@@ -6,15 +6,13 @@ import { useDataContext } from "../Contexts/DataContext";
 
 export default function FooterDetails() {
 
-    const { fileDetails, hasData } = useDataContext();
+    const { fileDetails, hasData, loadTime, isLoading, dataLoaded } = useDataContext();
     const [ footer, setFooter ] = useState("SarGRAP")
 
     useEffect(() => {
-        if(hasData) {
-            setFooter(`SarGRAPH ${fileDetails.date} | ${fileDetails.fileName}`)
-        }
+        setFooter(`SarGRAPH | Component load time ${loadTime}ms | Is it loading? ${isLoading} | Is dataLoaded? ${dataLoaded}`)
         
-    }, [hasData])
+    }, [loadTime])
 
 
     return (
