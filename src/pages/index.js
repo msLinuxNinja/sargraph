@@ -85,6 +85,12 @@ export const HomePage = () => {
     flexDirection: 'column',
     backgroundColor: 'rgb(66, 66, 66)',
     height: '100vh',
+  };
+
+  const footerStyle = {
+    display: 'flex',
+    justifyContent: 'left',
+    alignItems: 'center'
   }
   return (
     <Space
@@ -113,7 +119,7 @@ export const HomePage = () => {
             
           </ChartContainer>           
         </Content>
-        <Footer>
+        <Footer style={footerStyle}>
           <FooterDetails />
         </Footer>
         
