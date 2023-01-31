@@ -1,6 +1,6 @@
 import "./Components/Styles/styles.css";
 import { DataContextProvider } from "./Components/Contexts/DataContext";
-import { ConfigProvider, theme, Switch } from "antd";
+import { ConfigProvider, theme } from "antd";
 
 import { HomePage } from "./pages";
 
