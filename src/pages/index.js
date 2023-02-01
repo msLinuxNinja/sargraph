@@ -9,12 +9,10 @@ import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
 import FooterDetails from "../Components/Atoms/FooterDetails";
 import LoadingSpin from "../Components/Atoms/LoadingSpin";
-
-
-
 const { Header, Footer, Content } = Layout;
 
 
@@ -94,7 +92,6 @@ export const HomePage = () => {
     alignItems: 'center'
   }
 
-
   return (
     <Space
     direction="vertical"
@@ -109,6 +106,7 @@ export const HomePage = () => {
         height: '100vh'
       }}
       >
+
         <Header />
         <Content style={contentStyle}>
           
@@ -121,6 +119,7 @@ export const HomePage = () => {
             
           </ChartContainer> }
              
+
         </Content>
         <Footer style={footerStyle}>
           <FooterDetails />

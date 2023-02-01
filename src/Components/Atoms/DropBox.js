@@ -42,7 +42,6 @@ export function DropBox() {
   }
 
 
-
   return (
     <div className="centered">
       <Dragger {...props}>

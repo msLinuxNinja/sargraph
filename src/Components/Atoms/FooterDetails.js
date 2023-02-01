@@ -16,9 +16,6 @@ export default function FooterDetails() {
         
     }, [hasData])
 
-
-
-
     return (
         <>
             <FontAwesomeIcon icon={faGithub} />
