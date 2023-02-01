@@ -31,7 +31,7 @@ export default function CpuChart() {
   const t0 = Date.now();
   const { cpuData, selectedCPU, setSelectedCPU, setLoadTime, setIsLoading } = useDataContext();
   const chartRef = useRef();
-
+  let aniValue = true;
 
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
@@ -190,6 +190,9 @@ export default function CpuChart() {
   }
 
   function createChartOptions() {
+    if (cpuData.xlables.length > 6000) {
+      aniValue = false;
+    }
     return {
       scales: {
         y: {
@@ -214,6 +217,7 @@ export default function CpuChart() {
           }
         },
       },
+      animation: aniValue
     };
   }
 
@@ -237,18 +241,16 @@ export default function CpuChart() {
   }, [selectedCPU]);
 
   useEffect(() => {
+    
     const t1 = Date.now();
     setLoadTime(t1 - t0);
     setIsLoading(false);
   }, [])
 
-
   return (
     <>
-      {cpuData ? <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  /> : null}
-      {cpuData ? (
-        <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU}/>
-      ) : null}
+      <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  />
+      <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU}/>
     </>
   );
 }

@@ -4,14 +4,12 @@ import { useDataContext } from "../Contexts/DataContext";
 
 import { InboxOutlined } from '@ant-design/icons';
 import { Upload } from 'antd';
-import { useEffect } from "react";
-
 
 
 const { Dragger } = Upload;
 
 export function DropBox() {
-  const { setCpuData, setMemoryData, setBlockData, hasData, setFileDetails, setDataLoaded, dataLoaded } = useDataContext();
+  const { setCpuData, setMemoryData, setBlockData, hasData, setFileDetails, setDataLoaded } = useDataContext();
   
 
   const props = { // props for antd upload component
@@ -21,13 +19,11 @@ export function DropBox() {
   }
 
   async function handleCustomRequest({onError, onSuccess, file}) {
-    const t0 = Date.now();
+    
     
     if(file) {
-      
       const fileContent = await readFile(file);
       const dataObj = callParse(fileContent); // Object containing more objects (inception! 🤯)
-
       // Save data in context
       setCpuData(dataObj.cpuObject);
       setMemoryData(dataObj.memoryObject);
@@ -40,8 +36,7 @@ export function DropBox() {
         }
       });
       onSuccess(setDataLoaded(true))
-      const t1 = Date.now();
-      console.log(t1 - t0)
+
     }
   }
 

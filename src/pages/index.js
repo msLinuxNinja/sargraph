@@ -113,15 +113,13 @@ export const HomePage = () => {
         <Content style={contentStyle}>
           
           {!dataLoaded && <DropBox />}
-          {isLoading && dataLoaded  && <LoadingSpin />}
-          <ChartContainer>
-            { hasData &&
-            <>
+          {isLoading && dataLoaded && <LoadingSpin />}
+          { hasData && <ChartContainer>
+            
             <Btn />
             <Tabs type="card" items={tabItems} /> 
-            </>}
             
-          </ChartContainer>
+          </ChartContainer> }
              
         </Content>
         <Footer style={footerStyle}>
