@@ -9,8 +9,8 @@ import { Upload } from 'antd';
 const { Dragger } = Upload;
 
 export function DropBox() {
-
-  const { setCpuData, setMemoryData, setBlockData, hasData, setFileDetails } = useDataContext();
+  const { setCpuData, setMemoryData, setBlockData, setFileDetails, setDataLoaded } = useDataContext();
+  
 
   const props = { // props for antd upload component
     multiple: false,
@@ -19,11 +19,12 @@ export function DropBox() {
   }
 
   async function handleCustomRequest({onError, onSuccess, file}) {
+    
+    
     if(file) {
-      
+      setDataLoaded(true)
       const fileContent = await readFile(file);
       const dataObj = callParse(fileContent); // Object containing more objects (inception! 🤯)
-
       // Save data in context
       setCpuData(dataObj.cpuObject);
       setMemoryData(dataObj.memoryObject);
@@ -36,16 +37,13 @@ export function DropBox() {
         }
       });
       onSuccess()
+
     }
   }
 
 
-  function getStyles() {
-    return hasData ? "hidden" : "centered";
-  }
-
   return (
-    <div className={getStyles()}>
+    <div className="centered">
       <Dragger {...props}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />

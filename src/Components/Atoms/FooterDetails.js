@@ -7,15 +7,14 @@ import { useDataContext } from "../Contexts/DataContext";
 export default function FooterDetails() {
 
     const { fileDetails, hasData } = useDataContext();
-    const [ footer, setFooter ] = useState("SarGRAP")
+    const [ footer, setFooter ] = useState("SarGRAPH")
 
     useEffect(() => {
         if(hasData) {
-            setFooter(`SarGRAPH ${fileDetails.date} | ${fileDetails.fileName}`)
+            setFooter(`SarGRAPH | ${fileDetails.date} | ${fileDetails.fileName}`)
         }
         
     }, [hasData])
-
 
     return (
         <>

@@ -28,9 +28,9 @@ ChartJS.register(
 
 
 export default function CpuChart() {
-  const { cpuData, selectedCPU, setSelectedCPU } = useDataContext();
+  const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } = useDataContext();
   const chartRef = useRef();
-
+  let perfOptions = true;
 
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
@@ -189,6 +189,9 @@ export default function CpuChart() {
   }
 
   function createChartOptions() {
+    if (cpuData.xlables.length > 6000) {
+      perfOptions = false;
+    }
     return {
       scales: {
         y: {
@@ -198,6 +201,7 @@ export default function CpuChart() {
               return value + "%";
             },
             color: "rgba(180, 180, 180, 1)",
+            
           },
           responsive: true,
           min: 0,
@@ -213,11 +217,14 @@ export default function CpuChart() {
           }
         },
       },
+      animation: perfOptions,
+      normalized: true,
     };
   }
 
   const chartData = useMemo(() => {
     if (cpuData) {
+      setIsLoading(true);
       setSelectedCPU("all") //sets default on first render
       return createChartData();
     }
@@ -236,13 +243,14 @@ export default function CpuChart() {
   }, [selectedCPU]);
 
 
+  useEffect(() => {
+    setIsLoading(false);
+  }, [])
 
   return (
     <>
-      {cpuData ? <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  /> : null}
-      {cpuData ? (
-        <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU}/>
-      ) : null}
+      <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  />
+      <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU}/>
     </>
   );
 }

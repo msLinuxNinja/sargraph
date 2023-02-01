@@ -14,6 +14,11 @@ const DataContext = createContext({
   hasData: false,
   fileDetails: undefined,
   setFileDetails: () => {},
+  isLoading: true,
+  setIsLoading: () => {},
+  dataLoaded: false,
+  setDataLoaded: () => {},
+
 });
 
 export const DataContextProvider = ({ children }) => {
@@ -23,8 +28,10 @@ export const DataContextProvider = ({ children }) => {
   const [selectedCPU, setSelectedCPU] = useState();
   const [selectedBlock, setSelectedBlock] = useState();
   const [fileDetails, setFileDetails] = useState(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  const hasData = cpuData || memoryData || blockData;
+  const hasData = cpuData || memoryData || blockData ;
 
   const contextValue = {
     cpuData,
@@ -39,7 +46,11 @@ export const DataContextProvider = ({ children }) => {
     setSelectedBlock,
     hasData,
     fileDetails,
-    setFileDetails
+    setFileDetails,
+    isLoading,
+    setIsLoading,
+    dataLoaded,
+    setDataLoaded
   };
 
   return (
