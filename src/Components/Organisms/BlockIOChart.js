@@ -155,9 +155,10 @@ export default function BlockIOChart(props) {
   }
 
   function createChartOptions() {
-    if (blockData.xlables.length > 6000) {
+    if (blockData.xlables.length > 1800) {
       perfOptions = false;
     }
+    console.log(blockData.xlables.length)
     return {
       scales: {
         y: {
@@ -182,9 +183,9 @@ export default function BlockIOChart(props) {
             color: "rgba(0, 0, 0, 0.05)",
           }
         },
-        animation: perfOptions,
-        normalized: perfOptions,
       },
+      animation: perfOptions,
+      normalized: true,
     };
   }
 

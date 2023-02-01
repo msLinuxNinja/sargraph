@@ -218,7 +218,7 @@ export default function CpuChart() {
         },
       },
       animation: perfOptions,
-      normalized: perfOptions,
+      normalized: true,
     };
   }
 
