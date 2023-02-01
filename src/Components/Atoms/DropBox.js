@@ -41,7 +41,7 @@ export function DropBox() {
 
 
   function getStyles() {
-    return hasData ? "hidden" : "centered antd-dropzone";
+    return hasData ? "hidden" : "centered";
   }
 
   return (

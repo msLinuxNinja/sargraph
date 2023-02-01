@@ -1,7 +1,7 @@
 import { DropBox } from "../Components/Atoms/DropBox";
 import ChartContainer from "../Components/Molecules/ChartContainer";
 import Btn from "../Components/Atoms/Btn";
-import { Tabs } from "antd";
+import { Tabs, Layout, Space } from "antd";
 import HeadingOne from "../Components/Atoms/HeadingOne";
 import MemoryChart from "../Components/Organisms/MemoryChart";
 import MemoryPercntChart from "../Components/Organisms/MemoryPercntChart";
@@ -10,10 +10,10 @@ import CpuChart from "../Components/Organisms/CpuChart";
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
 import { useEffect } from "react";
+import FooterDetails from "../Components/Atoms/FooterDetails";
 
 
-
-
+const { Header, Footer, Content } = Layout;
 
 
 
@@ -77,14 +77,53 @@ export const HomePage = () => {
     {hasData ? document.title = `${fileDetails.date}|${fileDetails.fileName}` : document.title = "SarGRAPH"}
   }, [fileDetails]);
 
+  const contentStyle = {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    backgroundColor: 'rgb(66, 66, 66)',
+    height: '100vh',
+  };
 
+  const footerStyle = {
+    display: 'flex',
+    justifyContent: 'left',
+    alignItems: 'center'
+  }
   return (
-    <>
-      <DropBox />
-      <ChartContainer>
-        <Btn />
-        { hasData ? <Tabs type="card" items={tabItems} /> : null}         
-      </ChartContainer>
-    </>
+    <Space
+    direction="vertical"
+    style={{
+      width: '100vw',
+      height: '100vh',      
+    }}
+    size={[0, 48]}
+    >
+      <Layout
+      style={{
+        height: '100vh'
+      }}
+      >
+        <Header></Header>
+        <Content style={contentStyle}>
+          
+          <DropBox />
+          <ChartContainer>
+            { hasData ?
+            <>
+            <Btn />
+            <Tabs type="card" items={tabItems} /> 
+            </> : null}
+            
+          </ChartContainer>           
+        </Content>
+        <Footer style={footerStyle}>
+          <FooterDetails />
+        </Footer>
+        
+      </Layout>
+    </Space>
   );
 };

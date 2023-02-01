@@ -28,7 +28,7 @@ export default function FileDetails() {
         }
     }
     
-    useEffect(() =>{
+    useEffect(() => {
         setIcon(returnDistroIcon());
 
     }, [])
