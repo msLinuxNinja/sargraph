@@ -9,7 +9,7 @@ import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import FooterDetails from "../Components/Atoms/FooterDetails";
 import LoadingSpin from "../Components/Atoms/LoadingSpin";
 
@@ -21,6 +21,7 @@ const { Header, Footer, Content } = Layout;
 
 export const HomePage = () => {
   const { hasData, fileDetails, isLoading, dataLoaded } = useDataContext();
+  const [ show, setShow ] = useState(true);
   
 
   const tabItems = [
@@ -95,6 +96,10 @@ export const HomePage = () => {
     alignItems: 'center'
   }
 
+  useEffect(() => {
+    setShow(prev => !prev);
+  }, [dataLoaded])
+
   return (
     <Space
     direction="vertical"
@@ -112,7 +117,7 @@ export const HomePage = () => {
         <Header />
         <Content style={contentStyle}>
           
-          {!dataLoaded && <DropBox />}
+          {show && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}
           { hasData && <ChartContainer>
             

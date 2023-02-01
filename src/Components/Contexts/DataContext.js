@@ -14,8 +14,6 @@ const DataContext = createContext({
   hasData: false,
   fileDetails: undefined,
   setFileDetails: () => {},
-  loadTime: undefined,
-  setLoadTime: () => {},
   isLoading: true,
   setIsLoading: () => {},
   dataLoaded: false,
@@ -30,7 +28,6 @@ export const DataContextProvider = ({ children }) => {
   const [selectedCPU, setSelectedCPU] = useState();
   const [selectedBlock, setSelectedBlock] = useState();
   const [fileDetails, setFileDetails] = useState(undefined);
-  const [loadTime, setLoadTime] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -50,8 +47,6 @@ export const DataContextProvider = ({ children }) => {
     hasData,
     fileDetails,
     setFileDetails,
-    loadTime,
-    setLoadTime,
     isLoading,
     setIsLoading,
     dataLoaded,

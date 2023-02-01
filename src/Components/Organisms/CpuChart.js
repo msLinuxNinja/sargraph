@@ -28,8 +28,7 @@ ChartJS.register(
 
 
 export default function CpuChart() {
-  const t0 = Date.now();
-  const { cpuData, selectedCPU, setSelectedCPU, setLoadTime, setIsLoading } = useDataContext();
+  const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } = useDataContext();
   const chartRef = useRef();
   let aniValue = true;
 
@@ -223,6 +222,7 @@ export default function CpuChart() {
 
   const chartData = useMemo(() => {
     if (cpuData) {
+      setIsLoading(true);
       setSelectedCPU("all") //sets default on first render
       return createChartData();
     }
@@ -240,10 +240,8 @@ export default function CpuChart() {
     }
   }, [selectedCPU]);
 
+
   useEffect(() => {
-    
-    const t1 = Date.now();
-    setLoadTime(t1 - t0);
     setIsLoading(false);
   }, [])
 
