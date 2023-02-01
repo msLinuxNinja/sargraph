@@ -20,9 +20,7 @@ const { Header, Footer, Content } = Layout;
 
 
 export const HomePage = () => {
-  const { hasData, fileDetails, isLoading, dataLoaded } = useDataContext();
-  const [ show, setShow ] = useState(true);
-  
+  const { hasData, fileDetails, isLoading, dataLoaded } = useDataContext();  
 
   const tabItems = [
     {
@@ -96,9 +94,6 @@ export const HomePage = () => {
     alignItems: 'center'
   }
 
-  useEffect(() => {
-    setShow(prev => !prev);
-  }, [dataLoaded])
 
   return (
     <Space
@@ -117,7 +112,7 @@ export const HomePage = () => {
         <Header />
         <Content style={contentStyle}>
           
-          {show && <DropBox />}
+          {!dataLoaded && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}
           { hasData && <ChartContainer>
             
