@@ -30,7 +30,7 @@ ChartJS.register(
 export default function CpuChart() {
   const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } = useDataContext();
   const chartRef = useRef();
-  let aniValue = true;
+  let perfOptions = true;
 
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
@@ -190,7 +190,7 @@ export default function CpuChart() {
 
   function createChartOptions() {
     if (cpuData.xlables.length > 6000) {
-      aniValue = false;
+      perfOptions = false;
     }
     return {
       scales: {
@@ -201,6 +201,7 @@ export default function CpuChart() {
               return value + "%";
             },
             color: "rgba(180, 180, 180, 1)",
+            
           },
           responsive: true,
           min: 0,
@@ -216,7 +217,8 @@ export default function CpuChart() {
           }
         },
       },
-      animation: aniValue
+      animation: perfOptions,
+      normalized: perfOptions,
     };
   }
 

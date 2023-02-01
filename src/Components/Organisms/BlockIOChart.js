@@ -28,6 +28,7 @@ ChartJS.register(
 export default function BlockIOChart(props) {
   const { blockData, selectedBlock, setSelectedBlock } = useDataContext();
   const chartRef = useRef();
+  let perfOptions = true;
 
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
@@ -154,6 +155,9 @@ export default function BlockIOChart(props) {
   }
 
   function createChartOptions() {
+    if (blockData.xlables.length > 6000) {
+      perfOptions = false;
+    }
     return {
       scales: {
         y: {
@@ -178,6 +182,8 @@ export default function BlockIOChart(props) {
             color: "rgba(0, 0, 0, 0.05)",
           }
         },
+        animation: perfOptions,
+        normalized: perfOptions,
       },
     };
   }
