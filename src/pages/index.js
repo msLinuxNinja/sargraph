@@ -76,6 +76,10 @@ export const HomePage = () => {
     {hasData ? document.title = `${fileDetails.date}|${fileDetails.fileName}` : document.title = "SarGRAPH"}
   }, [fileDetails]);
 
+  const headerStyle = {
+    background: 'linear-gradient(90deg, rgba(0,21,41,1) 0%, rgba(0,28,55,1) 50%, rgba(0,21,41,1) 100%)',
+  }
+
   const contentStyle = {
     display: 'flex',
     flex: 1,
@@ -89,7 +93,8 @@ export const HomePage = () => {
   const footerStyle = {
     display: 'flex',
     justifyContent: 'left',
-    alignItems: 'center'
+    alignItems: 'center',
+    background: 'linear-gradient(90deg, rgba(0,21,41,1) 0%, rgba(0,22,43,1) 50%, rgba(0,21,41,1) 100%)',
   }
 
   return (
@@ -107,7 +112,7 @@ export const HomePage = () => {
       }}
       >
 
-        <Header />
+        <Header style={headerStyle} />
         <Content style={contentStyle}>
           
           {!dataLoaded && <DropBox />}
