@@ -108,22 +108,19 @@ export function parseMemoryData (sarFileData) {
     const [xlables, ykbmemFree, ykbMemUsed, ymemUsedPrcnt, ykbBuffers, ykbCached, ykbCommit, ycommitPrcnt, ytotalMemory] = [[], [], [], [], [], [], [], [], []] ;
     let fileVersion = "";
 
-
+    const header = sarFileData.filter(row => row.includes('kbmemfree'))
+    
     const prasedData = sarFileData.filter(row => { 
-        if(row.length === 17 && !isNaN(row[1])) { // Memory section is exactly 17 columns long, checks if the second column is not a number 
-            
+        if(row.length === header[0].length && !isNaN(row[1])) { // Memory section is exactly 17 columns long, checks if the second column is not a number 
             return true;
-        } else if (row.length === 11 && !isNaN(row[1]) ) { // Memory section is exactly 11 columns long for RHEL7, checks if the second column is not a number as the network section is also 11 columns long
-            
-            return true
         }
     }); // Note RHEL8+ sar files, memory section is 17 Columns
 
     const filteredArray = prasedData.filter(row => !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
 
-    if ( filteredArray[0].length === 17 ) {
+    if ( header[0].length === 17 ) {
         fileVersion = "rhel8+";
-    } else if ( filteredArray[0].length === 11 ) {
+    } else if ( header[0].length === 11 ) {
         fileVersion = "rhel7";
     }
 

@@ -68,7 +68,7 @@ export default function MemoryChart(props) {
   }
 
   function createChartOptions() {
-    const maxMemory = parseInt(memoryData.ytotalMemory[0] * 1.05);
+
 
     return {
       scales: {
@@ -82,7 +82,7 @@ export default function MemoryChart(props) {
           },
           responsive: true,
           min: 0,
-          max: maxMemory,
+
         },
 
         x: {
