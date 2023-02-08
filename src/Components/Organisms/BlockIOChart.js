@@ -186,6 +186,7 @@ export default function BlockIOChart(props) {
       },
       animation: perfOptions,
       normalized: true,
+      matainAspectRatio: false,
     };
   }
 
