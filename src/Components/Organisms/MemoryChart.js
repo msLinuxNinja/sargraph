@@ -95,6 +95,8 @@ export default function MemoryChart(props) {
           }
         },
       },
+      normalized: true,
+      mantainAspectRatio: false,
     };
   }
 

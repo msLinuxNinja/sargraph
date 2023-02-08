@@ -96,6 +96,8 @@ export default function MemoryPercntChart(props) {
           }
         },
       },
+      normalized: true,
+      mantainAspectRatio: false,
     };
   }
 

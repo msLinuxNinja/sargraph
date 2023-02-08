@@ -12,22 +12,6 @@ html {
 
 } */
 
-a {
-  padding: 10px;
-}
-
-.centered {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-
-.hidden {
-  display: none !important;
-
-}
 
 #refresh-btn {    
   display: flex;
