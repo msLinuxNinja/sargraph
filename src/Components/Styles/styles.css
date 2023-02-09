@@ -14,8 +14,8 @@ html {
 
 
 #refresh-btn {    
-  display: flex;
-  position: relative;
+  display: block;
+  position: absolute;
   justify-content: center;
   margin: auto;
   margin-top: 10px;

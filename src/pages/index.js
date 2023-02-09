@@ -13,6 +13,7 @@ import { useDataContext } from "../Components/Contexts/DataContext";
 import { useEffect } from "react";
 import FooterDetails from "../Components/Atoms/FooterDetails";
 import LoadingSpin from "../Components/Atoms/LoadingSpin";
+import TabsContainer from "../Components/Molecules/TabsContainer";
 const { Footer, Content } = Layout;
 
 
@@ -25,50 +26,50 @@ export const HomePage = () => {
       label: "CPU",
       key: "1",
       children: (
-        <>
+        <ChartContainer>
           <HeadingOne heading="CPU" />
           <CpuChart />
-        </>
+        </ ChartContainer>
       ),
     },
     {
       label: "Memory",
       key: "2",
       children: (
-        <>
+        <ChartContainer>
           <HeadingOne heading="Memory" />
           <MemoryChart />
-        </>
+        </ ChartContainer>
       ),
     },
     {
       label: "Memory %",
       key: "3",
       children: (
-        <>
+        <ChartContainer>
           <HeadingOne heading="Memory%" />
           <MemoryPercntChart />
-        </>
+        </ ChartContainer>
       ),
     },
     {
       label: "IO",
       key: "4",
       children: (
-        <>
+        <ChartContainer>
           <HeadingOne heading="IO" />
           <BlockIOChart />
-        </>
+        </ ChartContainer>
       ),
     },
     {
       label: "System Details",
       key: "5",
       children: (
-        <>
+        <ChartContainer>
           <HeadingOne heading="System Details" />
           <FileDetails />
-        </>
+        </ ChartContainer>
       ),
     },
   ];
@@ -112,12 +113,14 @@ export const HomePage = () => {
           
           {!dataLoaded && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}
-          { hasData && <ChartContainer>
+          { hasData && 
+            <TabsContainer>
             
-            <Btn />
-            <Tabs type="card" items={tabItems} /> 
+              {/* <Btn /> */}
+              <Tabs type="card" items={tabItems} /> 
             
-          </ChartContainer> }
+            </TabsContainer> 
+          }
 
         </Content>
         <Footer style={footerStyle}>
