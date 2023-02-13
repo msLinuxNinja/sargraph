@@ -48,7 +48,7 @@ export function DropBox() {
 
 
   return (
-    <div className="centered">
+    <div>
       <Dragger {...props}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
