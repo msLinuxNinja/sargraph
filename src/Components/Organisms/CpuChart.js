@@ -220,6 +220,13 @@ export default function CpuChart() {
       animation: perfOptions,
       normalized: true,
       mantainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "rgba(180, 180, 180, 1)",
+          },
+        },
+      },
     };
   }
 

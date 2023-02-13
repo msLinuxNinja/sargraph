@@ -187,6 +187,13 @@ export default function BlockIOChart(props) {
       animation: perfOptions,
       normalized: true,
       matainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "rgba(180, 180, 180, 1)",
+          },
+        },
+      },
     };
   }
 
