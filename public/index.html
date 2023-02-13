@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ondrop="handleDrop(event)">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
@@ -9,10 +9,38 @@
       name="SarGRAP"
       content="Visualize sar data"
     />
-    <title>React App</title>
+    <title>SarGRAP</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>
 </html>
+<script>
+  window.addEventListener("dragenter", function(e) {
+    e = e || event;
+    if(!e.target.className.includes("ant-upload-")) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "none";
+      e.dataTransfer.effectAllowed = "none";
+    }
+  }, false);  
+  window.addEventListener("dragover", function(e) {
+    e = e || event;
+    if(!e.target.className.includes("ant-upload-")) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "none";
+      e.dataTransfer.effectAllowed = "none";
+    }
+  }, false);  
+  window.addEventListener("drop", function(e) {
+    e = e || event;
+    if(!e.target.className.includes("ant-upload-")) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "none";
+      e.dataTransfer.effectAllowed = "none";
+    }
+  }, false);  
+
+
+</script>

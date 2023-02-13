@@ -19,11 +19,12 @@ export function DropBox() {
   }
 
   async function handleCustomRequest({onError, onSuccess, file}) {
-    
-    
-    if(file) {
-      setDataLoaded(true)
-      const fileContent = await readFile(file);
+    setDataLoaded(true) // Set dataLoaded to true to show loading spin
+    const fileContent = await readFile(file); // Read file and return content as string
+
+    if(fileContent.includes("Linux")) { // Check if file is a sar file has the correct content
+      
+      
       const dataObj = callParse(fileContent); // Object containing more objects (inception! 🤯)
       // Save data in context
       setCpuData(dataObj.cpuObject);
@@ -38,12 +39,16 @@ export function DropBox() {
       });
       onSuccess()
 
+    } else { // If file is not a sar file add error message and set dataLoaded to false
+      onError()
+      alert("Incorrect file loaded \nPlease select a sar file containing the text output from sysstat")
+      setDataLoaded(false)
     }
   }
 
 
   return (
-    <div className="centered">
+    <div>
       <Dragger {...props}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
