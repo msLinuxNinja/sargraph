@@ -1,17 +1,7 @@
-import { useDataContext } from "../Contexts/DataContext";
-
 export default function ChartContainer({ children }) {
-  const { hasData } = useDataContext();
-
-  const containerStyles = {
-    width: '75vw',
-    margin: '0 auto',
-    overflow: 'scroll',
-    position: 'relative',
-  };
 
   return (
-    <div style={containerStyles}>
+    <div className=" w-5/6 m-auto overflow-y-auto overflow-x-hidden">
       {children}
     </div>
   );

@@ -1,22 +1,10 @@
-import { useDataContext } from "../Contexts/DataContext";
-
 export default function TabsContainer({ children }) {
-  const { hasData } = useDataContext();
-
-  const containerStyles = {
-    width: '100%',
-    margin: '0 auto',
-    top: '0',
-    alignItems: 'center',
-    alignContent: 'center',
-    JustifyContent: 'center',
-    position: 'fixed',
-    padding: '20px 20px',
-  };
 
   return (
-    <div style={containerStyles}>
+    <div  className="w-full my-auto top-0 content-center items-center justify-center absolute p-2 overflow-y-auto">
       {children}
     </div>
   );
 }
+
+// style={containerStyles}
