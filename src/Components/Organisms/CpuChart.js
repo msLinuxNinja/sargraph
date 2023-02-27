@@ -220,6 +220,7 @@ export default function CpuChart() {
       animation: perfOptions,
       normalized: true,
       mantainAspectRatio: false,
+      responsive: true,
       plugins: {
         legend: {
           labels: {

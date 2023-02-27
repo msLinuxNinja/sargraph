@@ -25,7 +25,7 @@ ChartJS.register(
   Legend
 )
 
-export default function BlockIOChart(props) {
+export default function BlockIOChart() {
   const { blockData, selectedBlock, setSelectedBlock } = useDataContext();
   const chartRef = useRef();
   let perfOptions = true;
@@ -220,10 +220,8 @@ export default function BlockIOChart(props) {
 
   return (
     <>
-      {blockData ? <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} /> : null}
-      {blockData ? (
-        <ItemList items={blockData.uniqDev.sort()} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
-      ) : null}
+      <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} />
+      <ItemList items={blockData.uniqDev.sort()} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
     </>
   );
 }

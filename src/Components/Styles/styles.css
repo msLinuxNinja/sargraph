@@ -2,21 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-    box-sizing: border-box;
-}
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
-}
-
-/* html {
-    background-color: rgb(66, 66, 66);
-
-} */
-
-
 #refresh-btn {    
   display: block;
   position: absolute;

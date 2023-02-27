@@ -71,13 +71,7 @@ export const HomePage = () => {
   }, [fileDetails]);
 
   const contentStyle = {
-    display: 'flex',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
     backgroundColor: 'rgb(66, 66, 66)',
-    height: '100vh',
   };
 
   const footerStyle = {
@@ -90,19 +84,12 @@ export const HomePage = () => {
   return (
     <Space
     direction="vertical"
-    style={{
-      width: '100vw',
-      height: '100vh',      
-    }}
+    className="h-screen w-screen"
     size={[0, 48]}
     >
-      <Layout
-      style={{
-        height: '100vh'
-      }}
-      >
+      <Layout className="h-screen w-screen">
 
-        <Content style={contentStyle} className="overflow-y-auto relative">
+        <Content style={contentStyle} className="overflow-y-auto relative h-full w-full flex-1 flex justify-center items-center flex-col ">
           
           {!dataLoaded && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}
