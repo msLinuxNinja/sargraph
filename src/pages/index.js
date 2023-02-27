@@ -2,14 +2,12 @@ import { DropBox } from "../Components/Atoms/DropBox";
 import ChartContainer from "../Components/Molecules/ChartContainer";
 import Btn from "../Components/Atoms/Btn";
 import { Tabs, Layout, Space } from "antd";
-import HeadingOne from "../Components/Atoms/HeadingOne";
 import MemoryChart from "../Components/Organisms/MemoryChart";
 import MemoryPercntChart from "../Components/Organisms/MemoryPercntChart";
 import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
-
 import { useEffect } from "react";
 import FooterDetails from "../Components/Atoms/FooterDetails";
 import LoadingSpin from "../Components/Atoms/LoadingSpin";
@@ -27,7 +25,6 @@ export const HomePage = () => {
       key: "1",
       children: (
         <ChartContainer>
-          <HeadingOne heading="CPU" />
           <CpuChart />
         </ ChartContainer>
       ),
@@ -37,7 +34,6 @@ export const HomePage = () => {
       key: "2",
       children: (
         <ChartContainer>
-          <HeadingOne heading="Memory" />
           <MemoryChart />
         </ ChartContainer>
       ),
@@ -47,7 +43,6 @@ export const HomePage = () => {
       key: "3",
       children: (
         <ChartContainer>
-          <HeadingOne heading="Memory%" />
           <MemoryPercntChart />
         </ ChartContainer>
       ),
@@ -57,7 +52,6 @@ export const HomePage = () => {
       key: "4",
       children: (
         <ChartContainer>
-          <HeadingOne heading="IO" />
           <BlockIOChart />
         </ ChartContainer>
       ),
@@ -67,7 +61,6 @@ export const HomePage = () => {
       key: "5",
       children: (
         <ChartContainer>
-          <HeadingOne heading="System Details" />
           <FileDetails />
         </ ChartContainer>
       ),
@@ -109,7 +102,7 @@ export const HomePage = () => {
       }}
       >
 
-        <Content style={contentStyle}>
+        <Content style={contentStyle} className="overflow-y-auto relative">
           
           {!dataLoaded && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}
@@ -123,7 +116,7 @@ export const HomePage = () => {
           }
 
         </Content>
-        <Footer style={footerStyle}>
+        <Footer style={footerStyle} className="z-30">
           <FooterDetails />
         </Footer>
         

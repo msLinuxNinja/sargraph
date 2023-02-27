@@ -8,6 +8,7 @@ export default function FooterDetails() {
 
     const { fileDetails, hasData } = useDataContext();
     const [ footer, setFooter ] = useState("SarGRAPH")
+    console.log(process.env.REACT_APP_VERSION)
 
     useEffect(() => {
         if(hasData) {
@@ -18,9 +19,10 @@ export default function FooterDetails() {
 
     return (
         <>
-            <FontAwesomeIcon icon={faGithub} />
-            <a href="https://github.com/msLinuxNinja/sargraph" target="_blank" rel="noopener noreferrer" style={{ padding: '0 10px'}}>https://github.com/msLinuxNinja/sargraph</a>
-            <p>{footer}</p>
+            <FontAwesomeIcon icon={faGithub} className="fa-2x"/>
+            <a href="https://github.com/msLinuxNinja/sargraph" target="_blank" rel="noopener noreferrer" className="pl-3 text-blue-600">https://github.com/msLinuxNinja/sargraph</a>
+            <p className="pl-2">{footer}</p>
+            <p className="ml-auto">Version: {process.env.REACT_APP_VERSION}</p>
         </>
     )
 }
