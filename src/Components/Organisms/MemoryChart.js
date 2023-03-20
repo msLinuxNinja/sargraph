@@ -1,9 +1,32 @@
-import { useMemo } from "react";
-import LineChart from "../Molecules/LineChart";
+import { useEffect, useMemo, useRef } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 
-export default function MemoryChart(props) {
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Chart } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
+
+export default function MemoryChart() {
   const { memoryData } = useDataContext();
+  const chartRef = useRef();
 
   function createChartData() {
     return {
@@ -69,7 +92,6 @@ export default function MemoryChart(props) {
 
   function createChartOptions() {
 
-
     return {
       scales: {
         y: {
@@ -97,6 +119,7 @@ export default function MemoryChart(props) {
       },
       normalized: true,
       mantainAspectRatio: false,
+      responsive: true,
       plugins: {
         legend: {
           labels: {
@@ -114,16 +137,13 @@ export default function MemoryChart(props) {
   }, [memoryData]);
 
   const chartOptions = useMemo(() => {
-    if (memoryData) {
-      return createChartOptions();
-    }
-  }, [memoryData]);
+    return createChartOptions();
+  }, []);
+
 
   return (
     <>
-      {memoryData ? (
-        <LineChart options={chartOptions} data={chartData} />
-      ) : null}
+      <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} />
     </>
   );
 }

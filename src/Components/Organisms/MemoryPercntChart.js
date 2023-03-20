@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import LineChart from "../Molecules/LineChart";
 import { useDataContext } from "../Contexts/DataContext";
 
-export default function MemoryPercntChart(props) {
+export default function MemoryPercntChart() {
   const { memoryData } = useDataContext();
   function createChartData() {
     return {
@@ -122,9 +122,7 @@ export default function MemoryPercntChart(props) {
 
   return (
     <>
-      {memoryData ? (
-        <LineChart options={chartOptions} data={chartData} />
-      ) : null}
+      <LineChart options={chartOptions} data={chartData} />
     </>
   );
 }

@@ -206,12 +206,10 @@ export default function CpuChart() {
           responsive: true,
           min: 0,
         },
-
         x: {
           ticks: {
             color: "rgba(180, 180, 180, 1)",
           },
-
           grid: {
             color: "rgba(0, 0, 0, 0.05)",
           }
@@ -220,6 +218,7 @@ export default function CpuChart() {
       animation: perfOptions,
       normalized: true,
       mantainAspectRatio: false,
+      responsive: true,
       plugins: {
         legend: {
           labels: {
