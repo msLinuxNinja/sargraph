@@ -1,7 +1,10 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
+
+import {Button, Drawer } from "antd";
+
 
 import {
   Chart as ChartJS,
@@ -29,6 +32,22 @@ ChartJS.register(
 
 export default function CpuChart() {
   const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } = useDataContext();
+  const [cpuStats, setCpuStats] = useState({
+    max: 0,
+    average: 0,
+    index: 0,
+    maxTime: "",
+    cpuID: 0,
+  });
+  const [visible, setVisible] = useState(false);
+  function showDrawer() {
+    setVisible(true);
+  }
+
+  function onClose() {
+    setVisible(false);
+  }
+
   const chartRef = useRef();
   let perfOptions = true;
 
@@ -229,6 +248,14 @@ export default function CpuChart() {
     };
   }
 
+  function getStats () {
+    const newCpuStats = { ...cpuStats };
+    newCpuStats.max = Math.max.apply(Math, cpuData.ycpuUsr)
+    newCpuStats.index = cpuData.ycpuUsr.indexOf(newCpuStats.max)
+    newCpuStats.maxTime = cpuData.xlables[newCpuStats.index]
+    newCpuStats.cpuID = cpuData.cpuNumber[newCpuStats.index]
+    setCpuStats(newCpuStats);
+  }
   const chartData = useMemo(() => {
     if (cpuData) {
       setIsLoading(true);
@@ -252,12 +279,29 @@ export default function CpuChart() {
 
   useEffect(() => {
     setIsLoading(false);
+    getStats()
   }, [])
 
   return (
     <>
       <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  />
       <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU}/>
+      <p>Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU {cpuStats.cpuID}</p>
+      <Button type="primary" onClick={showDrawer}>
+        More Details
+      </Button>
+      <Drawer
+        title="CPU Details"
+        placement="left"
+        onClose={onClose}
+        open={visible}
+        width={500}
+      >
+        <p>Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU {cpuStats.cpuID}</p>
+        <Button type="primary" onClick={onClose}>
+        Close
+      </Button>
+      </Drawer>
     </>
   );
 }

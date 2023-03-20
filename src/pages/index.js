@@ -1,7 +1,6 @@
 import { DropBox } from "../Components/Atoms/DropBox";
 import ChartContainer from "../Components/Molecules/ChartContainer";
-import Btn from "../Components/Atoms/Btn";
-import { Tabs, Layout, Space } from "antd";
+import { Tabs, Layout, Space, FloatButton } from "antd";
 import MemoryChart from "../Components/Organisms/MemoryChart";
 import MemoryPercntChart from "../Components/Organisms/MemoryPercntChart";
 import BlockIOChart from "../Components/Organisms/BlockIOChart";
@@ -12,12 +11,17 @@ import { useEffect } from "react";
 import FooterDetails from "../Components/Atoms/FooterDetails";
 import LoadingSpin from "../Components/Atoms/LoadingSpin";
 import TabsContainer from "../Components/Molecules/TabsContainer";
+import { ReloadOutlined } from "@ant-design/icons";
 const { Footer, Content } = Layout;
 
 
 
 export const HomePage = () => {
   const { hasData, fileDetails, isLoading, dataLoaded } = useDataContext();  
+  
+  function realoadPage() {
+    window.location.reload();
+  }
 
   const tabItems = [
     {
@@ -96,13 +100,22 @@ export const HomePage = () => {
           { hasData && 
             <TabsContainer>
             
-              {/* <Btn /> */}
               <Tabs type="card" items={tabItems} /> 
             
             </TabsContainer> 
           }
 
         </Content>
+        <FloatButton 
+          icon={<ReloadOutlined />} 
+          tooltip={<div>Load New File</div>} 
+          onClick={realoadPage} 
+          style={{
+            right: 50,
+            bottom: 120,
+          }}
+          type="primary"
+        />
         <Footer style={footerStyle} className="z-30">
           <FooterDetails />
         </Footer>

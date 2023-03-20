@@ -1,6 +1,4 @@
 {
-  "name": "sargraph-react",
-  "version": "0.1.2",
   "private": true,
   "dependencies": {
     "@fontsource/roboto": "^4.5.8",

@@ -8,7 +8,6 @@ export default function FooterDetails() {
 
     const { fileDetails, hasData } = useDataContext();
     const [ footer, setFooter ] = useState("SarGRAPH")
-    console.log(process.env.REACT_APP_VERSION)
 
     useEffect(() => {
         if(hasData) {
