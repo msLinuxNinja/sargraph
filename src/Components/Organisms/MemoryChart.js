@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 
 
@@ -139,6 +139,7 @@ export default function MemoryChart() {
   const chartOptions = useMemo(() => {
     return createChartOptions();
   }, []);
+
 
   return (
     <>

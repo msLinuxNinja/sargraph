@@ -85,11 +85,11 @@ export const HomePage = () => {
     <Space
     direction="vertical"
     className="h-screen w-screen"
-    size={[0, 48]}
+    size={[48, 48]}
     >
       <Layout className="h-screen w-screen">
 
-        <Content style={contentStyle} className="overflow-y-auto relative h-full w-full flex-1 flex justify-center items-center flex-col ">
+        <Content style={contentStyle} className="overflow-y-auto h-full w-full  justify-center items-center flex-col flex">
           
           {!dataLoaded && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}

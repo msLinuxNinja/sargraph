@@ -6,5 +6,3 @@ export default function TabsContainer({ children }) {
     </div>
   );
 }
-
-// style={containerStyles}
