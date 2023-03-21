@@ -79,9 +79,6 @@ export const HomePage = () => {
   };
 
   const footerStyle = {
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
     background: 'linear-gradient(90deg, rgba(0,21,41,1) 0%, rgba(0,22,43,1) 50%, rgba(0,21,41,1) 100%)',
   }
 
@@ -98,25 +95,30 @@ export const HomePage = () => {
           {!dataLoaded && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}
           { hasData && 
+            <>
             <TabsContainer>
             
               <Tabs type="card" items={tabItems} /> 
             
             </TabsContainer> 
+            
+            <FloatButton 
+            icon={<ReloadOutlined />} 
+            tooltip={<div>Load New File</div>} 
+            onClick={realoadPage} 
+            style={{
+              right: 50,
+              bottom: 120,
+            }}
+            type="primary"
+          />
+          </>
+          
           }
 
         </Content>
-        <FloatButton 
-          icon={<ReloadOutlined />} 
-          tooltip={<div>Load New File</div>} 
-          onClick={realoadPage} 
-          style={{
-            right: 50,
-            bottom: 120,
-          }}
-          type="primary"
-        />
-        <Footer style={footerStyle} className="z-30">
+        
+        <Footer style={footerStyle} className="z-30 flex justify-start items-center content-center">
           <FooterDetails />
         </Footer>
         
