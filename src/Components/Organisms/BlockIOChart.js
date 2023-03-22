@@ -3,6 +3,7 @@ import { useMemo, useRef, useEffect } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 
+import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,6 +16,8 @@ import {
 } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 
+
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -22,7 +25,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  zoomPlugin // register zoom plugin
 )
 
 export default function BlockIOChart() {
@@ -191,6 +195,20 @@ export default function BlockIOChart() {
         legend: {
           labels: {
             color: "rgba(180, 180, 180, 1)",
+          },
+        },
+        zoom: { // logic to enable zoom chart
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            enabled: true,
+            mode: "x",
+            speed: 0.05,
+          },
+          pan: {
+            enabled: true,
+            mode: "x",
           },
         },
       },

@@ -2,7 +2,7 @@ import { useMemo, useEffect, useRef, useState } from "react";
 
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
-
+import TableDetails from "../Molecules/TableDetails";
 import {Button, Drawer } from "antd";
 
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
@@ -17,7 +17,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
-import TableDetails from "../Molecules/TableDetails";
+
 
 
 ChartJS.register(
@@ -292,10 +292,10 @@ export default function CpuChart() {
             mode: "x",
             speed: 0.05,
           },
-        },
-        pan: {
-          enabled: true,
-          mode: "x",
+          pan: {
+            enabled: true,
+            mode: "x",
+          },
         },
       },
     };

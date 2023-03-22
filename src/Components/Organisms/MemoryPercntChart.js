@@ -1,6 +1,32 @@
 import { useMemo } from "react";
-import LineChart from "../Molecules/LineChart";
 import { useDataContext } from "../Contexts/DataContext";
+
+
+import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Chart } from 'react-chartjs-2';
+
+
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin // register zoom plugin
+)
 
 export default function MemoryPercntChart() {
   const { memoryData } = useDataContext();
@@ -104,6 +130,20 @@ export default function MemoryPercntChart() {
             color: "rgba(180, 180, 180, 1)",
           },
         },
+        zoom: { // logic to enable zoom chart
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            enabled: true,
+            mode: "x",
+            speed: 0.05,
+          },
+          pan: {
+            enabled: true,
+            mode: "x",
+          },
+        },
       },
     };
   }
@@ -122,7 +162,7 @@ export default function MemoryPercntChart() {
 
   return (
     <>
-      <LineChart options={chartOptions} data={chartData} />
+      <Chart type="line" options={chartOptions} data={chartData} />
     </>
   );
 }
