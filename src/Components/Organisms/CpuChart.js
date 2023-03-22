@@ -327,7 +327,7 @@ export default function CpuChart() {
     <>
       <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  />
       <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU} />
-      <p>Core with highest usr% usage is {cpuStats.cpuID}</p>
+      <p>Core with highest usr% usage is {cpuStats.cpuID}. Click on the button below for more details.</p>
       <Button type="primary" onClick={showDrawer} >
         More Details
       </Button>
@@ -339,8 +339,8 @@ export default function CpuChart() {
         width={700}
         className="text-white"
       >
-        <p >Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU {cpuStats.cpuID}</p>
-        <TableDetails columns={tableColumns} data={tableData} />
+        <p >Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU {cpuStats.cpuID}.</p>
+        <TableDetails columns={tableColumns} data={tableData}  />
         <Button type="primary" onClick={onClose}>
         Close
       </Button>
