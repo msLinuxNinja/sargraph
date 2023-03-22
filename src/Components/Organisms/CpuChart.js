@@ -1,8 +1,11 @@
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 
+import {Button, Drawer } from "antd";
+
+import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,6 +17,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
+import TableDetails from "../Molecules/TableDetails";
+
 
 ChartJS.register(
   CategoryScale,
@@ -22,16 +27,69 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  zoomPlugin // register zoom plugin
 )
 
 
 
+
 export default function CpuChart() {
+  //states
   const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } = useDataContext();
+  const [cpuStats, setCpuStats] = useState({
+    max: 0,
+    average: 0,
+    index: 0,
+    maxTime: "",
+    cpuID: 0,
+  });
+
+  const [visible, setVisible] = useState(false);
+
+  //table details
+  const tableColumns = [
+    {
+      title: "Time",
+      dataIndex: "maxTime",
+    },
+    {
+      title: "CPU ID",
+      dataIndex: "cpuID",
+    },
+    {
+      title: "Max usr%",
+      dataIndex: "max",
+    },
+    {
+      title: "Total usr% Avg",
+      dataIndex: "average",
+    }
+  ];
+
+  const tableData = [
+    {
+      key: "1",
+      maxTime: cpuStats.maxTime,
+      cpuID: cpuStats.cpuID,
+      max: cpuStats.max,
+      average: cpuStats.average,
+    },
+  ];
+
+  //drawer on off
+  function showDrawer() {
+    setVisible(true);
+  }
+
+  function onClose() {
+    setVisible(false);
+  }
+
   const chartRef = useRef();
   let perfOptions = true;
 
+  //chart generation and select
   function getSelectedIndex(chart) {
     //logs the indexes of the selected value (CPU)
     // console.log(chart.data.datasets[0].data)
@@ -225,10 +283,36 @@ export default function CpuChart() {
             color: "rgba(180, 180, 180, 1)",
           },
         },
+        zoom: { // logic to enable zoom chart
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            enabled: true,
+            mode: "x",
+            speed: 0.05,
+          },
+        },
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
       },
     };
   }
+  
+  //data statistics
+  function getStats () {
+    const newCpuStats = { ...cpuStats };
+    newCpuStats.max = Math.max.apply(Math, cpuData.ycpuUsr)
+    newCpuStats.index = cpuData.ycpuUsr.indexOf(newCpuStats.max)
+    newCpuStats.maxTime = cpuData.xlables[newCpuStats.index]
+    newCpuStats.cpuID = cpuData.cpuNumber[newCpuStats.index]
+    newCpuStats.average = cpuData.ycpuUsr.reduce((a, b) => a + b, 0) / cpuData.ycpuUsr.length
+    setCpuStats(newCpuStats);
+  }
 
+  // useMemo and effects
   const chartData = useMemo(() => {
     if (cpuData) {
       setIsLoading(true);
@@ -247,17 +331,37 @@ export default function CpuChart() {
     if (cpuData) {
       getSelectedIndex(chart);
     }
+    console.log(selectedCPU)
   }, [selectedCPU]);
 
 
   useEffect(() => {
     setIsLoading(false);
+    getStats()
   }, [])
 
   return (
     <>
       <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  />
-      <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU}/>
+      <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU} />
+      <p>Core with highest usr% usage is {cpuStats.cpuID}. Click on the button below for more details.</p>
+      <Button type="primary" onClick={showDrawer} >
+        More Details
+      </Button>
+      <Drawer
+        title="CPU Details"
+        placement="left"
+        onClose={onClose}
+        open={visible}
+        width={700}
+        className="text-white"
+      >
+        <p >Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU {cpuStats.cpuID}.</p>
+        <TableDetails columns={tableColumns} data={tableData}  />
+        <Button type="primary" onClick={onClose}>
+        Close
+      </Button>
+      </Drawer>
     </>
   );
 }
