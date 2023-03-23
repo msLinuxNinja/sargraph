@@ -14,7 +14,7 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { Chart } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 
 
@@ -162,7 +162,7 @@ export default function MemoryChart() {
 
   return (
     <>
-      <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} />
+      <Line ref={chartRef} options={chartOptions} data={chartData} />
     </>
   );
 }
