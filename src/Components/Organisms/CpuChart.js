@@ -17,7 +17,7 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { Chart } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 
 
@@ -342,7 +342,7 @@ export default function CpuChart() {
 
   return (
     <>
-      <Chart ref={chartRef} type='line' options={chartOptions} data={chartData}  />
+      <Line ref={chartRef} options={chartOptions} data={chartData}  />
       <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU} />
       <p>Core with highest usr% usage is {cpuStats.cpuID}. Click on the button below for more details.</p>
       <Button type="primary" onClick={showDrawer} >

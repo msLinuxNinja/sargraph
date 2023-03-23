@@ -15,7 +15,7 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { Chart } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 
 
@@ -239,7 +239,7 @@ export default function BlockIOChart() {
 
   return (
     <>
-      <Chart ref={chartRef} type="line" options={chartOptions} data={chartData} />
+      <Line ref={chartRef} options={chartOptions} data={chartData} />
       <ItemList items={blockData.uniqDev.sort()} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
     </>
   );
