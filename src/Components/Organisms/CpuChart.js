@@ -290,7 +290,6 @@ export default function CpuChart() {
             wheel: {
               enabled: true,
             },
-            enabled: true,
             mode: "x",
             speed: 0.05,
           },
@@ -333,7 +332,6 @@ export default function CpuChart() {
     if (cpuData) {
       getSelectedIndex(chart);
     }
-    console.log(selectedCPU)
   }, [selectedCPU]);
 
 
