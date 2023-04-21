@@ -1,4 +1,6 @@
 
+let avgInterval = 0;
+
 const returnDataPortion = (firstIndex, lastIndex, array) => {
     // console.log(`First: ${firstIndex}, Last: ${lastIndex}`)
     const resultingArray = array.slice(firstIndex, lastIndex);
@@ -10,6 +12,24 @@ const returnMatch = (re, array) => { // returns new array from matched lines bas
     const regex = new RegExp(re);
 
     return array.filter(element => element[1].match(regex));
+}
+
+function calculatePollInterval(sarData){
+    const sarDataPortion = sarData.filter(row => row.includes('all') && !row.includes('Average:') && !row.includes('CPU'));
+    const dateRange = sarDataPortion.map(row => { 
+        return row[0]
+    });
+
+    const dates = dateRange.map(entry => Date.parse(`01/01/2022 ${entry}`));
+    const intervals = [];
+    dates.forEach((date, i) => {
+        if (i > 0) {
+            intervals.push((date - dates[i - 1]) / 1000);
+        }
+    });
+
+    const sum = intervals.reduce((total, interval) => total + interval);
+    avgInterval = Math.round(sum / intervals.length);
 }
 
 export function parseFileDetails (sarFileData) {
@@ -29,9 +49,34 @@ export function parseFileDetails (sarFileData) {
         hostname = "N/A";
         date = "N/A";
     }
-    
 
-    return {kernel, hostname, date};
+    // const sarDataPortion = sarFileData.filter(row => row.includes('all') && !row.includes('Average:') && !row.includes('CPU'));
+
+    // const dateRange = sarDataPortion.map(row => { 
+    //     return row[0]
+    // });
+
+    // const dates = dateRange.map(entry => Date.parse(`01/01/2022 ${entry}`));
+    // const intervals = [];
+    // dates.forEach((date, i) => {
+    //     if (i > 0) {
+    //         intervals.push((date - dates[i - 1]) / 1000);
+    //     }
+    // });
+
+    // const sum = intervals.reduce((total, interval) => total + interval);
+    // const avgInterval = Math.round(sum / intervals.length);
+    calculatePollInterval(sarFileData);
+    if (avgInterval > 60) {
+        const minutes = Math.round(avgInterval / 60);
+        const interval = `${minutes}m`;
+        console.log(interval)
+    } else {
+        const interval = `${avgInterval}s`;
+        console.log(interval)
+    }
+
+    return {kernel, hostname, date, avgInterval};
 }
 
 export function parseCPUData (sarFileData) { // Parse CPU details and return an object with 8 arrays
@@ -77,6 +122,7 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
         return false;
     });
 
+    
 
     filteredArray.forEach(row => { // Logic to add each coulmn to the correct metric
 
