@@ -1,4 +1,3 @@
-
 const returnDataPortion = (firstIndex, lastIndex, array) => {
     // console.log(`First: ${firstIndex}, Last: ${lastIndex}`)
     const resultingArray = array.slice(firstIndex, lastIndex);
@@ -10,6 +9,25 @@ const returnMatch = (re, array) => { // returns new array from matched lines bas
     const regex = new RegExp(re);
 
     return array.filter(element => element[1].match(regex));
+}
+
+function calculatePollInterval(sarData){
+    const sarDataPortion = sarData.filter(row => row.includes('all') && !row.includes('Average:') && !row.includes('CPU'));
+    const dateRange = sarDataPortion.map(row => { 
+        return row[0]
+    });
+
+    const dates = dateRange.map(entry => Date.parse(`01/01/2022 ${entry}`));
+    const intervals = [];
+    dates.forEach((date, i) => {
+        if (i > 0) {
+            intervals.push((date - dates[i - 1]) / 1000);
+        }
+    });
+
+    const sum = intervals.reduce((total, interval) => total + interval);
+    const avgInterval = Math.round(sum / intervals.length);
+    return avgInterval;
 }
 
 export function parseFileDetails (sarFileData) {
@@ -29,13 +47,23 @@ export function parseFileDetails (sarFileData) {
         hostname = "N/A";
         date = "N/A";
     }
-    
 
-    return {kernel, hostname, date};
+    const avgInterval = calculatePollInterval(sarFileData);
+    if (avgInterval > 60) {
+        const minutes = Math.round(avgInterval / 60);
+        const interval = `${minutes}m`;
+        console.log(interval)
+    } else {
+        const interval = `${avgInterval}s`;
+        console.log(interval)
+    }
+
+    return {kernel, hostname, date, avgInterval};
 }
 
 export function parseCPUData (sarFileData) { // Parse CPU details and return an object with 8 arrays
     const [xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU, matchedData, parsedData] = [ [], [], [], [], [], [], [], [], [], [], [], [] ];
+    let dataArray = [];
 
 
     const rowIncludesUsr = sarFileData.map((row, index) => row.includes('CPU') ? index: null ).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
@@ -46,7 +74,7 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
 
     const cpuData = returnDataPortion(firstIndex, lastIndex, sarFileData); // returns the portion of the data from firstIndex to lastIndex
     const cpuFilter = cpuData.filter(row => !row.includes('%usr'))
-   
+
     cpuFilter.forEach(row => { // Obtain list of unique CPUs to later use as an iterator and perform Regex
         const cpuNum = row[1];
 
@@ -76,30 +104,40 @@ export function parseCPUData (sarFileData) { // Parse CPU details and return an 
         }
         return false;
     });
+    const avgInterval = calculatePollInterval(sarFileData);
+    console.log(`Interval ${avgInterval}`)
+    if (avgInterval <= 10) { // on large datasets, reduce the datapoints by filtering out by an 18th of the data based on the average polling interval
+        dataArray = filteredArray.filter((row, index) => index % 18 === 0);
+    } else if (avgInterval <= 20 ) {
+      dataArray = filteredArray.filter((row, index) => index % 15 === 0);
+    } else if (avgInterval <= 30 ) {
+      dataArray = filteredArray.filter((row, index) => index % 4 === 0);
+    } else if (avgInterval <= 60 ) {
+      dataArray = filteredArray.filter((row, index) => index % 2 === 0);
+    } else {
+      dataArray = filteredArray;
+    }
 
-
-    filteredArray.forEach(row => { // Logic to add each coulmn to the correct metric
-
-        const time = row[0];
-        const cpuNum = row[1];
-        const cpuUsr = parseFloat(row[2]);
-        const cpuNice = parseFloat(row[3]);
-        const cpuSys = parseFloat(row[4]);
-        const cpuIowait = parseFloat(row[5]);
-        const cpuIrq = parseFloat(row[7]);
-        const cpuSoft = parseFloat(row[8]);
-        const cpuIdle = parseFloat(row[11]);
-        xlables.push(time);
-        cpuNumber.push(cpuNum);
-        ycpuUsr.push(cpuUsr);
-        ycpuNice.push(cpuNice);
-        ycpuSys.push(cpuSys);
-        ycpuIowait.push(cpuIowait);
-        ycpuIrq.push(cpuIrq);
-        ycpuSoft.push(cpuSoft);
-        ycpuIdle.push(cpuIdle);
+    dataArray.forEach(row => { // Logic to add each coulmn to the correct metric
+      const time = row[0];
+      const cpuNum = row[1];
+      const cpuUsr = parseFloat(row[2]);
+      const cpuNice = parseFloat(row[3]);
+      const cpuSys = parseFloat(row[4]);
+      const cpuIowait = parseFloat(row[5]);
+      const cpuIrq = parseFloat(row[7]);
+      const cpuSoft = parseFloat(row[8]);
+      const cpuIdle = parseFloat(row[11]);
+      xlables.push(time);
+      cpuNumber.push(cpuNum);
+      ycpuUsr.push(cpuUsr);
+      ycpuNice.push(cpuNice);
+      ycpuSys.push(cpuSys);
+      ycpuIowait.push(cpuIowait);
+      ycpuIrq.push(cpuIrq);
+      ycpuSoft.push(cpuSoft);
+      ycpuIdle.push(cpuIdle);
     });
-
 
     return {xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU};
 }
