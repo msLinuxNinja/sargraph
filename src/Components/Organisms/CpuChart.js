@@ -308,7 +308,7 @@ export default function CpuChart() {
         decimation: {
           enabled: true,
           algorithm: "lttb",
-          samples: 300,
+          samples: 100,
           threshold: 1000,
         },
       },
