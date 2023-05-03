@@ -164,41 +164,12 @@ export default function CpuChart() {
   }
 
   function createChartData() {
-    const cpuUsrData = cpuData.xlables.map((timeEntry, index) => ({
-      x: timeEntry,
-      y: cpuData.ycpuUsr[index]
-    }));
-    const cpuNiceData = cpuData.xlables.map((timeEntry, index) => ({
-      x: timeEntry,
-      y: cpuData.ycpuNice[index]
-    }));
-    const cpuSysData = cpuData.xlables.map((timeEntry, index) => ({
-      x: timeEntry,
-      y: cpuData.ycpuSys[index]
-    }));
-    const cpuIowaitData = cpuData.xlables.map((timeEntry, index) => ({
-      x: timeEntry,
-      y: cpuData.ycpuIowait[index]
-    }));
-    const cpuIrqData = cpuData.xlables.map((timeEntry, index) => ({
-      x: timeEntry,
-      y: cpuData.ycpuIrq[index]
-    }));
-    const cpuSoftData = cpuData.xlables.map((timeEntry, index) => ({
-      x: timeEntry,
-      y: cpuData.ycpuSoft[index]
-    }));
-    const cpuIdleData = cpuData.xlables.map((timeEntry, index) => ({
-      x: timeEntry,
-      y: cpuData.ycpuIdle[index]
-    }));
-
-
+    
     return {
       datasets: [
         {
           label: "CPU all usr%",
-          data: cpuUsrData,
+          data: cpuData.cpuArray[0][0].cpuUsrData,
           // backgroundColor: "rgba(0, 132, 195, 0.1)",
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
@@ -225,7 +196,7 @@ export default function CpuChart() {
         },
         {
           label: "CPU all nice%",
-          data: cpuNiceData,
+          data: cpuData.cpuArray[0][0].cpuNiceData,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 1)",
           borderWidth: 2,
@@ -234,57 +205,54 @@ export default function CpuChart() {
         },
         {
           label: "CPU all sys%",
-          data: cpuSysData,
+          data: cpuData.cpuArray[0][0].cpuSysData,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
           fill: true,
           tension: 0.2,
         },
-        // {
-        //   label: "CPU all iowait%",
-        //   data: cpuData.ycpuIowait,
-        //   backgroundColor: "rgba(255, 0, 0, 0.1)",
-        //   borderColor: "rgba(255, 0, 0, 0.8)",
-        //   borderWidth: 2,
-        //   fill: true,
-        //   tension: 0.2,
-        // },
-        // {
-        //   label: "CPU all irq%",
-        //   data: cpuData.ycpuIrq,
-        //   backgroundColor: "rgba(95, 17, 177, 0.1)",
-        //   borderColor: "rgba(95, 17, 177, 0.8)",
-        //   borderWidth: 2,
-        //   fill: true,
-        //   tension: 0.2,
-        // },
-        // {
-        //   label: "CPU all softIrq%",
-        //   data: cpuData.ycpuSoft,
-        //   backgroundColor: "rgba(177, 17, 82, 0.1)",
-        //   borderColor: "rgba(177, 17, 82, 0.8)",
-        //   borderWidth: 2,
-        //   fill: true,
-        //   tension: 0.2,
-        // },
-        // {
-        //   label: "CPU all idle%",
-        //   data: cpuData.ycpuIdle,
-        //   backgroundColor: "rgba(0, 210, 255, 0.05)",
-        //   borderColor: "rgba(0, 210, 255, 0.8)",
-        //   borderWidth: 2,
-        //   fill: false,
-        //   tension: 0.2,
-        // },
+        {
+          label: "CPU all iowait%",
+          data: cpuData.cpuArray[0][0].cpuIowaitData,
+          backgroundColor: "rgba(255, 0, 0, 0.1)",
+          borderColor: "rgba(255, 0, 0, 0.8)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.2,
+        },
+        {
+          label: "CPU all irq%",
+          data: cpuData.cpuArray[0][0].cpuIrqData,
+          backgroundColor: "rgba(95, 17, 177, 0.1)",
+          borderColor: "rgba(95, 17, 177, 0.8)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.2,
+        },
+        {
+          label: "CPU all softIrq%",
+          data: cpuData.cpuArray[0][0].cpuSoftData,
+          backgroundColor: "rgba(177, 17, 82, 0.1)",
+          borderColor: "rgba(177, 17, 82, 0.8)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.2,
+        },
+        {
+          label: "CPU all idle%",
+          data: cpuData.cpuArray[0][0].cpuIdleData,
+          backgroundColor: "rgba(0, 210, 255, 0.05)",
+          borderColor: "rgba(0, 210, 255, 0.8)",
+          borderWidth: 2,
+          fill: false,
+          tension: 0.2,
+        },
       ],
     };
   }
 
   function createChartOptions() {
-    if (cpuData.xlables.length > 6000) {
-      perfOptions = false;
-    }
     return {
       scales: {
         y: {
@@ -313,7 +281,7 @@ export default function CpuChart() {
           type: "time",
         },
       },
-      animation: perfOptions,
+      animation: true,
       normalized: true,
       mantainAspectRatio: false,
       parsing: false,
@@ -383,7 +351,7 @@ export default function CpuChart() {
 
   useEffect(() => {
     setIsLoading(false);
-    getStats()
+    // getStats()
   }, [])
 
   return (

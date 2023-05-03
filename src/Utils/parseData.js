@@ -140,8 +140,6 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     });
   });
 
-    console.log(cpuArray)
-
 
   return { cpuArray, uniqCPU };
 }
