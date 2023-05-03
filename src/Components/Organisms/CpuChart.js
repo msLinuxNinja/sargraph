@@ -96,7 +96,7 @@ export default function CpuChart() {
   }
 
   const chartRef = useRef();
-  let perfOptions = true;
+  
 
   //chart generation and select
   function getSelectedIndex(chart) {
@@ -253,6 +253,11 @@ export default function CpuChart() {
   }
 
   function createChartOptions() {
+    let perfOptions = true;
+    if (cpuData.cpuArray[0][0].cpuUsrData.length > 2000) {
+      console.log(cpuData.cpuArray[0][0].cpuUsrData.length)
+      perfOptions = false;
+    }
     return {
       scales: {
         y: {
@@ -281,7 +286,7 @@ export default function CpuChart() {
           type: "time",
         },
       },
-      animation: true,
+      animation: perfOptions,
       normalized: true,
       mantainAspectRatio: false,
       parsing: false,
@@ -304,6 +309,12 @@ export default function CpuChart() {
             enabled: true,
             mode: "x",
           },
+          limits: {
+            x: {
+              min: cpuData.cpuArray[0][0].cpuUsrData[0].x,
+              max: cpuData.cpuArray[0][0].cpuUsrData[cpuData.cpuArray[0][0].cpuUsrData.length - 1].x,
+            }
+          }
         },
         decimation: {
           enabled: true,
