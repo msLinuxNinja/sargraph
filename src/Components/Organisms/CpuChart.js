@@ -99,68 +99,27 @@ export default function CpuChart() {
   
 
   //chart generation and select
-  function getSelectedIndex(chart) {
-    
-    const re =  new RegExp (`^${selectedCPU}$`) // Build RegExp
+  function changeDatasetData(chart) {
 
-    const dataIndex = cpuData.cpuNumber // Returns the indexes where the RegExp occurs
-      .map((x, index) => (x.match(re) ? index : null))
-      .filter((item) => item !== null);
+    chart.data.datasets[0].data = cpuData.cpuArray[selectedCPU][0].cpuUsrData;
+    chart.data.datasets[1].data = cpuData.cpuArray[selectedCPU][0].cpuNiceData;
+    chart.data.datasets[2].data = cpuData.cpuArray[selectedCPU][0].cpuSysData;
+    chart.data.datasets[3].data = cpuData.cpuArray[selectedCPU][0].cpuIowaitData;
+    chart.data.datasets[4].data = cpuData.cpuArray[selectedCPU][0].cpuIrqData;
+    chart.data.datasets[5].data = cpuData.cpuArray[selectedCPU][0].cpuSoftData;
+    chart.data.datasets[6].data = cpuData.cpuArray[selectedCPU][0].cpuIdleData;
+    chart.update();
 
-    const newXLables = dataIndex.map(index => {
-
-      return cpuData.xlables[index]
-    })
-    
-    const newCpuUsr = dataIndex.map(index => {
-
-      return cpuData.ycpuUsr[index]
-    })
-    
-    const newCpuNice = dataIndex.map(index => {
-
-      return cpuData.ycpuNice[index]
-    })
-    
-    const newCpuSys = dataIndex.map(index => {
-
-      return cpuData.ycpuSys[index]
-    })
-    
-    const newCpuIowait = dataIndex.map(index => {
-
-      return cpuData.ycpuIowait[index]
-    })
-    
-    const newCpuIrq = dataIndex.map(index => {
-
-      return cpuData.ycpuIrq[index]
-    })
-    
-    const newCpuSoft = dataIndex.map(index => {
-
-      return cpuData.ycpuSoft[index]
-    })
-    
-    const newCpuIdle = dataIndex.map(index => {
-
-      return cpuData.ycpuIdle[index]
-    })
-    
-    
-    // console.log(newTime)
-
-    chart.data.labels = newXLables
-    chart.data.datasets[0].data = newCpuUsr
-    chart.data.datasets[1].data = newCpuNice
-    chart.data.datasets[2].data = newCpuSys
-    chart.data.datasets[3].data = newCpuIowait
-    chart.data.datasets[4].data = newCpuIrq
-    chart.data.datasets[5].data = newCpuSoft
-    chart.data.datasets[6].data = newCpuIdle
+    // chart.data.datasets[0].data = newCpuUsr
+    // chart.data.datasets[1].data = newCpuNice
+    // chart.data.datasets[2].data = newCpuSys
+    // chart.data.datasets[3].data = newCpuIowait
+    // chart.data.datasets[4].data = newCpuIrq
+    // chart.data.datasets[5].data = newCpuSoft
+    // chart.data.datasets[6].data = newCpuIdle
 
     
-    chart.update()
+    // chart.update()
   }
 
   function createChartData() {
@@ -340,24 +299,19 @@ export default function CpuChart() {
 
   // useMemo and effects
   const chartData = useMemo(() => {
-    if (cpuData) {
-      setIsLoading(true);
-      setSelectedCPU("all") //sets default on first render
-      return createChartData();
-    }
+    setIsLoading(true);
+    // setSelectedCPU(0) //sets default on first render
+    return createChartData();
   }, [cpuData]);
 
   const chartOptions = useMemo(() => {
     return createChartOptions();
   }, []);
 
-  // useEffect(() => {
-  //   const chart = chartRef.current
-
-  //   if (cpuData) {
-  //     getSelectedIndex(chart);
-  //   }
-  // }, [selectedCPU]);
+  useEffect(() => {
+    const chart = chartRef.current
+    changeDatasetData(chart);
+  }, [selectedCPU]);
 
 
   useEffect(() => {

@@ -25,7 +25,7 @@ export const DataContextProvider = ({ children }) => {
   const [cpuData, setCpuData] = useState(undefined);
   const [memoryData, setMemoryData] = useState(undefined);
   const [blockData, setBlockData] = useState(undefined);
-  const [selectedCPU, setSelectedCPU] = useState();
+  const [selectedCPU, setSelectedCPU] = useState(0);
   const [selectedBlock, setSelectedBlock] = useState();
   const [fileDetails, setFileDetails] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
