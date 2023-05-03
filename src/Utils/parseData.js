@@ -85,6 +85,15 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     }
   });
 
+  const cpuArray = Array.from({ length: uniqCPU.length }, () => [{
+    cpuUsrData: [],
+    cpuNiceData: [],
+    cpuSysData: [],
+    cpuIowaitData: [],
+    cpuIrqData: [],
+    cpuSoftData: [],
+    cpuIdleData: [],
+  }]);
 
   uniqCPU.forEach(cpu => { // With list of unique CPUs obtain data based on matched reges
     matchedData.push(returnMatch(`(^${cpu}$)`, sarFileData));
@@ -100,7 +109,7 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
   });
 
   const filteredArray = parsedData.filter(row => { // After removing nested array, filter out rows with "CPU", "Average:" and that are less than or equal to 12
-    if (!row.includes('CPU') && !row.includes('Average:') && row.length >= 12 && row.includes('all')) {
+    if (!row.includes('CPU') && !row.includes('Average:') && row.length >= 12) {
       return true;
     }
     return false;
@@ -118,29 +127,66 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
   } else {
     dataArray = filteredArray;
   }
-
-  dataArray.forEach(row => { // Logic to add each coulmn to the correct metric
-    const time = Date.parse(`${dateData} ${row[0]}`);
-    const cpuNum = row[1];
-    const cpuUsr = parseFloat(row[2]);
-    const cpuNice = parseFloat(row[3]);
-    const cpuSys = parseFloat(row[4]);
-    const cpuIowait = parseFloat(row[5]);
-    const cpuIrq = parseFloat(row[7]);
-    const cpuSoft = parseFloat(row[8]);
-    const cpuIdle = parseFloat(row[11]);
-    xlables.push(time);
-    cpuNumber.push(cpuNum);
-    ycpuUsr.push(cpuUsr);
-    ycpuNice.push(cpuNice);
-    ycpuSys.push(cpuSys);
-    ycpuIowait.push(cpuIowait);
-    ycpuIrq.push(cpuIrq);
-    ycpuSoft.push(cpuSoft);
-    ycpuIdle.push(cpuIdle);
+  console.log(cpuArray)
+  cpuArray.forEach((array, index) => { // Logic to add data to the array of objects
+    dataArray.filter(row => row[1] === uniqCPU[index]).forEach(row => {
+      const time = Date.parse(`${dateData} ${row[0]}`);
+      // const cpuUsr = { x: time, y: parseFloat(row[2]) };
+      // const cpuNice = { x: time, y: parseFloat(row[3]) };
+      // const cpuSys = { x: time, y: parseFloat(row[4]) };
+      // const cpuIowait = { x: time, y: parseFloat(row[5]) };
+      // const cpuIrq = { x: time, y: parseFloat(row[7]) };
+      // const cpuSoft = { x: time, y: parseFloat(row[8]) };
+      // const cpuIdle = { x: time, y: parseFloat(row[11]) };
+      array.cpuUsrData.push({ x: time, y: parseFloat(row[2]) });
+      array.cpuNiceData.push({ x: time, y: parseFloat(row[3]) });
+      array.cpuSysData.push({ x: time, y: parseFloat(row[4]) });
+      array.cpuIowaitData.push({ x: time, y: parseFloat(row[5]) });
+      array.cpuIrqData.push({ x: time, y: parseFloat(row[7]) });
+      array.cpuSoftData.push({ x: time, y: parseFloat(row[8]) });
+      array.cpuIdleData.push({ x: time, y: parseFloat(row[11]) });
+    });
   });
 
-  return { xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU };
+    console.log(cpuArray)
+
+  // cpuArray.forEach((array, index) => { // Logic to add data to the array of objects
+  //   dataArray.filter(row => row[1] === uniqCPU[index]).forEach(row => {
+  //     const time = Date.parse(`${dateData} ${row[0]}`);
+  //     const cpuUsr = { x: time, y: parseFloat(row[2]) };
+  //     const cpuNice = { x: time, y: parseFloat(row[3]) };
+  //     const cpuSys = { x: time, y: parseFloat(row[4]) };
+  //     const cpuIowait = { x: time, y: parseFloat(row[5]) };
+  //     const cpuIrq = { x: time, y: parseFloat(row[7]) };
+  //     const cpuSoft = { x: time, y: parseFloat(row[8]) };
+  //     const cpuIdle = { x: time, y: parseFloat(row[11]) };
+  //     array.push(cpuUsr, cpuNice, cpuSys, cpuIowait, cpuIrq, cpuSoft, cpuIdle);
+  //   });
+  // });
+
+
+  // dataArray.forEach(row => { // Logic to add each coulmn to the correct metric
+  //   const time = Date.parse(`${dateData} ${row[0]}`);
+  //   const cpuNum = row[1];
+  //   const cpuUsr = parseFloat(row[2]);
+  //   const cpuNice = parseFloat(row[3]);
+  //   const cpuSys = parseFloat(row[4]);
+  //   const cpuIowait = parseFloat(row[5]);
+  //   const cpuIrq = parseFloat(row[7]);
+  //   const cpuSoft = parseFloat(row[8]);
+  //   const cpuIdle = parseFloat(row[11]);
+  //   xlables.push(time);
+  //   cpuNumber.push(cpuNum);
+  //   ycpuUsr.push(cpuUsr);
+  //   ycpuNice.push(cpuNice);
+  //   ycpuSys.push(cpuSys);
+  //   ycpuIowait.push(cpuIowait);
+  //   ycpuIrq.push(cpuIrq);
+  //   ycpuSoft.push(cpuSoft);
+  //   ycpuIdle.push(cpuIdle);
+  // });
+
+  // return { xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU };
 }
 
 export function parseMemoryData(sarFileData) {
