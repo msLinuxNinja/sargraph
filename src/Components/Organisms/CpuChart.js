@@ -109,17 +109,6 @@ export default function CpuChart() {
     chart.data.datasets[5].data = cpuData.cpuArray[selectedCPU][0].cpuSoftData;
     chart.data.datasets[6].data = cpuData.cpuArray[selectedCPU][0].cpuIdleData;
     chart.update();
-
-    // chart.data.datasets[0].data = newCpuUsr
-    // chart.data.datasets[1].data = newCpuNice
-    // chart.data.datasets[2].data = newCpuSys
-    // chart.data.datasets[3].data = newCpuIowait
-    // chart.data.datasets[4].data = newCpuIrq
-    // chart.data.datasets[5].data = newCpuSoft
-    // chart.data.datasets[6].data = newCpuIdle
-
-    
-    // chart.update()
   }
 
   function createChartData() {
@@ -300,7 +289,6 @@ export default function CpuChart() {
   // useMemo and effects
   const chartData = useMemo(() => {
     setIsLoading(true);
-    // setSelectedCPU(0) //sets default on first render
     return createChartData();
   }, [cpuData]);
 
