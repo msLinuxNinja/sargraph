@@ -62,7 +62,7 @@ export function parseFileDetails(sarFileData) {
 }
 
 export function parseCPUData(sarFileData) { // Parse CPU details and return an object with 8 arrays
-  const [xlables, cpuNumber, ycpuUsr, ycpuNice, ycpuSys, ycpuIowait, ycpuIrq, ycpuSoft, ycpuIdle, uniqCPU, matchedData, parsedData] = [[], [], [], [], [], [], [], [], [], [], [], []];
+  const [uniqCPU, matchedData, parsedData] = [[], [], []];
   let dataArray = [];
 
 
@@ -85,7 +85,16 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     }
   });
 
-  const cpuArray = Array.from({ length: uniqCPU.length }, () => [{
+  // const cpuArray = Array.from({ length: uniqCPU.length }, () => [{
+  //   cpuUsrData: [],
+  //   cpuNiceData: [],
+  //   cpuSysData: [],
+  //   cpuIowaitData: [],
+  //   cpuIrqData: [],
+  //   cpuSoftData: [],
+  //   cpuIdleData: [],
+  // }]);
+  const cpuArray = uniqCPU.map(() => ({ // Maps through the array of unique CPUs and returns an object with 8 arrays for each CPU metric
     cpuUsrData: [],
     cpuNiceData: [],
     cpuSysData: [],
@@ -93,7 +102,7 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     cpuIrqData: [],
     cpuSoftData: [],
     cpuIdleData: [],
-  }]);
+  }));
 
   uniqCPU.forEach(cpu => { // With list of unique CPUs obtain data based on matched reges
     matchedData.push(returnMatch(`(^${cpu}$)`, sarFileData));
@@ -115,7 +124,7 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     return false;
   });
   const avgInterval = calculatePollInterval(sarFileData);
-  console.log(`Interval ${avgInterval}`)
+
   if (avgInterval <= 10) { // on large datasets, reduce the datapoints by filtering out by an 18th of the data based on the average polling interval
     dataArray = filteredArray.filter((row, index) => index % 18 === 0);
   } else if (avgInterval <= 20) {
@@ -128,18 +137,19 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     dataArray = filteredArray;
   }
   cpuArray.forEach((array, index) => { // Logic to add data to the array of objects
-    dataArray.filter(row => row[1] === uniqCPU[index]).forEach((row, secIndex) => {
+    console.log(array)
+    dataArray.filter(row => row[1] === uniqCPU[index]).forEach((row) => {
       const time = Date.parse(`${dateData} ${row[0]}`);
-      array[0].cpuUsrData.push({ x: time, y: parseFloat(row[2]) });
-      array[0].cpuNiceData.push({ x: time, y: parseFloat(row[3]) });
-      array[0].cpuSysData.push({ x: time, y: parseFloat(row[4]) });
-      array[0].cpuIowaitData.push({ x: time, y: parseFloat(row[5]) });
-      array[0].cpuIrqData.push({ x: time, y: parseFloat(row[7]) });
-      array[0].cpuSoftData.push({ x: time, y: parseFloat(row[8]) });
-      array[0].cpuIdleData.push({ x: time, y: parseFloat(row[11]) });
+      array.cpuUsrData.push({ x: time, y: parseFloat(row[2]) });
+      array.cpuNiceData.push({ x: time, y: parseFloat(row[3]) });
+      array.cpuSysData.push({ x: time, y: parseFloat(row[4]) });
+      array.cpuIowaitData.push({ x: time, y: parseFloat(row[5]) });
+      array.cpuIrqData.push({ x: time, y: parseFloat(row[7]) });
+      array.cpuSoftData.push({ x: time, y: parseFloat(row[8]) });
+      array.cpuIdleData.push({ x: time, y: parseFloat(row[11]) });
     });
   });
-
+  console.log(cpuArray)
 
   return { cpuArray, uniqCPU };
 }

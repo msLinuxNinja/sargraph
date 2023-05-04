@@ -101,13 +101,13 @@ export default function CpuChart() {
   //chart generation and select
   function changeDatasetData(chart) {
 
-    chart.data.datasets[0].data = cpuData.cpuArray[selectedCPU][0].cpuUsrData;
-    chart.data.datasets[1].data = cpuData.cpuArray[selectedCPU][0].cpuNiceData;
-    chart.data.datasets[2].data = cpuData.cpuArray[selectedCPU][0].cpuSysData;
-    chart.data.datasets[3].data = cpuData.cpuArray[selectedCPU][0].cpuIowaitData;
-    chart.data.datasets[4].data = cpuData.cpuArray[selectedCPU][0].cpuIrqData;
-    chart.data.datasets[5].data = cpuData.cpuArray[selectedCPU][0].cpuSoftData;
-    chart.data.datasets[6].data = cpuData.cpuArray[selectedCPU][0].cpuIdleData;
+    chart.data.datasets[0].data = cpuData.cpuArray[selectedCPU].cpuUsrData;
+    chart.data.datasets[1].data = cpuData.cpuArray[selectedCPU].cpuNiceData;
+    chart.data.datasets[2].data = cpuData.cpuArray[selectedCPU].cpuSysData;
+    chart.data.datasets[3].data = cpuData.cpuArray[selectedCPU].cpuIowaitData;
+    chart.data.datasets[4].data = cpuData.cpuArray[selectedCPU].cpuIrqData;
+    chart.data.datasets[5].data = cpuData.cpuArray[selectedCPU].cpuSoftData;
+    chart.data.datasets[6].data = cpuData.cpuArray[selectedCPU].cpuIdleData;
     chart.update();
   }
 
@@ -117,7 +117,7 @@ export default function CpuChart() {
       datasets: [
         {
           label: "CPU all usr%",
-          data: cpuData.cpuArray[0][0].cpuUsrData,
+          data: cpuData.cpuArray[0].cpuUsrData,
           // backgroundColor: "rgba(0, 132, 195, 0.1)",
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
@@ -144,7 +144,7 @@ export default function CpuChart() {
         },
         {
           label: "CPU all nice%",
-          data: cpuData.cpuArray[0][0].cpuNiceData,
+          data: cpuData.cpuArray[0].cpuNiceData,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 1)",
           borderWidth: 2,
@@ -153,7 +153,7 @@ export default function CpuChart() {
         },
         {
           label: "CPU all sys%",
-          data: cpuData.cpuArray[0][0].cpuSysData,
+          data: cpuData.cpuArray[0].cpuSysData,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -162,7 +162,7 @@ export default function CpuChart() {
         },
         {
           label: "CPU all iowait%",
-          data: cpuData.cpuArray[0][0].cpuIowaitData,
+          data: cpuData.cpuArray[0].cpuIowaitData,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -171,7 +171,7 @@ export default function CpuChart() {
         },
         {
           label: "CPU all irq%",
-          data: cpuData.cpuArray[0][0].cpuIrqData,
+          data: cpuData.cpuArray[0].cpuIrqData,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -180,7 +180,7 @@ export default function CpuChart() {
         },
         {
           label: "CPU all softIrq%",
-          data: cpuData.cpuArray[0][0].cpuSoftData,
+          data: cpuData.cpuArray[0].cpuSoftData,
           backgroundColor: "rgba(177, 17, 82, 0.1)",
           borderColor: "rgba(177, 17, 82, 0.8)",
           borderWidth: 2,
@@ -189,7 +189,7 @@ export default function CpuChart() {
         },
         {
           label: "CPU all idle%",
-          data: cpuData.cpuArray[0][0].cpuIdleData,
+          data: cpuData.cpuArray[0].cpuIdleData,
           backgroundColor: "rgba(0, 210, 255, 0.05)",
           borderColor: "rgba(0, 210, 255, 0.8)",
           borderWidth: 2,
@@ -202,8 +202,8 @@ export default function CpuChart() {
 
   function createChartOptions() {
     let perfOptions = true;
-    if (cpuData.cpuArray[0][0].cpuUsrData.length > 2000) {
-      console.log(cpuData.cpuArray[0][0].cpuUsrData.length)
+    if (cpuData.cpuArray[0].cpuUsrData.length > 2000) {
+      console.log(cpuData.cpuArray[0].cpuUsrData.length)
       perfOptions = false;
     }
     return {
@@ -259,8 +259,8 @@ export default function CpuChart() {
           },
           limits: {
             x: {
-              min: cpuData.cpuArray[0][0].cpuUsrData[0].x,
-              max: cpuData.cpuArray[0][0].cpuUsrData[cpuData.cpuArray[0][0].cpuUsrData.length - 1].x,
+              min: cpuData.cpuArray[0].cpuUsrData[0].x,
+              max: cpuData.cpuArray[0].cpuUsrData[cpuData.cpuArray[0].cpuUsrData.length - 1].x,
             }
           }
         },
@@ -277,7 +277,8 @@ export default function CpuChart() {
   //data statistics
   function getStats () {
     const newCpuStats = { ...cpuStats };
-    newCpuStats.max = Math.max.apply(Math, cpuData.ycpuUsr)
+
+    // newCpuStats.max = Math.max.apply(Math, combined)
     newCpuStats.index = cpuData.ycpuUsr.indexOf(newCpuStats.max)
     newCpuStats.maxTime = cpuData.xlables[newCpuStats.index]
     newCpuStats.cpuID = cpuData.cpuNumber[newCpuStats.index]
@@ -304,6 +305,7 @@ export default function CpuChart() {
 
   useEffect(() => {
     setIsLoading(false);
+    console.log(cpuData.cpuArray[0])
     // getStats()
   }, [])
 
