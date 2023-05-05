@@ -70,10 +70,10 @@ export default function CpuChart() {
       title: "Max usr%",
       dataIndex: "max",
     },
-    {
-      title: "Total usr% Avg",
-      dataIndex: "average",
-    }
+    // {
+    //   title: "Total usr% Avg",
+    //   dataIndex: "average",
+    // }
   ];
 
   const tableData = [
@@ -82,7 +82,7 @@ export default function CpuChart() {
       maxTime: cpuStats.maxTime,
       cpuID: cpuStats.cpuID,
       max: cpuStats.max,
-      average: cpuStats.average,
+      // average: cpuStats.average,
     },
   ];
 
@@ -278,11 +278,26 @@ export default function CpuChart() {
   function getStats () {
     const newCpuStats = { ...cpuStats };
 
-    // newCpuStats.max = Math.max.apply(Math, combined)
-    newCpuStats.index = cpuData.ycpuUsr.indexOf(newCpuStats.max)
-    newCpuStats.maxTime = cpuData.xlables[newCpuStats.index]
-    newCpuStats.cpuID = cpuData.cpuNumber[newCpuStats.index]
-    newCpuStats.average = cpuData.ycpuUsr.reduce((a, b) => a + b, 0) / cpuData.ycpuUsr.length
+    let max = -Infinity;
+    let maxCpuIndex = -1;
+    let maxUsrIndex = -1;
+
+    cpuData.cpuArray.slice(1).forEach((cpu, cpuIndex) => {
+      cpu.cpuUsrData.forEach((usrData, usrIndex) => {
+        const y = usrData.y;
+        if (y > max) {
+          max = y;
+          maxCpuIndex = cpuIndex + 1;
+          maxUsrIndex = usrIndex;
+        }
+      });
+    });
+    let tiemString = new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+    tiemString = tiemString + " " + new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    newCpuStats.max = cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].y;
+    newCpuStats.maxTime = tiemString
+    newCpuStats.cpuID = cpuData.uniqCPU[maxCpuIndex]
+    // newCpuStats.average = cpuData.ycpuUsr.reduce((a, b) => a + b, 0) / cpuData.ycpuUsr.length
     setCpuStats(newCpuStats);
   }
 
@@ -305,8 +320,7 @@ export default function CpuChart() {
 
   useEffect(() => {
     setIsLoading(false);
-    console.log(cpuData.cpuArray[0])
-    // getStats()
+    getStats()
   }, [])
 
   return (

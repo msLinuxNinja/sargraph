@@ -137,9 +137,9 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     dataArray = filteredArray;
   }
   cpuArray.forEach((array, index) => { // Logic to add data to the array of objects
-    console.log(array)
+
     dataArray.filter(row => row[1] === uniqCPU[index]).forEach((row) => {
-      const time = Date.parse(`${dateData} ${row[0]}`);
+      const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
       array.cpuUsrData.push({ x: time, y: parseFloat(row[2]) });
       array.cpuNiceData.push({ x: time, y: parseFloat(row[3]) });
       array.cpuSysData.push({ x: time, y: parseFloat(row[4]) });
@@ -149,7 +149,6 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
       array.cpuIdleData.push({ x: time, y: parseFloat(row[11]) });
     });
   });
-  console.log(cpuArray)
 
   return { cpuArray, uniqCPU };
 }
