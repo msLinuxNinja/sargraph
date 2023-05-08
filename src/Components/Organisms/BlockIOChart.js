@@ -164,7 +164,6 @@ export default function BlockIOChart() {
     if (blockData.xlables.length > 1800) {
       perfOptions = false;
     }
-    console.log(blockData.xlables.length)
     return {
       scales: {
         y: {
