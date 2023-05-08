@@ -203,7 +203,6 @@ export default function CpuChart() {
   function createChartOptions() {
     let perfOptions = true;
     if (cpuData.cpuArray[0].cpuUsrData.length > 2000) {
-      console.log(cpuData.cpuArray[0].cpuUsrData.length)
       perfOptions = false;
     }
     return {
