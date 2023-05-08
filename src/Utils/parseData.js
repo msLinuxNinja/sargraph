@@ -35,12 +35,15 @@ export function parseFileDetails(sarFileData) {
   let kernel = "";
   let hostname = "";
   let date = "";
+  let arch = "";
 
   const header = sarFileData[0];
+
   if (header.includes('Linux')) {
     kernel = header[1];
     hostname = header[2].replace(/[()]/g, '');
     date = header[3];
+    arch = header[4].replace(/^_+|_+[^_]*$/g, '');
 
   } else {
     kernel = "N/A";
@@ -49,16 +52,14 @@ export function parseFileDetails(sarFileData) {
   }
 
   const avgInterval = calculatePollInterval(sarFileData);
+  let interval = "";
   if (avgInterval > 60) {
     const minutes = Math.round(avgInterval / 60);
-    const interval = `${minutes}m`;
-    console.log(interval)
+    interval = `${minutes}m`;
   } else {
-    const interval = `${avgInterval}s`;
-    console.log(interval)
+    interval = `${avgInterval}s`;
   }
-
-  return { kernel, hostname, date, avgInterval };
+  return { kernel, hostname, date, interval, arch };
 }
 
 export function parseCPUData(sarFileData) { // Parse CPU details and return an object with 8 arrays
@@ -85,15 +86,6 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
     }
   });
 
-  // const cpuArray = Array.from({ length: uniqCPU.length }, () => [{
-  //   cpuUsrData: [],
-  //   cpuNiceData: [],
-  //   cpuSysData: [],
-  //   cpuIowaitData: [],
-  //   cpuIrqData: [],
-  //   cpuSoftData: [],
-  //   cpuIdleData: [],
-  // }]);
   const cpuArray = uniqCPU.map(() => ({ // Maps through the array of unique CPUs and returns an object with 8 arrays for each CPU metric
     cpuUsrData: [],
     cpuNiceData: [],

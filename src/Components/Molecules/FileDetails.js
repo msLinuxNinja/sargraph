@@ -2,7 +2,7 @@ import { useDataContext } from "../Contexts/DataContext";
 import { Card, Col, Row, Statistic } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLinux, faFedora, faRedhat } from "@fortawesome/free-brands-svg-icons";
-import { faMicrochip, faCalendarDay, faServer, faHardDrive, faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { faMicrochip, faCalendarDay, faServer, faHardDrive, faFileArrowUp, faHourglassStart, faComputer } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 
 
@@ -13,6 +13,7 @@ export default function FileDetails() {
   const { fileDetails, cpuData, blockData } = useDataContext();
   const [icon, setIcon] = useState(<FontAwesomeIcon icon={faLinux} />);
   const [textColor, setTextColor] = useState("");
+  const green = "#3f8600";
 
 
   function returnDistroIcon() { // detect ditro type
@@ -41,7 +42,7 @@ export default function FileDetails() {
               title="Hostname"
               value={fileDetails.hostname}
               valueStyle={{
-                color: '#3f8600',
+                color: green,
               }}
               prefix={<FontAwesomeIcon icon={faServer} />}
             />
@@ -57,7 +58,6 @@ export default function FileDetails() {
                 color: textColor,
               }}
               prefix={icon}
-
             />
           </Card>
         </Col>
@@ -67,7 +67,7 @@ export default function FileDetails() {
               title="File Name"
               value={fileDetails.fileName}
               valueStyle={{
-                color: '#3f8600',
+                color: green,
               }}
               prefix={<FontAwesomeIcon icon={faFileArrowUp} />}
             />
@@ -82,7 +82,6 @@ export default function FileDetails() {
                 color: textColor,
               }}
               prefix={<FontAwesomeIcon icon={faHardDrive} />}
-
             />
           </Card>
         </Col>
@@ -92,7 +91,7 @@ export default function FileDetails() {
               title="File Date"
               value={fileDetails.date}
               valueStyle={{
-                color: '#3f8600',
+                color: green,
               }}
               prefix={<FontAwesomeIcon icon={faCalendarDay} />}
             />
@@ -107,7 +106,30 @@ export default function FileDetails() {
                 color: textColor,
               }}
               prefix={<FontAwesomeIcon icon={faMicrochip} />}
-
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card bordered={false}>
+            <Statistic
+              title="File Poll Rate"
+              value={fileDetails.interval}
+              valueStyle={{
+                color: green,
+              }}
+              prefix={<FontAwesomeIcon icon={faHourglassStart} />}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card bordered={false}>
+            <Statistic
+              title="Architecture"
+              value={fileDetails.arch}
+              valueStyle={{
+                color: textColor,
+              }}
+              prefix={<FontAwesomeIcon icon={faComputer} />}
             />
           </Card>
         </Col>
