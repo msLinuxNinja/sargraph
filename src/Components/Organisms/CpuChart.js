@@ -292,12 +292,11 @@ export default function CpuChart() {
         }
       });
     });
-    let tiemString = new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
-    tiemString = tiemString + " " + new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    let timeString = new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+    timeString = timeString + " " + new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     newCpuStats.max = cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].y;
-    newCpuStats.maxTime = tiemString
+    newCpuStats.maxTime = timeString
     newCpuStats.cpuID = cpuData.uniqCPU[maxCpuIndex]
-    // newCpuStats.average = cpuData.ycpuUsr.reduce((a, b) => a + b, 0) / cpuData.ycpuUsr.length
     setCpuStats(newCpuStats);
   }
 
@@ -306,7 +305,7 @@ export default function CpuChart() {
   const chartData = useMemo(() => {
     setIsLoading(true);
     return createChartData();
-  }, [cpuData]);
+  }, []);
 
   const chartOptions = useMemo(() => {
     return createChartOptions();
