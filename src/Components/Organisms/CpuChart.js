@@ -116,7 +116,7 @@ export default function CpuChart() {
     return {
       datasets: [
         {
-          label: "CPU all usr%",
+          label: "usr%",
           data: cpuData.cpuArray[0].cpuUsrData,
           // backgroundColor: "rgba(0, 132, 195, 0.1)",
           backgroundColor: (context) => {
@@ -143,7 +143,7 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all nice%",
+          label: "nice%",
           data: cpuData.cpuArray[0].cpuNiceData,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 1)",
@@ -152,7 +152,7 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all sys%",
+          label: "sys%",
           data: cpuData.cpuArray[0].cpuSysData,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
@@ -161,7 +161,7 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all iowait%",
+          label: "iowait%",
           data: cpuData.cpuArray[0].cpuIowaitData,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
@@ -170,7 +170,7 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all irq%",
+          label: "irq%",
           data: cpuData.cpuArray[0].cpuIrqData,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
@@ -179,7 +179,7 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all softIrq%",
+          label: "softIrq%",
           data: cpuData.cpuArray[0].cpuSoftData,
           backgroundColor: "rgba(177, 17, 82, 0.1)",
           borderColor: "rgba(177, 17, 82, 0.8)",
@@ -188,7 +188,7 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all idle%",
+          label: "idle%",
           data: cpuData.cpuArray[0].cpuIdleData,
           backgroundColor: "rgba(0, 210, 255, 0.05)",
           borderColor: "rgba(0, 210, 255, 0.8)",
