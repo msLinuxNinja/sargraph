@@ -146,7 +146,17 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
 }
 
 export function parseMemoryData(sarFileData) {
-  const [xlables, ykbmemFree, ykbMemUsed, ymemUsedPrcnt, ykbBuffers, ykbCached, ykbCommit, ycommitPrcnt, ytotalMemory] = [[], [], [], [], [], [], [], [], []];
+  const dateData = sarFileData[0][3].replace(/[-]/g, '/');
+
+  const kbMemFree = []
+  const kbMemUsed = []
+  const memUsedPrcnt = []
+  const kbBuffers = []
+  const kbCached = []
+  const kbCommit = []
+  const commitPrcnt = []
+  const totalMemory =[]
+
   let fileVersion = "";
 
   const header = sarFileData.filter(row => row.includes('kbmemfree'))
@@ -168,40 +178,33 @@ export function parseMemoryData(sarFileData) {
   if (fileVersion == "rhel8+") {
     filteredArray.forEach(row => { //pushes values to the array
 
-      xlables.push(row[0]); //time
-      ykbmemFree.push(parseInt(row[1] / 1048576)); //Dividing by 1048576 gives number in GB instead of KB
-      ykbMemUsed.push(parseInt(row[3] / 1048576));
-      ymemUsedPrcnt.push(parseInt(row[4]));
-      ykbBuffers.push(parseInt(row[5] / 1048576));
-      ykbCached.push(parseInt(row[6] / 1048576));
-      ykbCommit.push(parseInt(row[7] / 1048576));
-      ycommitPrcnt.push(parseInt(row[8]));
-      ytotalMemory.push(ykbmemFree[0] + ykbMemUsed[0] + ykbBuffers[0] + ykbCached[0]);
-
+      const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+      kbMemFree.push({ x: time, y: parseInt(row[1] / 1048576) }); //Dividing by 1048576 gives number in GB instead of KB
+      kbMemUsed.push({ x: time, y: parseInt(row[3] / 1048576) });
+      memUsedPrcnt.push({ x: time, y: parseInt(row[4]) });
+      kbBuffers.push({ x: time, y: parseInt(row[5] / 1048576) });
+      kbCached.push({ x: time, y: parseInt(row[6] / 1048576) });
+      kbCommit.push({ x: time, y: parseInt(row[7] / 1048576) });
+      commitPrcnt.push({ x: time, y: parseInt(row[8]) });
+      totalMemory.push({ x: time, y: parseInt(row[1] / 1048576) + parseInt(row[3] / 1048576) + parseInt(row[5] / 1048576) + parseInt(row[6] / 1048576) });
     });
 
   } else if (fileVersion == "rhel7") {
     filteredArray.forEach(row => { //pushes values to the array
-
-      xlables.push(row[0]); //time
-      ykbmemFree.push(parseInt(row[1] / 1048576)); //Dividing by 1048576 gives number in GB instead of KB
-      ykbMemUsed.push(parseInt(row[2] / 1048576));
-      ymemUsedPrcnt.push(parseInt(row[3]));
-      ykbBuffers.push(parseInt(row[4] / 1048576));
-      ykbCached.push(parseInt(row[5] / 1048576));
-      ykbCommit.push(parseInt(row[6] / 1048576));
-      ycommitPrcnt.push(parseInt(row[7]));
-      ytotalMemory.push(ykbmemFree[0] + ykbMemUsed[0] + ykbBuffers[0] + ykbCached[0]);
-
+      const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+      kbMemFree.push({ x: time, y: parseInt(row[1] / 1048576) }); //Dividing by 1048576 gives number in GB instead of KB
+      kbMemUsed.push({ x: time, y: parseInt(row[2] / 1048576) });
+      memUsedPrcnt.push({ x: time, y: parseInt(row[3]) });
+      kbBuffers.push({ x: time, y: parseInt(row[4] / 1048576) });
+      kbCached.push({ x: time, y: parseInt(row[5] / 1048576) });
+      kbCommit.push({ x: time, y: parseInt(row[6] / 1048576) });
+      commitPrcnt.push({ x: time, y: parseInt(row[7]) });
+      totalMemory.push({ x: time, y: parseInt(row[1] / 1048576) + parseInt(row[2] / 1048576) + parseInt(row[4] / 1048576) + parseInt(row[5] / 1048576) });
     });
 
   }
 
-
-
-
-
-  return { xlables, ykbmemFree, ykbMemUsed, ymemUsedPrcnt, ykbBuffers, ykbCached, ykbCommit, ycommitPrcnt, ytotalMemory };
+  return { kbMemFree, kbMemUsed, memUsedPrcnt, kbBuffers, kbCached, kbCommit, commitPrcnt, totalMemory };
 }
 
 export function parseDiskIO(sarFileData) {

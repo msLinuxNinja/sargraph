@@ -1,18 +1,21 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 
-
+import 'chartjs-adapter-date-fns';
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  Decimation
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -21,14 +24,18 @@ import { Line } from 'react-chartjs-2';
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
   Filler,
-  zoomPlugin // register zoom plugin
+  zoomPlugin, // register zoom plugin
+  Decimation
 )
+
 
 export default function MemoryChart() {
   const { memoryData } = useDataContext();
@@ -36,11 +43,10 @@ export default function MemoryChart() {
 
   function createChartData() {
     return {
-      labels: memoryData.xlables,
       datasets: [
         {
           label: "Memory Free GB",
-          data: memoryData.ykbmemFree,
+          data: memoryData.kbMemFree,
           backgroundColor: "rgba(0, 132, 195, 0.1)",
           borderColor: "rgba(0, 132, 195, 0.8)",
           borderWidth: 2,
@@ -49,7 +55,7 @@ export default function MemoryChart() {
         },
         {
           label: "Memory Used GB",
-          data: memoryData.ykbMemUsed,
+          data: memoryData.kbMemUsed,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 0.8)",
           borderWidth: 2,
@@ -58,7 +64,7 @@ export default function MemoryChart() {
         },
         {
           label: "Memory Buffers GB",
-          data: memoryData.ykbBuffers,
+          data: memoryData.kbBuffers,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -67,7 +73,7 @@ export default function MemoryChart() {
         },
         {
           label: "Memory Cache GB",
-          data: memoryData.ykbCached,
+          data: memoryData.kbCached,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -76,7 +82,7 @@ export default function MemoryChart() {
         },
         {
           label: "Memory Commit GB",
-          data: memoryData.ykbCommit,
+          data: memoryData.kbCommit,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -85,7 +91,7 @@ export default function MemoryChart() {
         },
         {
           label: "Total Memory",
-          data: memoryData.ytotalMemory,
+          data: memoryData.totalMemory,
           backgroundColor: "rgba(0, 175, 218, 0.1)",
           borderColor: "rgba(0, 175, 218, 0.8)",
           borderWidth: 2,
@@ -110,21 +116,26 @@ export default function MemoryChart() {
           },
           responsive: true,
           min: 0,
-
+          type: "linear",
         },
 
         x: {
           ticks: {
             color: "rgba(180, 180, 180, 1)",
+            source: "auto",
+            autoSkip: true,
+            maxRotation: 0,
           },
 
           grid: {
             color: "rgba(0, 0, 0, 0.05)",
-          }
+          },
+          type: "time",
         },
       },
       normalized: true,
       mantainAspectRatio: false,
+      parsing: false,
       responsive: true,
       plugins: {
         legend: {
@@ -144,6 +155,18 @@ export default function MemoryChart() {
             enabled: true,
             mode: "x",
           },
+          limits: {
+            x: {
+              min: memoryData.kbMemFree[0].x,
+              max: memoryData.kbMemFree[memoryData.kbMemFree.length - 1].x,
+            }
+          }
+        },
+        decimation: {
+          enabled: true,
+          algorithm: "lttb",
+          samples: 200,
+          threshold: 1100,
         },
       },
     };
