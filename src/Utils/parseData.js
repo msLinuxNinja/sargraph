@@ -1,5 +1,5 @@
 const returnDataPortion = (firstIndex, lastIndex, array) => {
-  // console.log(`First: ${firstIndex}, Last: ${lastIndex}`)
+
   const resultingArray = array.slice(firstIndex, lastIndex);
   return resultingArray;
 }
@@ -211,19 +211,26 @@ export function parseMemoryData(sarFileData) {
 export function parseDiskIO(sarFileData) {
   const [uniqDev, matchedData, parsedData] = [[], [], []];
   let dataArray = [];
+ 
   const dateData = sarFileData[0][3].replace(/[-]/g, '/');
+  const header = sarFileData.filter(row => row.includes('DEV'));
   const rowIncludesDev = sarFileData.map((row, index) => row.includes('DEV') ? index : null).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
   const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance 
-
   const rowIncludesAvg = sarFileData.map((row, index) => row.includes('Average:') ? index : null).filter(index => typeof index === 'number');
-
   const tempLastIndex = rowIncludesAvg.filter(number => number > rowIncludesDev[0]); // Last index from the array
 
-  const lastIndex = tempLastIndex[0] - 1;
+  const lastIndex = tempLastIndex[0];
 
 
-  const diskData = returnDataPortion(firstIndex, lastIndex, sarFileData);
+  const diskPortion = returnDataPortion(firstIndex, lastIndex, sarFileData);
+  const diskData = diskPortion.filter(row => !row.includes('DEV'))
 
+  let fileVersion = "";
+  if (!header.includes('svctm')) {
+    fileVersion = "rhel8+";
+  } else {
+    fileVersion = "rhel7";
+  }
 
   diskData.forEach(row => { // Obtain list of unique block devices to later use as an iterator and perform Regex
     const block = row[1];
@@ -233,6 +240,12 @@ export function parseDiskIO(sarFileData) {
     }
   });
 
+  uniqDev.forEach(block => {
+    matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
+  });
+
+  uniqDev.sort();
+
   const diskArray = uniqDev.map(() => ({
     tps: [],
     readSec: [],
@@ -241,10 +254,6 @@ export function parseDiskIO(sarFileData) {
     avgQz: [],
     awaitMS: []
   }));
-
-  uniqDev.forEach(block => {
-    matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
-  });
 
   matchedData.forEach(array => {
     array.forEach(entry => {
@@ -268,17 +277,32 @@ export function parseDiskIO(sarFileData) {
     dataArray = filteredArray;
   }
 
-  diskArray.forEach((array, index) => {
-    dataArray.filter(row => row[1] === uniqDev[index]).forEach(row => {
-      const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-      array.tps.push({ x: time, y: parseFloat(row[2]) });
-      array.readSec.push({ x: time, y: parseInt((row[3] * 512) / 1048576) }); // Calculate MB/s
-      array.writeSec.push({ x: time, y: parseInt((row[4] * 512) / 1048576) }); // Calculate MB/s
-      array.avgRQz.push({ x: time, y: parseInt((row[5] * 512) / 1024) }); // Calculate blocksize in KB
-      array.avgQz.push({ x: time, y: parseInt(row[6]) });
-      array.awaitMS.push({ x: time, y: parseFloat(row[7]) });
-    });    
-  });
-  uniqDev.sort();
+  if (fileVersion == "rhel8+") {
+    diskArray.forEach((array, index) => {
+      dataArray.filter(row => row[1] === uniqDev[index]).forEach(row => {
+        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+        array.tps.push({ x: time, y: parseFloat(row[2]) });
+        array.readSec.push({ x: time, y: parseInt(row[3] / 1024) }); // Calculate MB/s
+        array.writeSec.push({ x: time, y: parseInt(row[4] / 1024) }); // Calculate MB/s
+        array.avgRQz.push({ x: time, y: parseInt((row[6] * 512) / 1024) }); // Calculate blocksize in KB
+        array.avgQz.push({ x: time, y: parseInt(row[7]) });
+        array.awaitMS.push({ x: time, y: parseFloat(row[8]) });
+      });    
+    });
+  
+  } else if (fileVersion == "rhel7") {
+    diskArray.forEach((array, index) => {
+      dataArray.filter(row => row[1] === uniqDev[index]).forEach(row => {
+        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+        array.tps.push({ x: time, y: parseFloat(row[2]) });
+        array.readSec.push({ x: time, y: parseInt((row[3] * 512) / 1048576) }); // Calculate MB/s
+        array.writeSec.push({ x: time, y: parseInt((row[4] * 512) / 1048576) }); // Calculate MB/s
+        array.avgRQz.push({ x: time, y: parseInt((row[5] * 512) / 1024) }); // Calculate blocksize in KB
+        array.avgQz.push({ x: time, y: parseInt(row[6]) });
+        array.awaitMS.push({ x: time, y: parseFloat(row[7]) });
+      });    
+    });
+  }
+  
   return { diskArray, uniqDev }; //export object with arrays
 }
