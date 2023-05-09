@@ -1,18 +1,22 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 
 
+import 'chartjs-adapter-date-fns';
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  Decimation
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -21,30 +25,32 @@ import { Line } from 'react-chartjs-2';
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
   Filler,
-  zoomPlugin // register zoom plugin
+  zoomPlugin, // register zoom plugin
+  Decimation
 )
 
 export default function MemoryPercntChart() {
   const { memoryData } = useDataContext();
+  const chartRef = useRef();
+
   function createChartData() {
     return {
-      labels: memoryData.xlables,
       datasets: [
         {
           label: "Memory Used %",
-          data: memoryData.ymemUsedPrcnt,
-          // backgroundColor:'rgba(0, 132, 195, 0.1)',
+          data: memoryData.memUsedPrcnt,
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
             let yAxis = context.chart.scales.y.height; // Get chart height to make it responsive
             if (yAxis === undefined) {
-              // scales.y.height is undefined when starting ideally should use isMounted? but for now an if to check if undefined assign an arbitrary number.
               yAxis = 400;
             } else {
               yAxis = context.chart.scales.y.height;
@@ -65,7 +71,7 @@ export default function MemoryPercntChart() {
         },
         {
           label: "Memory Commit %",
-          data: memoryData.ycommitPrcnt,
+          data: memoryData.commitPrcnt,
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
             let yAxis = context.chart.scales.y.height; // Get chart height to make it responsive
@@ -108,24 +114,30 @@ export default function MemoryPercntChart() {
           grid: {
             color: "rgba(0, 0, 0, 0.2)",
           },
-          responsive: true,
           min: 0,
           max: 100,
+          type: "linear",
           
         },
 
         x: {
           ticks: {
             color: "rgba(180, 180, 180, 1)",
+            source: "auto",
+            autoSkip: true,
+            maxRotation: 0,
           },
 
           grid: {
             color: "rgba(0, 0, 0, 0.05)",
-          }
+          },
+          type: "time",
         },
       },
       normalized: true,
       mantainAspectRatio: false,
+      parsing: false,
+      responsive: true,
       plugins: {
         legend: {
           labels: {
@@ -144,26 +156,34 @@ export default function MemoryPercntChart() {
             enabled: true,
             mode: "x",
           },
+          limits: {
+            x: {
+              min: memoryData.memUsedPrcnt[0].x,
+              max: memoryData.memUsedPrcnt[memoryData.memUsedPrcnt.length - 1].x,
+            },
+          },
+        },
+        decimation: {
+          enabled: true,
+          algorithm: "lttb",
+          samples: 150,
+          threshold: 1000,
         },
       },
     };
   }
 
   const chartData = useMemo(() => {
-    if (memoryData) {
-      return createChartData();
-    }
-  }, [memoryData]);
+    return createChartData();
+  }, []);
 
   const chartOptions = useMemo(() => {
-    if (memoryData) {
-      return createChartOptions();
-    }
-  }, [memoryData]);
+    return createChartOptions();
+  }, []);
 
   return (
     <>
-      <Line options={chartOptions} data={chartData} />
+      <Line ref={chartRef} options={chartOptions} data={chartData} />
     </>
   );
 }

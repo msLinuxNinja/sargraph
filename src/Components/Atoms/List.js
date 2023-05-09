@@ -5,7 +5,8 @@ export default function ItemList(props) {
 
 
   function handleChange(selectedOption) {
-    props.setValue(selectedOption);
+    const dataIndex = props.items.indexOf(selectedOption)
+    props.setValue(dataIndex);
   }
 
   const options = [];

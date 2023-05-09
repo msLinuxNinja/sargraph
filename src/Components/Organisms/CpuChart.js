@@ -5,17 +5,21 @@ import ItemList from "../Atoms/List";
 import TableDetails from "../Molecules/TableDetails";
 import {Button, Drawer } from "antd";
 
+import 'chartjs-adapter-date-fns';
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  Decimation
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -24,13 +28,16 @@ import { Line } from 'react-chartjs-2';
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
   Filler,
-  zoomPlugin // register zoom plugin
+  zoomPlugin, // register zoom plugin
+  Decimation
 )
 
 
@@ -63,10 +70,10 @@ export default function CpuChart() {
       title: "Max usr%",
       dataIndex: "max",
     },
-    {
-      title: "Total usr% Avg",
-      dataIndex: "average",
-    }
+    // {
+    //   title: "Total usr% Avg",
+    //   dataIndex: "average",
+    // }
   ];
 
   const tableData = [
@@ -75,7 +82,7 @@ export default function CpuChart() {
       maxTime: cpuStats.maxTime,
       cpuID: cpuStats.cpuID,
       max: cpuStats.max,
-      average: cpuStats.average,
+      // average: cpuStats.average,
     },
   ];
 
@@ -89,83 +96,28 @@ export default function CpuChart() {
   }
 
   const chartRef = useRef();
-  let perfOptions = true;
+  
 
   //chart generation and select
-  function getSelectedIndex(chart) {
-    //logs the indexes of the selected value (CPU)
-    // console.log(chart.data.datasets[0].data)
-    // console.log(chart.data.labels)
-    
-    const re =  new RegExp (`^${selectedCPU}$`) // Build RegExp
+  function changeDatasetData(chart) {
 
-    const dataIndex = cpuData.cpuNumber // Returns the indexes where the RegExp occurs
-      .map((x, index) => (x.match(re) ? index : null))
-      .filter((item) => item !== null);
-
-    const newXLables = dataIndex.map(index => {
-
-      return cpuData.xlables[index]
-    })
-    
-    const newCpuUsr = dataIndex.map(index => {
-
-      return cpuData.ycpuUsr[index]
-    })
-    
-    const newCpuNice = dataIndex.map(index => {
-
-      return cpuData.ycpuNice[index]
-    })
-    
-    const newCpuSys = dataIndex.map(index => {
-
-      return cpuData.ycpuSys[index]
-    })
-    
-    const newCpuIowait = dataIndex.map(index => {
-
-      return cpuData.ycpuIowait[index]
-    })
-    
-    const newCpuIrq = dataIndex.map(index => {
-
-      return cpuData.ycpuIrq[index]
-    })
-    
-    const newCpuSoft = dataIndex.map(index => {
-
-      return cpuData.ycpuSoft[index]
-    })
-    
-    const newCpuIdle = dataIndex.map(index => {
-
-      return cpuData.ycpuIdle[index]
-    })
-    
-    
-    // console.log(newTime)
-
-    chart.data.labels = newXLables
-    chart.data.datasets[0].data = newCpuUsr
-    chart.data.datasets[1].data = newCpuNice
-    chart.data.datasets[2].data = newCpuSys
-    chart.data.datasets[3].data = newCpuIowait
-    chart.data.datasets[4].data = newCpuIrq
-    chart.data.datasets[5].data = newCpuSoft
-    chart.data.datasets[6].data = newCpuIdle
-
-    
-    chart.update()
+    chart.data.datasets[0].data = cpuData.cpuArray[selectedCPU].cpuUsrData;
+    chart.data.datasets[1].data = cpuData.cpuArray[selectedCPU].cpuNiceData;
+    chart.data.datasets[2].data = cpuData.cpuArray[selectedCPU].cpuSysData;
+    chart.data.datasets[3].data = cpuData.cpuArray[selectedCPU].cpuIowaitData;
+    chart.data.datasets[4].data = cpuData.cpuArray[selectedCPU].cpuIrqData;
+    chart.data.datasets[5].data = cpuData.cpuArray[selectedCPU].cpuSoftData;
+    chart.data.datasets[6].data = cpuData.cpuArray[selectedCPU].cpuIdleData;
+    chart.update();
   }
 
   function createChartData() {
+    
     return {
-      labels: cpuData.xlables,
       datasets: [
         {
-          label: "CPU all usr%",
-          data: cpuData.ycpuUsr,
+          label: "usr%",
+          data: cpuData.cpuArray[0].cpuUsrData,
           // backgroundColor: "rgba(0, 132, 195, 0.1)",
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
@@ -191,8 +143,8 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all nice%",
-          data: cpuData.ycpuNice,
+          label: "nice%",
+          data: cpuData.cpuArray[0].cpuNiceData,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 1)",
           borderWidth: 2,
@@ -200,8 +152,8 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all sys%",
-          data: cpuData.ycpuSys,
+          label: "sys%",
+          data: cpuData.cpuArray[0].cpuSysData,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -209,8 +161,8 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all iowait%",
-          data: cpuData.ycpuIowait,
+          label: "iowait%",
+          data: cpuData.cpuArray[0].cpuIowaitData,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -218,8 +170,8 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all irq%",
-          data: cpuData.ycpuIrq,
+          label: "irq%",
+          data: cpuData.cpuArray[0].cpuIrqData,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -227,8 +179,8 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all softIrq%",
-          data: cpuData.ycpuSoft,
+          label: "softIrq%",
+          data: cpuData.cpuArray[0].cpuSoftData,
           backgroundColor: "rgba(177, 17, 82, 0.1)",
           borderColor: "rgba(177, 17, 82, 0.8)",
           borderWidth: 2,
@@ -236,8 +188,8 @@ export default function CpuChart() {
           tension: 0.2,
         },
         {
-          label: "CPU all idle%",
-          data: cpuData.ycpuIdle,
+          label: "idle%",
+          data: cpuData.cpuArray[0].cpuIdleData,
           backgroundColor: "rgba(0, 210, 255, 0.05)",
           borderColor: "rgba(0, 210, 255, 0.8)",
           borderWidth: 2,
@@ -249,7 +201,8 @@ export default function CpuChart() {
   }
 
   function createChartOptions() {
-    if (cpuData.xlables.length > 6000) {
+    let perfOptions = true;
+    if (cpuData.cpuArray[0].cpuUsrData.length > 2000) {
       perfOptions = false;
     }
     return {
@@ -265,19 +218,25 @@ export default function CpuChart() {
           },
           responsive: true,
           min: 0,
+          type: "linear",
         },
         x: {
           ticks: {
             color: "rgba(180, 180, 180, 1)",
+            source: "auto",
+            autoSkip: true,
+            maxRotation: 0,
           },
           grid: {
             color: "rgba(0, 0, 0, 0.05)",
-          }
+          },
+          type: "time",
         },
       },
       animation: perfOptions,
       normalized: true,
       mantainAspectRatio: false,
+      parsing: false,
       responsive: true,
       plugins: {
         legend: {
@@ -297,6 +256,18 @@ export default function CpuChart() {
             enabled: true,
             mode: "x",
           },
+          limits: {
+            x: {
+              min: cpuData.cpuArray[0].cpuUsrData[0].x,
+              max: cpuData.cpuArray[0].cpuUsrData[cpuData.cpuArray[0].cpuUsrData.length - 1].x,
+            }
+          }
+        },
+        decimation: {
+          enabled: true,
+          algorithm: "lttb",
+          samples: 100,
+          threshold: 1000,
         },
       },
     };
@@ -305,22 +276,35 @@ export default function CpuChart() {
   //data statistics
   function getStats () {
     const newCpuStats = { ...cpuStats };
-    newCpuStats.max = Math.max.apply(Math, cpuData.ycpuUsr)
-    newCpuStats.index = cpuData.ycpuUsr.indexOf(newCpuStats.max)
-    newCpuStats.maxTime = cpuData.xlables[newCpuStats.index]
-    newCpuStats.cpuID = cpuData.cpuNumber[newCpuStats.index]
-    newCpuStats.average = cpuData.ycpuUsr.reduce((a, b) => a + b, 0) / cpuData.ycpuUsr.length
+
+    let max = -Infinity;
+    let maxCpuIndex = -1;
+    let maxUsrIndex = -1;
+
+    cpuData.cpuArray.slice(1).forEach((cpu, cpuIndex) => {
+      cpu.cpuUsrData.forEach((usrData, usrIndex) => {
+        const y = usrData.y;
+        if (y > max) {
+          max = y;
+          maxCpuIndex = cpuIndex + 1;
+          maxUsrIndex = usrIndex;
+        }
+      });
+    });
+    let timeString = new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+    timeString = timeString + " " + new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    newCpuStats.max = cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].y;
+    newCpuStats.maxTime = timeString
+    newCpuStats.cpuID = cpuData.uniqCPU[maxCpuIndex]
     setCpuStats(newCpuStats);
   }
 
+
   // useMemo and effects
   const chartData = useMemo(() => {
-    if (cpuData) {
-      setIsLoading(true);
-      setSelectedCPU("all") //sets default on first render
-      return createChartData();
-    }
-  }, [cpuData]);
+    setIsLoading(true);
+    return createChartData();
+  }, []);
 
   const chartOptions = useMemo(() => {
     return createChartOptions();
@@ -328,10 +312,7 @@ export default function CpuChart() {
 
   useEffect(() => {
     const chart = chartRef.current
-
-    if (cpuData) {
-      getSelectedIndex(chart);
-    }
+    changeDatasetData(chart);
   }, [selectedCPU]);
 
 
