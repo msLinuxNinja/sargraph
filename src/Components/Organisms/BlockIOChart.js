@@ -125,11 +125,7 @@ export default function BlockIOChart() {
           beginAtZero: true,
           ticks: {
             color: "rgba(180, 180, 180, 1)",
-            //   callback: function (value, index, ticks) {
-            //     return value + "%";
-            //   },
           },
-          
           responsive: true,
           min: 0,
           type: "linear",
