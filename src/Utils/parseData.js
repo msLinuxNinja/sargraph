@@ -128,6 +128,7 @@ export function parseCPUData(sarFileData) { // Parse CPU details and return an o
   } else {
     dataArray = filteredArray;
   }
+
   cpuArray.forEach((array, index) => { // Logic to add data to the array of objects
 
     dataArray.filter(row => row[1] === uniqCPU[index]).forEach((row) => {
@@ -208,8 +209,9 @@ export function parseMemoryData(sarFileData) {
 }
 
 export function parseDiskIO(sarFileData) {
-  const [xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, blockDevices, uniqDev, matchedData, parsedData] = [[], [], [], [], [], [], [], [], [], [], []];
-
+  const [uniqDev, matchedData, parsedData] = [[], [], []];
+  let dataArray = [];
+  const dateData = sarFileData[0][3].replace(/[-]/g, '/');
   const rowIncludesDev = sarFileData.map((row, index) => row.includes('DEV') ? index : null).filter(index => typeof index === 'number'); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
   const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance 
 
@@ -231,6 +233,14 @@ export function parseDiskIO(sarFileData) {
     }
   });
 
+  const diskArray = uniqDev.map(() => ({
+    tps: [],
+    readSec: [],
+    writeSec: [],
+    avgRQz: [],
+    avgQz: [],
+    awaitMS: []
+  }));
 
   uniqDev.forEach(block => {
     matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
@@ -243,23 +253,32 @@ export function parseDiskIO(sarFileData) {
   });
 
 
-
+  const avgInterval = calculatePollInterval(sarFileData);
   const filteredArray = parsedData.filter(row => !row.includes('DEV') && !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
+  
+  if (avgInterval <= 10) { // on large datasets, reduce the datapoints by filtering out by an 18th of the data based on the average polling interval
+    dataArray = filteredArray.filter((row, index) => index % 18 === 0);
+  } else if (avgInterval <= 20) {
+    dataArray = filteredArray.filter((row, index) => index % 15 === 0);
+  } else if (avgInterval <= 30) {
+    dataArray = filteredArray.filter((row, index) => index % 4 === 0);
+  } else if (avgInterval <= 60) {
+    dataArray = filteredArray.filter((row, index) => index % 2 === 0);
+  } else {
+    dataArray = filteredArray;
+  }
 
-  filteredArray.forEach(row => { //pushes values to the array
-    const blockDev = row[1];
-    xlables.push(row[0]);
-    ytps.push(row[2])
-    yreadSec.push(parseInt((row[3] * 512) / 1048576)); // Calculate MB/s
-    ywriteSec.push(parseInt((row[4] * 512) / 1048576)); // Calculate MB/s
-    yavgRQz.push(parseInt((row[5] * 512) / 1024)); // Calculate blocksize in KB
-    yavgQz.push(parseInt(row[6]));
-    yawaitMS.push(parseFloat(row[7]));
-    blockDevices.push(blockDev); // Update found block devices
-
+  diskArray.forEach((array, index) => {
+    dataArray.filter(row => row[1] === uniqDev[index]).forEach(row => {
+      const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+      array.tps.push({ x: time, y: parseFloat(row[2]) });
+      array.readSec.push({ x: time, y: parseInt((row[3] * 512) / 1048576) }); // Calculate MB/s
+      array.writeSec.push({ x: time, y: parseInt((row[4] * 512) / 1048576) }); // Calculate MB/s
+      array.avgRQz.push({ x: time, y: parseInt((row[5] * 512) / 1024) }); // Calculate blocksize in KB
+      array.avgQz.push({ x: time, y: parseInt(row[6]) });
+      array.awaitMS.push({ x: time, y: parseFloat(row[7]) });
+    });    
   });
-
-
-
-  return { xlables, ytps, yreadSec, ywriteSec, yavgRQz, yavgQz, yawaitMS, uniqDev, blockDevices }; //export object with arrays
+  uniqDev.sort();
+  return { diskArray, uniqDev }; //export object with arrays
 }

@@ -3,17 +3,21 @@ import { useMemo, useRef, useEffect } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 
+import 'chartjs-adapter-date-fns';
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  Decimation
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -22,13 +26,16 @@ import { Line } from 'react-chartjs-2';
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
   Filler,
-  zoomPlugin // register zoom plugin
+  zoomPlugin, // register zoom plugin
+  Decimation
 )
 
 export default function BlockIOChart() {
@@ -36,75 +43,23 @@ export default function BlockIOChart() {
   const chartRef = useRef();
   let perfOptions = true;
 
-  function getSelectedIndex(chart) {
-    //logs the indexes of the selected value (CPU)
-    // console.log(chart.data.datasets[0].data) 
-    // console.log(chart.data.labels)
-  
 
-    const re =  new RegExp (`^${selectedBlock}$`) // Build RegExp
-
-    const dataIndex = blockData.blockDevices // Returns the indexes where the RegExp occurs
-      .map((x, index) => (x.match(re) ? index : null))
-      .filter((item) => item !== null);
-
-  
-    const newXLables = dataIndex.map(index => {
-
-      return blockData.xlables[index]
-    })
-    
-    const newTps = dataIndex.map(index => {
-
-      return blockData.ytps[index]
-    })    
-    
-    const newReadSec = dataIndex.map(index => {
-
-      return blockData.yreadSec[index]
-    })    
-    
-    const newWriteSec = dataIndex.map(index => {
-
-      return blockData.ywriteSec[index]
-    })    
-    
-    const newAvgRQsz = dataIndex.map(index => {
-
-      return blockData.yavgRQz[index]
-    })    
-    
-    const newAvgQz = dataIndex.map(index => {
-
-      return blockData.yavgQz[index]
-    })    
-    
-    const newAwaitMs = dataIndex.map(index => {
-
-      return blockData.yawaitMS[index]
-    })    
-    
-
-    chart.data.labels = newXLables
-    chart.data.datasets[0].data = newTps
-    chart.data.datasets[1].data = newReadSec
-    chart.data.datasets[2].data = newWriteSec
-    chart.data.datasets[3].data = newAvgRQsz
-    chart.data.datasets[4].data = newAvgQz
-    chart.data.datasets[5].data = newAwaitMs
-
-
-    
-    chart.update()
+  function changeDatasetData(chart) {
+    chart.data.datasets[0].data = blockData.diskArray[selectedBlock].tps;
+    chart.data.datasets[1].data = blockData.diskArray[selectedBlock].readSec;
+    chart.data.datasets[2].data = blockData.diskArray[selectedBlock].writeSec;
+    chart.data.datasets[3].data = blockData.diskArray[selectedBlock].avgRQz;
+    chart.data.datasets[4].data = blockData.diskArray[selectedBlock].avgQz;
+    chart.data.datasets[5].data = blockData.diskArray[selectedBlock].awaitMS;
+    chart.update();
   }
 
   function createChartData() {
     return {
-      labels: blockData.xlables,
       datasets: [
         {
           label: "Transfers per second",
-          data: blockData.ytps,
+          data: blockData.diskArray[0].tps,
           backgroundColor: "rgba(0, 132, 195, 0.1)",
           borderColor: "rgba(0, 132, 195, 0.8)",
           borderWidth: 2,
@@ -113,7 +68,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Read MB/s",
-          data: blockData.yreadSec,
+          data: blockData.diskArray[0].readSec,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 0.8)",
           borderWidth: 2,
@@ -122,7 +77,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Write MB/s",
-          data: blockData.ywriteSec,
+          data: blockData.diskArray[0].writeSec,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -131,7 +86,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Average Request Size (KB)",
-          data: blockData.yavgRQz,
+          data: blockData.diskArray[0].avgRQz,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -140,7 +95,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Average Queue Size",
-          data: blockData.yavgQz,
+          data: blockData.diskArray[0].avgQz,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -149,7 +104,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Latency in MS",
-          data: blockData.yawaitMS,
+          data: blockData.diskArray[0].awaitMS,
           backgroundColor: "rgba(0, 175, 218, 0.1)",
           borderColor: "rgba(0, 175, 218, 0.8)",
           borderWidth: 2,
@@ -161,7 +116,7 @@ export default function BlockIOChart() {
   }
 
   function createChartOptions() {
-    if (blockData.xlables.length > 1800) {
+    if (blockData.diskArray[0].tps.length > 1800) {
       perfOptions = false;
     }
     return {
@@ -177,21 +132,28 @@ export default function BlockIOChart() {
           
           responsive: true,
           min: 0,
+          type: "linear",
         },
 
         x: {
           ticks: {
             color: "rgba(180, 180, 180, 1)",
+            source: "auto",
+            autoSkip: true,
+            maxRotation: 0,
           },
 
           grid: {
             color: "rgba(0, 0, 0, 0.05)",
-          }
+          },
+          type: "time",
         },
       },
       animation: perfOptions,
       normalized: true,
       matainAspectRatio: false,
+      parsing: false,
+      responsive: true,
       plugins: {
         legend: {
           labels: {
@@ -210,36 +172,41 @@ export default function BlockIOChart() {
             enabled: true,
             mode: "x",
           },
+          limits: {
+            x: {
+              min: blockData.diskArray[0].tps[0].x,
+              max: blockData.diskArray[0].tps[blockData.diskArray[0].tps.length - 1].x,
+            }
+          },
+        },
+        decimation: {
+          enabled: true,
+          algorithm: "lttb",
+          samples: 100,
+          threshold: 1000,
         },
       },
     };
   }
 
   const chartData = useMemo(() => {
-    if (blockData) {
-      setSelectedBlock(blockData.uniqDev[0]) //sets default on first render
-      return createChartData();
-    }
-  }, [blockData]);
+    return createChartData();
+  }, []);
 
   const chartOptions = useMemo(() => {
-    if (blockData) {
-      return createChartOptions()
-    }    
-  }, [blockData]);
+    return createChartOptions()
+  }, []);
 
   useEffect(() => {
     const chart = chartRef.current
+    changeDatasetData(chart);
 
-    if (blockData) {
-      getSelectedIndex(chart);
-    }
   }, [selectedBlock]);
 
   return (
     <>
       <Line ref={chartRef} options={chartOptions} data={chartData} />
-      <ItemList items={blockData.uniqDev.sort()} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
+      <ItemList items={blockData.uniqDev} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
     </>
   );
 }
