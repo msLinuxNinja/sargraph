@@ -166,7 +166,7 @@ export default function MemoryPercntChart() {
         decimation: {
           enabled: true,
           algorithm: "lttb",
-          samples: 100,
+          samples: 150,
           threshold: 1000,
         },
       },
@@ -179,12 +179,6 @@ export default function MemoryPercntChart() {
 
   const chartOptions = useMemo(() => {
     return createChartOptions();
-  }, []);
-
-  useEffect(() => {
-
-    const chart = chartRef.current;
-    console.log(chart.data)
   }, []);
 
   return (
