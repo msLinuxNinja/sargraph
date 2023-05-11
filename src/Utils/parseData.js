@@ -226,11 +226,13 @@ export function parseDiskIO(sarFileData) {
   const diskData = diskPortion.filter(row => !row.includes('DEV'))
 
   let fileVersion = "";
-  if (!header.includes('svctm')) {
-    fileVersion = "rhel8+";
-  } else {
+  if (header[0].includes('svctm')) {
     fileVersion = "rhel7";
+  } else {
+    fileVersion = "rhel8+";
   }
+
+  console.log(header[0].includes('svctm'))
 
   diskData.forEach(row => { // Obtain list of unique block devices to later use as an iterator and perform Regex
     const block = row[1];
@@ -277,7 +279,7 @@ export function parseDiskIO(sarFileData) {
     dataArray = filteredArray;
   }
 
-  if (fileVersion == "rhel8+") {
+  if (fileVersion === "rhel8+") {
     diskArray.forEach((array, index) => {
       dataArray.filter(row => row[1] === uniqDev[index]).forEach(row => {
         const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
@@ -290,7 +292,7 @@ export function parseDiskIO(sarFileData) {
       });    
     });
   
-  } else if (fileVersion == "rhel7") {
+  } else if (fileVersion === "rhel7") {
     diskArray.forEach((array, index) => {
       dataArray.filter(row => row[1] === uniqDev[index]).forEach(row => {
         const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
