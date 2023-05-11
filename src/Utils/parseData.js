@@ -263,7 +263,6 @@ export function parseDiskIO(sarFileData) {
     });
   });
 
-
   const avgInterval = calculatePollInterval(sarFileData);
   const filteredArray = parsedData.filter(row => !row.includes('DEV') && !row.includes('Average:')) // return everything that does not include the word "%usr" which indicates a header
   
