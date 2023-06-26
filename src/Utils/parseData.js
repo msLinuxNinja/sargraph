@@ -253,8 +253,6 @@ export function parseDiskIO(sarFileData) {
     fileVersion = "rhel8+";
   }
 
-  console.log(header[0].includes('svctm'))
-
   diskData.forEach(row => { // Obtain list of unique block devices to later use as an iterator and perform Regex
     const block = row[1];
 
