@@ -208,7 +208,7 @@ export function parseMemoryData(sarFileData) {
       kbCached.push({ x: time, y: parseInt(row[6] / 1048576) });
       kbCommit.push({ x: time, y: parseInt(row[7] / 1048576) });
       commitPrcnt.push({ x: time, y: parseInt(row[8]) });
-      totalMemory.push({ x: time, y: parseInt(row[1] / 1048576) + parseInt(row[3] / 1048576) + parseInt(row[5] / 1048576) + parseInt(row[6] / 1048576) });
+      totalMemory.push({ x: time, y: parseInt(row[1] / 1048576) + parseInt(row[3] / 1048576) });
     });
 
   } else if (fileVersion == "rhel7") {
@@ -221,7 +221,7 @@ export function parseMemoryData(sarFileData) {
       kbCached.push({ x: time, y: parseInt(row[5] / 1048576) });
       kbCommit.push({ x: time, y: parseInt(row[6] / 1048576) });
       commitPrcnt.push({ x: time, y: parseInt(row[7]) });
-      totalMemory.push({ x: time, y: parseInt(row[1] / 1048576) + parseInt(row[2] / 1048576) + parseInt(row[4] / 1048576) + parseInt(row[5] / 1048576) });
+      totalMemory.push({ x: time, y: parseInt(row[1] / 1048576) + parseInt(row[2] / 1048576) });
     });
 
   }
