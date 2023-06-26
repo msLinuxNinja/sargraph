@@ -10,6 +10,26 @@ const returnMatch = (re, array) => { // returns new array from matched lines bas
   return array.filter(element => element[1].match(regex));
 }
 
+function findMode(arr) {
+  const frequency = arr.reduce((count, num) => {
+    count[num] = (count[num] || 0) + 1;
+    return count;
+  }, {});
+
+  let mode;
+  let maxFrequency = 0;
+  for (const key in frequency) {
+    if (frequency.hasOwnProperty(key)) {
+      if (frequency[key] > maxFrequency) {
+        maxFrequency = frequency[key];
+        mode = Number(key);
+      }
+    }
+  }
+
+  return mode;
+}
+
 function calculatePollInterval(sarData) {
   const sarDataPortion = sarData.filter(row => row.includes('all') && !row.includes('Average:') && !row.includes('CPU'));
   const dateRange = sarDataPortion.map(row => {
@@ -25,8 +45,9 @@ function calculatePollInterval(sarData) {
     }
   });
 
-  const sum = intervals.reduce((total, interval) => total + interval);
-  const avgInterval = Math.round(sum / intervals.length);
+  const modeInterval = findMode(intervals);
+  const filterInterval = intervals.filter(interval => interval === modeInterval);
+  const avgInterval = filterInterval.reduce((sum, num) => sum + num, 0) / filterInterval.length;
   return avgInterval;
 }
 
