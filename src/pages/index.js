@@ -107,7 +107,7 @@ export const HomePage = () => {
             tooltip={<div>Load New File</div>} 
             onClick={realoadPage} 
             style={{
-              right: 50,
+              right: 60,
               bottom: 120,
             }}
             type="primary"
