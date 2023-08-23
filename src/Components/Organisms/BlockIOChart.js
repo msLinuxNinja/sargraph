@@ -162,6 +162,7 @@ export default function BlockIOChart() {
             },
             drag: {
               enabled: true,
+              modifierKey: "ctrl",
             },
             mode: "x",
             speed: 0.05,

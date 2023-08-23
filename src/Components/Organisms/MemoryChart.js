@@ -150,6 +150,7 @@ export default function MemoryChart() {
             },
             drag: {
               enabled: true,
+              modifierKey: "ctrl",
             },
             mode: "x",
             speed: 0.05,
