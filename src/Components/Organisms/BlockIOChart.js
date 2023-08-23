@@ -43,7 +43,6 @@ export default function BlockIOChart() {
   const chartRef = useRef();
   let perfOptions = true;
 
-
   function changeDatasetData(chart) {
     chart.data.datasets[0].data = blockData.diskArray[selectedBlock].tps;
     chart.data.datasets[1].data = blockData.diskArray[selectedBlock].readSec;
