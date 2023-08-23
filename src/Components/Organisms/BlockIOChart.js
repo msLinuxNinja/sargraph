@@ -160,6 +160,9 @@ export default function BlockIOChart() {
             wheel: {
               enabled: true,
             },
+            drag: {
+              enabled: true,
+            },
             mode: "x",
             speed: 0.05,
           },
