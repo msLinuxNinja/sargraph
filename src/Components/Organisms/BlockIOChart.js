@@ -185,14 +185,23 @@ export default function BlockIOChart() {
   }
 
   const chartData = useMemo(() => {
+    if (blockData.diskArray.length === 0) {
+      return false;
+    }
     return createChartData();
   }, []);
 
   const chartOptions = useMemo(() => {
+    if (blockData.diskArray.length === 0) {
+      return false;
+    }
     return createChartOptions()
   }, []);
 
   useEffect(() => {
+    if (blockData.diskArray.length === 0) {
+      return;
+    }
     const chart = chartRef.current
     changeDatasetData(chart);
 
@@ -200,8 +209,8 @@ export default function BlockIOChart() {
 
   return (
     <>
-      <Line ref={chartRef} options={chartOptions} data={chartData} />
-      <ItemList items={blockData.uniqDev} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
+      {chartData ? <Line ref={chartRef} options={chartOptions} data={chartData} /> : <><h1>No data found</h1></>}
+      {chartData ? <ItemList items={blockData.uniqDev} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/> : <></>}
     </>
   );
 }
