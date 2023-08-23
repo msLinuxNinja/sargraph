@@ -251,6 +251,7 @@ export default function CpuChart() {
             },
             drag: {
               enabled: true,
+              modifierKey: "ctrl",
             },
             mode: "x",
             speed: 0.05,
