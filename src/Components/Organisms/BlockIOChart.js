@@ -43,7 +43,6 @@ export default function BlockIOChart() {
   const chartRef = useRef();
   let perfOptions = true;
 
-
   function changeDatasetData(chart) {
     chart.data.datasets[0].data = blockData.diskArray[selectedBlock].tps;
     chart.data.datasets[1].data = blockData.diskArray[selectedBlock].readSec;
@@ -161,6 +160,9 @@ export default function BlockIOChart() {
             wheel: {
               enabled: true,
             },
+            drag: {
+              enabled: true,
+            },
             mode: "x",
             speed: 0.05,
           },
@@ -186,14 +188,23 @@ export default function BlockIOChart() {
   }
 
   const chartData = useMemo(() => {
+    if (blockData.diskArray.length === 0) {
+      return false;
+    }
     return createChartData();
   }, []);
 
   const chartOptions = useMemo(() => {
+    if (blockData.diskArray.length === 0) {
+      return false;
+    }
     return createChartOptions()
   }, []);
 
   useEffect(() => {
+    if (blockData.diskArray.length === 0) {
+      return;
+    }
     const chart = chartRef.current
     changeDatasetData(chart);
 
@@ -201,8 +212,8 @@ export default function BlockIOChart() {
 
   return (
     <>
-      <Line ref={chartRef} options={chartOptions} data={chartData} />
-      <ItemList items={blockData.uniqDev} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/>
+      {chartData ? <Line ref={chartRef} options={chartOptions} data={chartData} /> : <><h1>No data found</h1></>}
+      {chartData ? <ItemList items={blockData.uniqDev} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/> : <></>}
     </>
   );
 }

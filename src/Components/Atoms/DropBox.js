@@ -25,7 +25,6 @@ export function DropBox() {
     try{
       if(fileContent.includes("Linux") && fileContent.includes("all")) { // Check if file is a sar file has the correct content
       
-      
         const dataObj = callParse(fileContent); // Object containing more objects (inception! 🤯)
         // Save data in context
         setCpuData(dataObj.cpuObject);

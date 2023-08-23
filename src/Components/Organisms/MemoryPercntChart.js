@@ -149,6 +149,9 @@ export default function MemoryPercntChart() {
             wheel: {
               enabled: true,
             },
+            drag: {
+              enabled: true,
+            },
             mode: "x",
             speed: 0.05,
           },
