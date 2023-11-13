@@ -125,7 +125,7 @@ export function parseCPUData(sarFileData) {
   }));
 
   uniqCPU.forEach((cpu) => {
-    // With list of unique CPUs obtain data based on matched reges
+    // With list of unique CPUs obtain data based on matched regex
     matchedData.push(returnMatch(`(^${cpu}$)`, sarFileData));
   });
 
@@ -138,12 +138,13 @@ export function parseCPUData(sarFileData) {
   });
 
   const filteredArray = parsedData.filter((row) => {
-    // After removing nested array, filter out rows with "CPU", "Average:" and that are less than or equal to 12
-    if (!row.includes("CPU") && !row.includes("Average:") && row.length >= 12) {
+    // After removing nested array, filter out rows with "CPU", "Average:" and that have 12 columns (only CPU section has 12 columns)
+    if (!row.includes("CPU") && !row.includes("Average:") && row.length == 12) {
       return true;
     }
     return false;
   });
+  
   const avgInterval = calculatePollInterval(sarFileData);
 
   if (avgInterval <= 10) {
@@ -175,7 +176,6 @@ export function parseCPUData(sarFileData) {
         array.cpuIdleData.push({ x: time, y: parseFloat(row[11]) });
       });
   });
-
   return { cpuArray, uniqCPU };
 }
 
@@ -265,7 +265,6 @@ export function parseDiskIO(sarFileData) {
 
   if (header.length === 0) {
     // verify if the file contains disk data, if not return empty arrays
-    console.log(header);
     return { diskArray: [], uniqDev: [] };
   }
   const rowIncludesDev = sarFileData
