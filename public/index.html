@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
-      name="SarGRAP"
+      name="SarGRAPH"
       content="Visualize sar data"
     />
     <title>SarGRAP</title>
@@ -16,31 +16,3 @@
     <div id="root"></div>
   </body>
 </html>
-<script>
-  window.addEventListener("dragenter", function(e) {
-    e = e || event;
-    if(!e.target.className.includes("ant-upload-")) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "none";
-      e.dataTransfer.effectAllowed = "none";
-    }
-  }, false);  
-  window.addEventListener("dragover", function(e) {
-    e = e || event;
-    if(!e.target.className.includes("ant-upload-")) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "none";
-      e.dataTransfer.effectAllowed = "none";
-    }
-  }, false);  
-  window.addEventListener("drop", function(e) {
-    e = e || event;
-    if(!e.target.className.includes("ant-upload-")) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "none";
-      e.dataTransfer.effectAllowed = "none";
-    }
-  }, false);  
-
-
-</script>
