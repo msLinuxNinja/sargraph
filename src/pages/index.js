@@ -90,7 +90,7 @@ export const HomePage = () => {
       <Layout className="h-screen w-screen">
         <Content
           style={contentStyle}
-          className="overflow-y-auto h-full w-full  justify-center items-center flex-col flex"
+          className="overflow-y-auto h-full w-full justify-center items-center flex-col flex"
         >
           {!dataLoaded && <DropBox />}
           {isLoading && dataLoaded && <LoadingSpin />}
@@ -99,7 +99,6 @@ export const HomePage = () => {
               <TabsContainer>
                 <Tabs type="card" items={tabItems} />
               </TabsContainer>
-
               <FloatButton
                 icon={<ReloadOutlined />}
                 tooltip={<div>Load New File</div>}
@@ -113,7 +112,6 @@ export const HomePage = () => {
             </>
           )}
         </Content>
-
         <Footer
           style={footerStyle}
           className="z-30 flex justify-start items-center content-center"
