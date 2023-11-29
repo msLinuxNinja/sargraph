@@ -22,6 +22,7 @@ import {
   Decimation,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import ResetButton from "../Atoms/ResetButton";
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +38,8 @@ ChartJS.register(
   zoomPlugin, // register zoom plugin
   Decimation
 );
+
+
 
 export default function CpuChart() {
   //states
@@ -406,9 +409,7 @@ export default function CpuChart() {
         <Button type="primary" onClick={showDrawer}>
           More Details
         </Button>
-        <Button type="primary" onClick={showDrawer}>
-          Reset Zoom
-        </Button>
+        <ResetButton chartRef={chartRef} />
       </Flex>
       <Drawer
         title="CPU Details"

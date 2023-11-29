@@ -3,7 +3,7 @@ import { useMemo, useRef, useEffect } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 
-import 'chartjs-adapter-date-fns';
+import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
@@ -17,11 +17,11 @@ import {
   Tooltip,
   Legend,
   Filler,
-  Decimation
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-
-
+  Decimation,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import ResetButton from "../Atoms/ResetButton";
+import { Flex } from "antd";
 
 ChartJS.register(
   CategoryScale,
@@ -36,7 +36,7 @@ ChartJS.register(
   Filler,
   zoomPlugin, // register zoom plugin
   Decimation
-)
+);
 
 export default function BlockIOChart() {
   const { blockData, selectedBlock, setSelectedBlock } = useDataContext();
@@ -155,7 +155,8 @@ export default function BlockIOChart() {
             color: "rgba(180, 180, 180, 1)",
           },
         },
-        zoom: { // logic to enable zoom chart
+        zoom: {
+          // logic to enable zoom chart
           zoom: {
             wheel: {
               enabled: true,
@@ -174,8 +175,10 @@ export default function BlockIOChart() {
           limits: {
             x: {
               min: blockData.diskArray[0].tps[0].x,
-              max: blockData.diskArray[0].tps[blockData.diskArray[0].tps.length - 1].x,
-            }
+              max: blockData.diskArray[0].tps[
+                blockData.diskArray[0].tps.length - 1
+              ].x,
+            },
           },
         },
         decimation: {
@@ -199,22 +202,39 @@ export default function BlockIOChart() {
     if (blockData.diskArray.length === 0) {
       return false;
     }
-    return createChartOptions()
+    return createChartOptions();
   }, []);
 
   useEffect(() => {
     if (blockData.diskArray.length === 0) {
       return;
     }
-    const chart = chartRef.current
+    const chart = chartRef.current;
     changeDatasetData(chart);
-
   }, [selectedBlock]);
 
   return (
     <>
-      {chartData ? <Line ref={chartRef} options={chartOptions} data={chartData} /> : <><h1>No data found</h1></>}
-      {chartData ? <ItemList items={blockData.uniqDev} placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`} setValue={setSelectedBlock} showSearch={true}/> : <></>}
+      {chartData ? (
+        <Line ref={chartRef} options={chartOptions} data={chartData} />
+      ) : (
+        <>
+          <h1>No data found</h1>
+        </>
+      )}
+      {chartData ? (
+        <Flex className="gap-2 items-center">
+          <ItemList
+            items={blockData.uniqDev}
+            placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`}
+            setValue={setSelectedBlock}
+            showSearch={true}
+          />
+          <ResetButton chartRef={chartRef}/>
+        </Flex>
+      ) : (
+        <></>
+      )}
     </>
   );
 }

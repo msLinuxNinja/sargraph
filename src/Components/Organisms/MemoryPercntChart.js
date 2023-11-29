@@ -19,6 +19,7 @@ import {
   Decimation
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import ResetButton from "../Atoms/ResetButton";
 
 
 
@@ -188,6 +189,7 @@ export default function MemoryPercntChart() {
   return (
     <>
       <Line ref={chartRef} options={chartOptions} data={chartData} />
+      <ResetButton chartRef={chartRef} />
     </>
   );
 }
