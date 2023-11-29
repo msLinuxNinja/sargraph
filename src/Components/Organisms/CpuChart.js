@@ -39,8 +39,6 @@ ChartJS.register(
   Decimation
 );
 
-
-
 export default function CpuChart() {
   //states
   const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } =
@@ -396,21 +394,23 @@ export default function CpuChart() {
   return (
     <>
       <Line ref={chartRef} options={chartOptions} data={chartData} />
-      <ItemList
-        items={cpuData.uniqCPU}
-        placeHolderText="Select CPU (selected All)"
-        setValue={setSelectedCPU}
-      />
+      <Flex className="gap-2" className="items-center gap-2">
+        <ItemList
+          items={cpuData.uniqCPU}
+          placeHolderText="Select CPU (selected All)"
+          setValue={setSelectedCPU}
+        />
+        <ResetButton chartRef={chartRef} />
+      </Flex>
       <p>
         Core with highest usr% usage is {cpuStats.cpuID}. Click on the button
         below for more details.
       </p>
-      <Flex className="gap-2">
-        <Button type="primary" onClick={showDrawer}>
-          More Details
-        </Button>
-        <ResetButton chartRef={chartRef} />
-      </Flex>
+
+      <Button type="primary" onClick={showDrawer}>
+        More Details
+      </Button>
+
       <Drawer
         title="CPU Details"
         placement="left"
