@@ -3,9 +3,9 @@ import { useMemo, useEffect, useRef, useState } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 import TableDetails from "../Molecules/TableDetails";
-import {Button, Drawer } from "antd";
+import { Button, Drawer } from "antd";
 
-import 'chartjs-adapter-date-fns';
+import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
@@ -19,11 +19,9 @@ import {
   Tooltip,
   Legend,
   Filler,
-  Decimation
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-
-
+  Decimation,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -38,14 +36,12 @@ ChartJS.register(
   Filler,
   zoomPlugin, // register zoom plugin
   Decimation
-)
-
-
-
+);
 
 export default function CpuChart() {
   //states
-  const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } = useDataContext();
+  const { cpuData, selectedCPU, setSelectedCPU, setIsLoading } =
+    useDataContext();
   const [cpuStats, setCpuStats] = useState({
     max: 0,
     average: 0,
@@ -86,6 +82,56 @@ export default function CpuChart() {
     },
   ];
 
+  // info table
+  const infoTable =[
+    {
+      title: "Field",
+      dataIndex: "field",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+    },
+  ];
+
+  const infoData = [
+    {
+      key: "1",
+      field: "usr%",
+      description: "Percentage of CPU utilization that occurred while executing at the user level (application).",
+    },
+    {
+      key: "2",
+      field: "nice%",
+      description: "Percentage of CPU utilization that occurred while executing at the user level with nice priority.",
+    },
+    {
+      key: "3",
+      field: "sys%",
+      description: "Percentage of CPU utilization that occurred while executing at the system level (kernel). Note that this field includes time spent servicing hardware and software interrupts.",
+    },
+    {
+      key: "4",
+      field: "iowait%",
+      description: "Percentage of time that the CPU or CPUs were idle due to outstanding disk I/O request. (Higher % might indicate disk latency)",
+    },
+    {
+      key: "5",
+      field: "irq%",
+      description: "Percentage of time spent by the CPU or CPUs to service hardware interrupts. (Higher % might indicate high network traffic)",
+    },
+    {
+      key: "6",
+      field: "soft%",
+      description: "Percentage of time spent by the CPU or CPUs to service software interrupts.",
+    },
+    {
+      key: "7",
+      field: "idle%",
+      description: "Percentage of time that the CPU or CPUs were idle and the system did not have an outstanding disk I/O request.",
+    },
+  ];
+
   //drawer on off
   function showDrawer() {
     setVisible(true);
@@ -96,11 +142,9 @@ export default function CpuChart() {
   }
 
   const chartRef = useRef();
-  
 
   //chart generation and select
   function changeDatasetData(chart) {
-
     chart.data.datasets[0].data = cpuData.cpuArray[selectedCPU].cpuUsrData;
     chart.data.datasets[1].data = cpuData.cpuArray[selectedCPU].cpuNiceData;
     chart.data.datasets[2].data = cpuData.cpuArray[selectedCPU].cpuSysData;
@@ -112,7 +156,6 @@ export default function CpuChart() {
   }
 
   function createChartData() {
-    
     return {
       datasets: [
         {
@@ -214,7 +257,6 @@ export default function CpuChart() {
               return value + "%";
             },
             color: "rgba(180, 180, 180, 1)",
-            
           },
           responsive: true,
           min: 0,
@@ -244,7 +286,8 @@ export default function CpuChart() {
             color: "rgba(180, 180, 180, 1)",
           },
         },
-        zoom: { // logic to enable zoom chart
+        zoom: {
+          // logic to enable zoom chart
           zoom: {
             wheel: {
               enabled: true,
@@ -263,9 +306,11 @@ export default function CpuChart() {
           limits: {
             x: {
               min: cpuData.cpuArray[0].cpuUsrData[0].x,
-              max: cpuData.cpuArray[0].cpuUsrData[cpuData.cpuArray[0].cpuUsrData.length - 1].x,
-            }
-          }
+              max: cpuData.cpuArray[0].cpuUsrData[
+                cpuData.cpuArray[0].cpuUsrData.length - 1
+              ].x,
+            },
+          },
         },
         decimation: {
           enabled: true,
@@ -276,9 +321,9 @@ export default function CpuChart() {
       },
     };
   }
-  
+
   //data statistics
-  function getStats () {
+  function getStats() {
     const newCpuStats = { ...cpuStats };
 
     let max = -Infinity;
@@ -295,14 +340,28 @@ export default function CpuChart() {
         }
       });
     });
-    let timeString = new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
-    timeString = timeString + " " + new Date(cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    let timeString = new Date(
+      cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x
+    ).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    timeString =
+      timeString +
+      " " +
+      new Date(
+        cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].x
+      ).toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
     newCpuStats.max = cpuData.cpuArray[maxCpuIndex].cpuUsrData[maxUsrIndex].y;
-    newCpuStats.maxTime = timeString
-    newCpuStats.cpuID = cpuData.uniqCPU[maxCpuIndex]
+    newCpuStats.maxTime = timeString;
+    newCpuStats.cpuID = cpuData.uniqCPU[maxCpuIndex];
     setCpuStats(newCpuStats);
   }
-
 
   // useMemo and effects
   const chartData = useMemo(() => {
@@ -315,22 +374,28 @@ export default function CpuChart() {
   }, []);
 
   useEffect(() => {
-    const chart = chartRef.current
+    const chart = chartRef.current;
     changeDatasetData(chart);
   }, [selectedCPU]);
 
-
   useEffect(() => {
     setIsLoading(false);
-    getStats()
-  }, [])
+    getStats();
+  }, []);
 
   return (
     <>
-      <Line ref={chartRef} options={chartOptions} data={chartData}  />
-      <ItemList items={cpuData.uniqCPU} placeHolderText="Select CPU (selected All)" setValue={setSelectedCPU} />
-      <p>Core with highest usr% usage is {cpuStats.cpuID}. Click on the button below for more details.</p>
-      <Button type="primary" onClick={showDrawer} >
+      <Line ref={chartRef} options={chartOptions} data={chartData} />
+      <ItemList
+        items={cpuData.uniqCPU}
+        placeHolderText="Select CPU (selected All)"
+        setValue={setSelectedCPU}
+      />
+      <p>
+        Core with highest usr% usage is {cpuStats.cpuID}. Click on the button
+        below for more details.
+      </p>
+      <Button type="primary" onClick={showDrawer}>
         More Details
       </Button>
       <Drawer
@@ -341,11 +406,15 @@ export default function CpuChart() {
         width={700}
         className="text-white"
       >
-        <p >Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU {cpuStats.cpuID}.</p>
-        <TableDetails columns={tableColumns} data={tableData}  />
-        <Button type="primary" onClick={onClose}>
-        Close
-      </Button>
+        <p>
+          Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU{" "}
+          {cpuStats.cpuID}.
+        </p>
+        <TableDetails title={'Core with highest usage'} columns={tableColumns} data={tableData} />
+        <TableDetails title={'Description of the fields'} columns={infoTable} data={infoData} />
+        <Button type="primary" onClick={onClose} className="mt-3">
+          Close
+        </Button>
       </Drawer>
     </>
   );
