@@ -3,7 +3,7 @@ import { useMemo, useEffect, useRef, useState } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 import TableDetails from "../Molecules/TableDetails";
-import { Button, Drawer } from "antd";
+import { Button, Drawer, Flex } from "antd";
 
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
@@ -83,7 +83,7 @@ export default function CpuChart() {
   ];
 
   // info table
-  const infoTable =[
+  const infoTable = [
     {
       title: "Field",
       dataIndex: "field",
@@ -98,37 +98,44 @@ export default function CpuChart() {
     {
       key: "1",
       field: "usr%",
-      description: "Percentage of CPU utilization that occurred while executing at the user level (application).",
+      description:
+        "Percentage of CPU utilization that occurred while executing at the user level (application).",
     },
     {
       key: "2",
       field: "nice%",
-      description: "Percentage of CPU utilization that occurred while executing at the user level with nice priority.",
+      description:
+        "Percentage of CPU utilization that occurred while executing at the user level with nice priority.",
     },
     {
       key: "3",
       field: "sys%",
-      description: "Percentage of CPU utilization that occurred while executing at the system level (kernel). Note that this field includes time spent servicing hardware and software interrupts.",
+      description:
+        "Percentage of CPU utilization that occurred while executing at the system level (kernel). Note that this field includes time spent servicing hardware and software interrupts.",
     },
     {
       key: "4",
       field: "iowait%",
-      description: "Percentage of time that the CPU or CPUs were idle due to outstanding disk I/O request. (Higher % might indicate disk latency)",
+      description:
+        "Percentage of time that the CPU or CPUs were idle due to outstanding disk I/O request. (Higher % might indicate disk latency)",
     },
     {
       key: "5",
       field: "irq%",
-      description: "Percentage of time spent by the CPU or CPUs to service hardware interrupts. (Higher % might indicate high network traffic)",
+      description:
+        "Percentage of time spent by the CPU or CPUs to service hardware interrupts. (Higher % might indicate high network traffic)",
     },
     {
       key: "6",
       field: "soft%",
-      description: "Percentage of time spent by the CPU or CPUs to service software interrupts.",
+      description:
+        "Percentage of time spent by the CPU or CPUs to service software interrupts.",
     },
     {
       key: "7",
       field: "idle%",
-      description: "Percentage of time that the CPU or CPUs were idle and the system did not have an outstanding disk I/O request.",
+      description:
+        "Percentage of time that the CPU or CPUs were idle and the system did not have an outstanding disk I/O request.",
     },
   ];
 
@@ -395,9 +402,14 @@ export default function CpuChart() {
         Core with highest usr% usage is {cpuStats.cpuID}. Click on the button
         below for more details.
       </p>
-      <Button type="primary" onClick={showDrawer}>
-        More Details
-      </Button>
+      <Flex className="gap-2">
+        <Button type="primary" onClick={showDrawer}>
+          More Details
+        </Button>
+        <Button type="primary" onClick={showDrawer}>
+          Reset Zoom
+        </Button>
+      </Flex>
       <Drawer
         title="CPU Details"
         placement="left"
@@ -410,8 +422,16 @@ export default function CpuChart() {
           Max CPU usage is {cpuStats.max}% at {cpuStats.maxTime} on CPU{" "}
           {cpuStats.cpuID}.
         </p>
-        <TableDetails title={'Core with highest usage'} columns={tableColumns} data={tableData} />
-        <TableDetails title={'Description of the fields'} columns={infoTable} data={infoData} />
+        <TableDetails
+          title={"Core with highest usage"}
+          columns={tableColumns}
+          data={tableData}
+        />
+        <TableDetails
+          title={"Description of the fields"}
+          columns={infoTable}
+          data={infoData}
+        />
         <Button type="primary" onClick={onClose} className="mt-3">
           Close
         </Button>
