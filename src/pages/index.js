@@ -21,6 +21,11 @@ export const HomePage = () => {
     window.location.reload();
   }
 
+  function handleUsage() {
+    
+  }
+
+
   const tabItems = [
     {
       label: "CPU",
@@ -99,16 +104,21 @@ export const HomePage = () => {
               <TabsContainer>
                 <Tabs type="card" items={tabItems} />
               </TabsContainer>
-              <FloatButton
-                icon={<ReloadOutlined />}
-                tooltip={<div>Load New File</div>}
-                onClick={realoadPage}
+              <FloatButton.Group
+                trigger="hover"
                 style={{
                   right: 50,
                   bottom: 120,
                 }}
                 type="primary"
-              />
+              >
+                <FloatButton tooltip="Usage" onClick={handleUsage} />
+                <FloatButton
+                  icon={<ReloadOutlined />}
+                  tooltip={<div>Load New File</div>}
+                  onClick={realoadPage}
+                />
+              </FloatButton.Group>
             </>
           )}
         </Content>
