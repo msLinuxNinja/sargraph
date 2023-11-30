@@ -2,30 +2,30 @@
   "private": true,
   "dependencies": {
     "@fontsource/roboto": "^4.5.8",
-    "@fortawesome/fontawesome-svg-core": "^6.2.1",
-    "@fortawesome/free-brands-svg-icons": "^6.2.1",
-    "@fortawesome/free-regular-svg-icons": "^6.2.1",
-    "@fortawesome/free-solid-svg-icons": "^6.2.1",
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-brands-svg-icons": "^6.4.2",
+    "@fortawesome/free-regular-svg-icons": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.11.64",
-    "@types/react": "^18.0.21",
-    "@types/react-dom": "^18.0.6",
-    "antd": "^5.3.2",
-    "chart.js": "^4.0.1",
+    "@types/node": "^16.18.61",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "antd": "^5.11.0",
+    "chart.js": "^4.4.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-zoom": "^2.0.1",
     "date-fns": "^2.30.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.3",
+    "react-router-dom": "^6.18.0",
     "react-scripts": "5.0.1",
-    "react-select": "^5.5.8",
-    "typescript": "^4.8.4",
+    "react-select": "^5.8.0",
+    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -53,6 +53,6 @@
     ]
   },
   "devDependencies": {
-    "tailwindcss": "^3.2.7"
+    "tailwindcss": "^3.3.5"
   }
 }

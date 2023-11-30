@@ -1,46 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" ondrop="handleDrop(event)">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
-      name="SarGRAP"
+      name="SarGRAPH"
       content="Visualize sar data"
     />
-    <title>SarGRAP</title>
+    <title>SarGRAPH</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>
 </html>
-<script>
-  window.addEventListener("dragenter", function(e) {
-    e = e || event;
-    if(!e.target.className.includes("ant-upload-")) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "none";
-      e.dataTransfer.effectAllowed = "none";
-    }
-  }, false);  
-  window.addEventListener("dragover", function(e) {
-    e = e || event;
-    if(!e.target.className.includes("ant-upload-")) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "none";
-      e.dataTransfer.effectAllowed = "none";
-    }
-  }, false);  
-  window.addEventListener("drop", function(e) {
-    e = e || event;
-    if(!e.target.className.includes("ant-upload-")) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "none";
-      e.dataTransfer.effectAllowed = "none";
-    }
-  }, false);  
-
-
-</script>
