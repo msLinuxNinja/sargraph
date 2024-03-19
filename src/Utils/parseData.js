@@ -139,7 +139,7 @@ export function parseCPUData(sarFileData) {
 
   const filteredArray = parsedData.filter((row) => {
     // After removing nested array, filter out rows with "CPU", "Average:" and that have 12 columns (only CPU section has 12 columns)
-    if (!row.includes("CPU") && !row.includes("Average:") && row.length == 12) {
+    if (!row.includes("CPU") && !row.includes("Average:") && row.length === 12) {
       return true;
     }
     return false;
@@ -210,7 +210,7 @@ export function parseMemoryData(sarFileData) {
     fileVersion = "rhel7";
   }
 
-  if (fileVersion == "rhel8+") {
+  if (fileVersion === "rhel8+") {
     filteredArray.forEach((row) => {
       //pushes values to the array
 
@@ -227,7 +227,7 @@ export function parseMemoryData(sarFileData) {
         y: parseInt(row[1] / 1048576) + parseInt(row[3] / 1048576),
       });
     });
-  } else if (fileVersion == "rhel7") {
+  } else if (fileVersion === "rhel7") {
     filteredArray.forEach((row) => {
       //pushes values to the array
       const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
