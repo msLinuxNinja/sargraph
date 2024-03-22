@@ -304,7 +304,7 @@ export function parseDiskIO(sarFileData) {
   });
 
   uniqDev.forEach((block) => {
-    matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
+    matchedData.push(returnMatch(`(^${block}$)`, diskData));
   });
 
   uniqDev.sort(); // Sort block devices
@@ -427,7 +427,7 @@ export function parseNetworkData(sarFileData) {
   uniqIFACE.forEach((eth) => {
     matchedData.push(returnMatch(`(^${eth}$)`, netData));
   });
-  console.log(matchedData);
+  
   uniqIFACE.sort(); // Sort eth devices
 
   const netArray = uniqIFACE.map(() => ({
