@@ -58,7 +58,7 @@ export default function BlockIOChart() {
       datasets: [
         {
           label: "Transfers per second",
-          data: blockData.diskArray[0].tps,
+          data: blockData.diskArray[selectedBlock].tps,
           backgroundColor: "rgba(0, 132, 195, 0.1)",
           borderColor: "rgba(0, 132, 195, 0.8)",
           borderWidth: 2,
@@ -67,7 +67,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Read MB/s",
-          data: blockData.diskArray[0].readSec,
+          data: blockData.diskArray[selectedBlock].readSec,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 0.8)",
           borderWidth: 2,
@@ -76,7 +76,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Write MB/s",
-          data: blockData.diskArray[0].writeSec,
+          data: blockData.diskArray[selectedBlock].writeSec,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -85,7 +85,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Average Request Size (KB)",
-          data: blockData.diskArray[0].avgRQz,
+          data: blockData.diskArray[selectedBlock].avgRQz,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -94,7 +94,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Average Queue Size",
-          data: blockData.diskArray[0].avgQz,
+          data: blockData.diskArray[selectedBlock].avgQz,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -103,7 +103,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Latency in MS",
-          data: blockData.diskArray[0].awaitMS,
+          data: blockData.diskArray[selectedBlock].awaitMS,
           backgroundColor: "rgba(0, 175, 218, 0.1)",
           borderColor: "rgba(0, 175, 218, 0.8)",
           borderWidth: 2,
@@ -196,7 +196,7 @@ export default function BlockIOChart() {
       return false;
     }
     return createChartData();
-  }, []);
+  }, [selectedBlock]);
 
   const chartOptions = useMemo(() => {
     if (blockData.diskArray.length === 0) {
@@ -209,8 +209,8 @@ export default function BlockIOChart() {
     if (blockData.diskArray.length === 0) {
       return;
     }
-    const chart = chartRef.current;
-    changeDatasetData(chart);
+    chartRef.current.update();
+
   }, [selectedBlock]);
 
   return (

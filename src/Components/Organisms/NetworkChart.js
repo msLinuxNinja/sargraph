@@ -155,12 +155,7 @@ export default function NetworkChart() {
   const chartOptions = useMemo(() => createChartOptions(), [netData]);
 
   useEffect(() => {
-    const chart = chartRef.current;
-  }, []);
-
-  useEffect(() => {
     chartRef.current.update();
-    console.log(netData.netArray[selectedInterface].ifutil)
   }, [selectedInterface]);
 
   return (
