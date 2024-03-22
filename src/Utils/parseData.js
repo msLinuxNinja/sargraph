@@ -457,7 +457,6 @@ export function parseNetworkData(sarFileData) {
           array.txpck.push({ x: time, y: parseFloat(row[3]) });
           array.rxkB.push({ x: time, y: parseFloat(row[4]) });
           array.txkB.push({ x: time, y: parseFloat(row[5]) });
-          array.ifutil.push({ x: time, y: parseFloat(row[6]) });
         });
     });
   } else if (fileVersion === "rhel7") {
