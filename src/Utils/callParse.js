@@ -11,5 +11,5 @@ export function callParse(fileContent) {
     const networkObject = parseNetworkData(sarFileData);
     const fileDetails = parseFileDetails(sarFileData);
 
-    return { cpuObject, memoryObject, blockObject, fileDetails }
+    return { cpuObject, memoryObject, blockObject, networkObject, fileDetails }
 }
