@@ -417,17 +417,17 @@ export function parseNetworkData(sarFileData) {
   }
 
   netData.forEach((row) => {
-    // Obtain list of unique block devices to later use as an iterator and perform Regex
-    const block = row[1];
-    if (!uniqIFACE.includes(block)) {
-      uniqIFACE.push(block);
+    // Obtain list of unique interfaces to later use as an iterator and perform Regex
+    const iface = row[1];
+    if (!uniqIFACE.includes(iface)) {
+      uniqIFACE.push(iface);
     }
   });
 
   uniqIFACE.forEach((eth) => {
-    matchedData.push(returnMatch(`(^${eth}$)`, sarFileData));
+    matchedData.push(returnMatch(`(^${eth}$)`, netData));
   });
-
+  console.log(matchedData);
   uniqIFACE.sort(); // Sort eth devices
 
   const netArray = uniqIFACE.map(() => ({
@@ -443,7 +443,6 @@ export function parseNetworkData(sarFileData) {
       parsedData.push(entry);
     });
   });
-
   const filteredArray = parsedData.filter(
     (row) => !row.includes("IFACE") && !row.includes("Average:")
   ); // return everything that does not include the word "IFACE" which indicates a header or average
