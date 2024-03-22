@@ -151,24 +151,12 @@ export default function CpuChart() {
 
   const chartRef = useRef();
 
-  //chart generation and select
-  function changeDatasetData(chart) {
-    chart.data.datasets[0].data = cpuData.cpuArray[selectedCPU].cpuUsrData;
-    chart.data.datasets[1].data = cpuData.cpuArray[selectedCPU].cpuNiceData;
-    chart.data.datasets[2].data = cpuData.cpuArray[selectedCPU].cpuSysData;
-    chart.data.datasets[3].data = cpuData.cpuArray[selectedCPU].cpuIowaitData;
-    chart.data.datasets[4].data = cpuData.cpuArray[selectedCPU].cpuIrqData;
-    chart.data.datasets[5].data = cpuData.cpuArray[selectedCPU].cpuSoftData;
-    chart.data.datasets[6].data = cpuData.cpuArray[selectedCPU].cpuIdleData;
-    chart.update();
-  }
-
   function createChartData() {
     return {
       datasets: [
         {
           label: "usr%",
-          data: cpuData.cpuArray[0].cpuUsrData,
+          data: cpuData.cpuArray[selectedCPU].cpuUsrData,
           // backgroundColor: "rgba(0, 132, 195, 0.1)",
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
@@ -195,7 +183,7 @@ export default function CpuChart() {
         },
         {
           label: "nice%",
-          data: cpuData.cpuArray[0].cpuNiceData,
+          data: cpuData.cpuArray[selectedCPU].cpuNiceData,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 1)",
           borderWidth: 2,
@@ -204,7 +192,7 @@ export default function CpuChart() {
         },
         {
           label: "sys%",
-          data: cpuData.cpuArray[0].cpuSysData,
+          data: cpuData.cpuArray[selectedCPU].cpuSysData,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -213,7 +201,7 @@ export default function CpuChart() {
         },
         {
           label: "iowait%",
-          data: cpuData.cpuArray[0].cpuIowaitData,
+          data: cpuData.cpuArray[selectedCPU].cpuIowaitData,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -222,7 +210,7 @@ export default function CpuChart() {
         },
         {
           label: "irq%",
-          data: cpuData.cpuArray[0].cpuIrqData,
+          data: cpuData.cpuArray[selectedCPU].cpuIrqData,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -231,7 +219,7 @@ export default function CpuChart() {
         },
         {
           label: "softIrq%",
-          data: cpuData.cpuArray[0].cpuSoftData,
+          data: cpuData.cpuArray[selectedCPU].cpuSoftData,
           backgroundColor: "rgba(177, 17, 82, 0.1)",
           borderColor: "rgba(177, 17, 82, 0.8)",
           borderWidth: 2,
@@ -240,7 +228,7 @@ export default function CpuChart() {
         },
         {
           label: "idle%",
-          data: cpuData.cpuArray[0].cpuIdleData,
+          data: cpuData.cpuArray[selectedCPU].cpuIdleData,
           backgroundColor: "rgba(0, 210, 255, 0.05)",
           borderColor: "rgba(0, 210, 255, 0.8)",
           borderWidth: 2,
@@ -371,19 +359,17 @@ export default function CpuChart() {
     setCpuStats(newCpuStats);
   }
 
-  // useMemo and effects
+  // Chart setup
   const chartData = useMemo(() => {
     setIsLoading(true);
     return createChartData();
-  }, []);
+  }, [selectedCPU]);
 
-  const chartOptions = useMemo(() => {
-    return createChartOptions();
-  }, []);
+  const chartOptions = useMemo(() => createChartOptions(), [cpuData]);
 
   useEffect(() => {
-    const chart = chartRef.current;
-    changeDatasetData(chart);
+    chartRef.current.update();
+    setIsLoading(false);
   }, [selectedCPU]);
 
   useEffect(() => {
