@@ -1,3 +1,5 @@
+import { fi, ro } from "date-fns/locale";
+
 const returnDataPortion = (firstIndex, lastIndex, array) => {
   const resultingArray = array.slice(firstIndex, lastIndex);
   return resultingArray;
@@ -139,12 +141,16 @@ export function parseCPUData(sarFileData) {
 
   const filteredArray = parsedData.filter((row) => {
     // After removing nested array, filter out rows with "CPU", "Average:" and that have 12 columns (only CPU section has 12 columns)
-    if (!row.includes("CPU") && !row.includes("Average:") && row.length === 12) {
+    if (
+      !row.includes("CPU") &&
+      !row.includes("Average:") &&
+      row.length === 12
+    ) {
       return true;
     }
     return false;
   });
-  
+
   const avgInterval = calculatePollInterval(sarFileData);
 
   if (avgInterval <= 10) {
@@ -303,7 +309,7 @@ export function parseDiskIO(sarFileData) {
     matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
   });
 
-  uniqDev.sort();
+  uniqDev.sort(); // Sort block devices
 
   const diskArray = uniqDev.map(() => ({
     tps: [],
@@ -375,4 +381,101 @@ export function parseDiskIO(sarFileData) {
   }
 
   return { diskArray, uniqDev }; //export object with arrays
+}
+
+export function parseNetworkData(sarFileData) {
+  const [uniqIFACE, matchedData, parsedData] = [[], [], []];
+
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const header = sarFileData.filter((row) => row.includes("IFACE"));
+
+  if (header.length === 0) {
+    // verify if the file contains network data, if not return empty arrays
+    return { networkArray: [], uniqIFACE: [] };
+  }
+
+  const rowIncludesRXs = sarFileData
+    .map((row, index) => (row.includes("rxpck/s") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes rxpck and returns index of matching pattern. Returns the index of the ocurrences of 'rxpck'.
+  const firstIndex = rowIncludesRXs[0] + 1; // first index not including the first instance
+
+  const rowIncludesAvg = sarFileData
+    .map((row, index) => (row.includes("Average:") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes avg and returns index of matching pattern. Returns the index of the ocurrences of 'Average:'.
+
+  const lastIndex = rowIncludesAvg.filter(
+    (number) => number > rowIncludesRXs[0]
+  ); // Last index from the array
+
+  const netPortion = returnDataPortion(firstIndex, lastIndex[0], sarFileData); // Pass lastIndex[0] as it is the first element
+
+  const netData = netPortion.filter((row) => !row.includes("rxpck/s")); // Filters out rows that include "rxpck/s"
+
+  let fileVersion = "";
+  if (header[0].includes("%ifutil")) {
+    fileVersion = "rhel8+";
+  } else {
+    fileVersion = "rhel7";
+  }
+
+  netData.forEach((row) => {
+    // Obtain list of unique block devices to later use as an iterator and perform Regex
+    const block = row[1];
+    if (!uniqIFACE.includes(block)) {
+      uniqIFACE.push(block);
+    }
+  });
+
+  uniqIFACE.forEach((eth) => {
+    matchedData.push(returnMatch(`(^${eth}$)`, sarFileData));
+  });
+
+  uniqIFACE.sort(); // Sort eth devices
+
+  const netArray = uniqIFACE.map(() => ({
+    rxpck: [],
+    txpck: [],
+    rxkB: [],
+    txkB: [],
+    ifutil: [],
+  }));
+
+  matchedData.forEach((array) => {
+    array.forEach((entry) => {
+      parsedData.push(entry);
+    });
+  });
+
+  const filteredArray = parsedData.filter(
+    (row) => !row.includes("IFACE") && !row.includes("Average:")
+  ); // return everything that does not include the word "IFACE" which indicates a header or average
+
+  if (fileVersion === "rhel8+") {
+    netArray.forEach((array, index) => {
+      filteredArray
+        .filter((row) => row[1] === uniqIFACE[index])
+        .forEach((row) => {
+          const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+          array.rxpck.push({ x: time, y: parseFloat(row[2]) });
+          array.txpck.push({ x: time, y: parseFloat(row[3]) });
+          array.rxkB.push({ x: time, y: parseFloat(row[4]) });
+          array.txkB.push({ x: time, y: parseFloat(row[5]) });
+          array.ifutil.push({ x: time, y: parseFloat(row[6]) });
+        });
+    });
+  } else if (fileVersion === "rhel7") {
+    netArray.forEach((array, index) => {
+      filteredArray
+        .filter((row) => row[1] === uniqIFACE[index])
+        .forEach((row) => {
+          const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+          array.rxpck.push({ x: time, y: parseFloat(row[2]) });
+          array.txpck.push({ x: time, y: parseFloat(row[3]) });
+          array.rxkB.push({ x: time, y: parseFloat(row[4] / 1024) }); // Convert to MB/s
+          array.txkB.push({ x: time, y: parseFloat(row[5] / 1024) }); // Convert to MB/s
+        });
+    });
+  }
+
+  return { netArray, uniqIFACE };
 }

@@ -1,4 +1,4 @@
-import { parseMemoryData, parseCPUData, parseDiskIO, parseFileDetails } from "./parseData";
+import { parseMemoryData, parseCPUData, parseDiskIO, parseNetworkData, parseFileDetails } from "./parseData";
 
 import readData from "./readData";
 
@@ -8,6 +8,7 @@ export function callParse(fileContent) {
     const cpuObject = parseCPUData(sarFileData);
     const blockObject = parseDiskIO(sarFileData);
     const memoryObject = parseMemoryData(sarFileData);
+    const networkObject = parseNetworkData(sarFileData);
     const fileDetails = parseFileDetails(sarFileData);
 
     return { cpuObject, memoryObject, blockObject, fileDetails }
