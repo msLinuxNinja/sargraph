@@ -1,5 +1,3 @@
-import { fi, ro } from "date-fns/locale";
-
 const returnDataPortion = (firstIndex, lastIndex, array) => {
   const resultingArray = array.slice(firstIndex, lastIndex);
   return resultingArray;
