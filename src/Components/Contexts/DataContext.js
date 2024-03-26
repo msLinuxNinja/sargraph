@@ -9,10 +9,14 @@ const DataContext = createContext({
   setBlockData: () => {},
   netData: undefined,
   setNetData: () => {},
+  netErrData: undefined,
+  setNetErrData: () => {},
   selectedCPU: undefined,
   setSelectedCPU: () => {},
   selectedBlock: undefined,
   setSelectedBlock: () => {},
+  selectedInterface: undefined,
+  setSelectedInterface: () => {},
   hasData: false,
   fileDetails: undefined,
   setFileDetails: () => {},
@@ -28,6 +32,7 @@ export const DataContextProvider = ({ children }) => {
   const [memoryData, setMemoryData] = useState(undefined);
   const [blockData, setBlockData] = useState(undefined);
   const [netData, setNetData] = useState(undefined);
+  const [netErrData, setNetErrData] = useState(undefined);
   const [selectedCPU, setSelectedCPU] = useState(0);
   const [selectedBlock, setSelectedBlock] = useState(0);
   const [selectedInterface, setSelectedInterface] = useState(0);
@@ -46,6 +51,8 @@ export const DataContextProvider = ({ children }) => {
     setBlockData,
     netData,
     setNetData,
+    netErrData,
+    setNetErrData,
     selectedCPU,
     setSelectedCPU,
     selectedBlock,

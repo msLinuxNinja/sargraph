@@ -9,7 +9,7 @@ import { Upload } from 'antd';
 const { Dragger } = Upload;
 
 export function DropBox() {
-  const { setCpuData, setMemoryData, setBlockData, setNetData, setFileDetails, setDataLoaded } = useDataContext();
+  const { setCpuData, setMemoryData, setBlockData, setNetData, setNetErrData, setFileDetails, setDataLoaded } = useDataContext();
   
 
   const props = { // props for antd upload component
@@ -31,6 +31,7 @@ export function DropBox() {
         setMemoryData(dataObj.memoryObject);
         setBlockData(dataObj.blockObject);
         setNetData(dataObj.networkObject);
+        setNetErrData(dataObj.networkErrObject);
         setFileDetails(dataObj.fileDetails);
         setFileDetails(prev => {
           return {
