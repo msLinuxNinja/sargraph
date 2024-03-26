@@ -409,13 +409,6 @@ export function parseNetworkData(sarFileData) {
 
   const netData = netPortion.filter((row) => !row.includes("rxpck/s")); // Filters out rows that include "rxpck/s"
 
-  let fileVersion = "";
-  if (header[0].includes("%ifutil")) {
-    fileVersion = "rhel8+";
-  } else {
-    fileVersion = "rhel7";
-  }
-
   netData.forEach((row) => {
     // Obtain list of unique interfaces to later use as an iterator and perform Regex
     const iface = row[1];
@@ -447,31 +440,17 @@ export function parseNetworkData(sarFileData) {
     (row) => !row.includes("IFACE") && !row.includes("Average:")
   ); // return everything that does not include the word "IFACE" which indicates a header or average
 
-  if (fileVersion === "rhel8+") {
-    netArray.forEach((array, index) => {
-      filteredArray
-        .filter((row) => row[1] === uniqIFACE[index])
-        .forEach((row) => {
-          const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-          array.rxpck.push({ x: time, y: parseFloat(row[2]) });
-          array.txpck.push({ x: time, y: parseFloat(row[3]) });
-          array.rxkB.push({ x: time, y: parseFloat(row[4]) });
-          array.txkB.push({ x: time, y: parseFloat(row[5]) });
-        });
-    });
-  } else if (fileVersion === "rhel7") {
-    netArray.forEach((array, index) => {
-      filteredArray
-        .filter((row) => row[1] === uniqIFACE[index])
-        .forEach((row) => {
-          const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-          array.rxpck.push({ x: time, y: parseFloat(row[2]) });
-          array.txpck.push({ x: time, y: parseFloat(row[3]) });
-          array.rxkB.push({ x: time, y: parseFloat(row[4] / 1024) }); // Convert to MB/s
-          array.txkB.push({ x: time, y: parseFloat(row[5] / 1024) }); // Convert to MB/s
-        });
-    });
-  }
+  netArray.forEach((array, index) => {
+    filteredArray
+      .filter((row) => row[1] === uniqIFACE[index])
+      .forEach((row) => {
+        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+        array.rxpck.push({ x: time, y: parseFloat(row[2]) });
+        array.txpck.push({ x: time, y: parseFloat(row[3]) });
+        array.rxkB.push({ x: time, y: parseFloat(row[4]) / 1024 }); // Convert to MB/s
+        array.txkB.push({ x: time, y: parseFloat(row[5]) / 1024 }); // Convert to MB/s
+      });
+  });
 
   return { netArray, uniqIFACE };
 }
