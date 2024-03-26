@@ -475,3 +475,81 @@ export function parseNetworkData(sarFileData) {
 
   return { netArray, uniqIFACE };
 }
+
+export function parseNetErrorData(sarFileData) {
+  const [uniqIFACE, matchedData, parsedData] = [[], [], []];
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const header = sarFileData.filter((row) => row.includes("rxerr/s"));
+
+  if (header.length === 0) {
+    // verify if the file contains network error data, if not return empty arrays
+    return { netErrorArray: [], uniqIFACE: [] };
+  }
+
+  const rowIncludesRXs = sarFileData
+    .map((row, index) => (row.includes("rxerr/s") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes rxerr/s and returns index of matching pattern. Returns the index of the ocurrences of 'rxerr/s'.
+  const firstIndex = rowIncludesRXs[0] + 1; // first index not including the first instance
+
+  const rowIncludesAvg = sarFileData
+    .map((row, index) => (row.includes("Average:") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes avg and returns index of matching pattern. Returns the index of the ocurrences of 'Average:'.
+
+  const lastIndex = rowIncludesAvg.filter(
+    (number) => number > rowIncludesRXs[0]
+  ); // Last index from the array
+
+  const netErrPortion = returnDataPortion(firstIndex, lastIndex[0], sarFileData); // Pass lastIndex[0] as it is the first element
+
+  const netErrData = netErrPortion.filter((row) => !row.includes("rxerr/s")); // Filters out rows that include "rxerr/s"
+
+  netErrData.forEach((row) => {
+    // Obtain list of unique interfaces to later use as an iterator and perform Regex
+    const iface = row[1];
+    if (!uniqIFACE.includes(iface)) {
+      uniqIFACE.push(iface);
+    }
+  });
+
+
+  uniqIFACE.forEach((eth) => {
+    matchedData.push(returnMatch(`(^${eth}$)`, netErrData));
+  });
+  
+  uniqIFACE.sort(); // Sort eth devices
+
+  const netErrArray = uniqIFACE.map(() => ({
+    rxerr: [],
+    txerr: [],
+    coll: [],
+    rxdrop: [],
+    txdrop: [],
+  }));
+
+  matchedData.forEach((array) => {
+    array.forEach((entry) => {
+      parsedData.push(entry);
+    });
+  });
+
+  const filteredArray = parsedData.filter(
+    (row) => !row.includes("IFACE") && !row.includes("Average:")
+  ); // return everything that does not include the word "IFACE" which indicates a header or average
+
+  netErrArray.forEach((array, index) => {
+    filteredArray
+      .filter((row) => row[1] === uniqIFACE[index])
+      .forEach((row) => {
+        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+        array.rxerr.push({ x: time, y: parseFloat(row[2]) });
+        array.txerr.push({ x: time, y: parseFloat(row[3]) });
+        array.coll.push({ x: time, y: parseFloat(row[4]) });
+        array.rxdrop.push({ x: time, y: parseFloat(row[5]) });
+        array.txdrop.push({ x: time, y: parseFloat(row[6]) });
+      });
+  });
+
+  return netErrArray;
+
+
+}
