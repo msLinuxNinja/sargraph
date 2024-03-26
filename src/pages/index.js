@@ -16,6 +16,7 @@ import MemoryPercntChart from "../Components/Organisms/MemoryPercntChart";
 import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
 import NetworkChart from "../Components/Organisms/NetworkChart";
+import NetworkErrChart from "../Components/Organisms/NetworkErrChart";
 
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
@@ -86,8 +87,17 @@ export const HomePage = () => {
       ),
     },
     {
-      label: "System Details",
+      label: "Network Errors",
       key: "6",
+      children: (
+        <ChartContainer>
+          <NetworkErrChart />
+        </ChartContainer>
+      ),
+    },
+    {
+      label: "System Details",
+      key: "7",
       children: (
         <ChartContainer>
           <FileDetails />

@@ -549,7 +549,7 @@ export function parseNetErrorData(sarFileData) {
       });
   });
 
-  return netErrArray;
+  return { netErrArray, uniqIFACE };
 
 
 }
