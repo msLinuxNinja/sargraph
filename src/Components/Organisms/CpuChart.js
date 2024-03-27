@@ -3,10 +3,10 @@ import { useMemo, useEffect, useRef, useState } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 import ItemList from "../Atoms/List";
 import TableDetails from "../Molecules/TableDetails";
-import { Button, Drawer, Flex } from "antd";
+import { Button, Drawer, Flex, Typography } from "antd";
 
 import "chartjs-adapter-date-fns";
-import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
+import zoomPlugin, { zoom } from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -52,6 +52,8 @@ export default function CpuChart() {
   });
 
   const [visible, setVisible] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [usrAvg, setUsrAvg] = useState(0);
 
   //table details
   const tableColumns = [
@@ -147,6 +149,19 @@ export default function CpuChart() {
 
   function onClose() {
     setVisible(false);
+  }
+
+  function fetchData(min, max, chart) {
+    const data = [];
+    chart.data.datasets[0].data.forEach((dataset) => {
+      if (dataset.x >= min && dataset.x <= max) {
+        data.push(dataset);
+      }
+    });
+    const usrPrcntAvg = Math.round(
+      data.reduce((acc, curr) => acc + curr.y, 0) / data.length
+    );
+    setUsrAvg(usrPrcntAvg);
   }
 
   const chartRef = useRef();
@@ -294,10 +309,23 @@ export default function CpuChart() {
             },
             mode: "x",
             speed: 0.05,
+            onZoomComplete: function ({ chart }) {
+              setZoomLevel(chart.getZoomLevel()); // Updates zoom level when zoom completes
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           pan: {
             enabled: true,
             mode: "x",
+            onPanComplete: function ({ chart }) {
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           limits: {
             x: {
@@ -368,7 +396,13 @@ export default function CpuChart() {
   const chartOptions = useMemo(() => createChartOptions(), [cpuData]);
 
   useEffect(() => {
-    chartRef.current.update();
+    
+    if (chartRef.current.scales) { // Update cpu data when selected CPU changes
+      const xMin = chartRef.current.scales.x.min;
+      const xMax = chartRef.current.scales.x.max;
+      fetchData(xMin, xMax, chartRef.current);
+    }
+    chartRef.current.update(); // Update chart after selecting CPU
     setIsLoading(false);
   }, [selectedCPU]);
 
@@ -387,6 +421,12 @@ export default function CpuChart() {
           setValue={setSelectedCPU}
         />
         <ResetButton chartRef={chartRef} />
+        <Typography.Text type="secondary">
+          Current level zoom: {zoomLevel}
+        </Typography.Text>
+        <Typography.Text type="secondary">
+          usr% Avg for selected period: {usrAvg}%
+        </Typography.Text>
       </Flex>
       <p>
         Core with highest usr% usage is {cpuStats.cpuID}. Click on the button
