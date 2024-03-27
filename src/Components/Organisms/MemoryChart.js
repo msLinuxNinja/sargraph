@@ -39,7 +39,7 @@ ChartJS.register(
 
 
 export default function MemoryChart() {
-  const { memoryData } = useDataContext();
+  const { memoryData, swapData } = useDataContext();
   const chartRef = useRef();
 
   function createChartData() {
@@ -55,10 +55,28 @@ export default function MemoryChart() {
           tension: 0.2,
         },
         {
+          label: "Swap Free GB",
+          data: swapData.kbSwapFree,
+          backgroundColor: "rgba(0, 128, 128, 0.1)",
+          borderColor: "rgba(0, 128, 128, 1)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.2,
+        },
+        {
           label: "Memory Used GB",
           data: memoryData.kbMemUsed,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 0.8)",
+          borderWidth: 2,
+          fill: true,
+          tension: 0.2,
+        },
+        {
+          label: "Swap Used GB",
+          data: swapData.kbSwapUsed,
+          backgroundColor: "rgba(202, 31, 123, 0.1)",
+          borderColor: "rgba(202, 31, 123, 0.8)",
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -93,6 +111,15 @@ export default function MemoryChart() {
         {
           label: "Total Memory",
           data: memoryData.totalMemory,
+          backgroundColor: "rgba(0, 175, 218, 0.1)",
+          borderColor: "rgba(0, 175, 218, 0.8)",
+          borderWidth: 2,
+          fill: false,
+          tension: 0.2,
+        },
+        {
+          label: "Total Swap",
+          data: swapData.totalSwap,
           backgroundColor: "rgba(0, 175, 218, 0.1)",
           borderColor: "rgba(0, 175, 218, 0.8)",
           borderWidth: 2,

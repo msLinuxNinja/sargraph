@@ -5,6 +5,8 @@ const DataContext = createContext({
   setCPUData: () => {},
   memoryData: undefined,
   setMemoryData: () => {},
+  swapData: undefined,
+  setSwapData: () => {},
   blockData: undefined,
   setBlockData: () => {},
   netData: undefined,
@@ -30,6 +32,7 @@ const DataContext = createContext({
 export const DataContextProvider = ({ children }) => {
   const [cpuData, setCpuData] = useState(undefined);
   const [memoryData, setMemoryData] = useState(undefined);
+  const [swapData, setSwapData] = useState(undefined);
   const [blockData, setBlockData] = useState(undefined);
   const [netData, setNetData] = useState(undefined);
   const [netErrData, setNetErrData] = useState(undefined);
@@ -47,6 +50,8 @@ export const DataContextProvider = ({ children }) => {
     setCpuData,
     memoryData,
     setMemoryData,
+    swapData,
+    setSwapData,
     blockData,
     setBlockData,
     netData,

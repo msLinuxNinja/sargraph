@@ -261,6 +261,41 @@ export function parseMemoryData(sarFileData) {
   };
 }
 
+export function parseSwapData(sarFileData) {
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const kbSwapFree = [];
+  const kbSwapUsed = [];
+  const swapUsedPrcnt = [];
+  const totalSwap = [];
+  const header = sarFileData.filter((row) => row.includes("kbswpfree"));
+
+  const rowKbSwap = sarFileData
+    .map((row, index) => (row.includes("kbswpfree") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes kbswpfree and returns index of matching pattern. Returns the index of the ocurrences of 'kbswpfree'.
+  const firstIndex = rowKbSwap[0] + 1; // first index not including the first instance
+  const rowIncludesAvg = sarFileData
+    .map((row, index) => (row.includes("Average:") ? index : null))
+    .filter((index) => typeof index === "number");
+  const tempLastIndex = rowIncludesAvg.filter(
+    (number) => number > rowKbSwap[0]
+  ); // Last index from the array
+
+  const lastIndex = tempLastIndex[0];
+
+  const swapPortion = returnDataPortion(firstIndex, lastIndex, sarFileData);
+  const swapData = swapPortion.filter((row) => !row.includes("kbswpfree") && !row.includes("Average:"));
+
+  swapData.forEach((row) => {
+    const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+    kbSwapFree.push({ x: time, y: parseFloat(row[1] / 1048576) });
+    kbSwapUsed.push({ x: time, y: parseFloat(row[2] / 1048576) });
+    swapUsedPrcnt.push({ x: time, y: parseFloat(row[3]) });
+    totalSwap.push({ x: time, y: parseFloat(row[1] / 1048576) + parseFloat(row[2] / 1048576) });
+  });
+  
+  return { kbSwapFree, kbSwapUsed, swapUsedPrcnt, totalSwap };
+}
+
 export function parseDiskIO(sarFileData) {
   const [uniqDev, matchedData, parsedData] = [[], [], []];
   let dataArray = [];
@@ -420,7 +455,7 @@ export function parseNetworkData(sarFileData) {
   uniqIFACE.forEach((eth) => {
     matchedData.push(returnMatch(`(^${eth}$)`, netData));
   });
-  
+
   uniqIFACE.sort(); // Sort eth devices
 
   const netArray = uniqIFACE.map(() => ({
@@ -478,7 +513,11 @@ export function parseNetErrorData(sarFileData) {
     (number) => number > rowIncludesRXs[0]
   ); // Last index from the array
 
-  const netErrPortion = returnDataPortion(firstIndex, lastIndex[0], sarFileData); // Pass lastIndex[0] as it is the first element
+  const netErrPortion = returnDataPortion(
+    firstIndex,
+    lastIndex[0],
+    sarFileData
+  ); // Pass lastIndex[0] as it is the first element
 
   const netErrData = netErrPortion.filter((row) => !row.includes("rxerr/s")); // Filters out rows that include "rxerr/s"
 
@@ -490,11 +529,10 @@ export function parseNetErrorData(sarFileData) {
     }
   });
 
-
   uniqIFACE.forEach((eth) => {
     matchedData.push(returnMatch(`(^${eth}$)`, netErrData));
   });
-  
+
   uniqIFACE.sort(); // Sort eth devices
 
   const netErrArray = uniqIFACE.map(() => ({
@@ -529,6 +567,4 @@ export function parseNetErrorData(sarFileData) {
   });
 
   return { netErrArray, uniqIFACE };
-
-
 }
