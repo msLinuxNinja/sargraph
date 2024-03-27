@@ -134,7 +134,7 @@ export const HomePage = () => {
           {hasData && (
             <>
               <TabsContainer>
-                <Tabs type="card" items={tabItems} />
+                <Tabs className="h-full" type="card" items={tabItems}/>
               </TabsContainer>
               <FloatButton.Group
                 trigger="hover"
