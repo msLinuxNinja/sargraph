@@ -23,6 +23,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import ResetButton from "../Atoms/ResetButton";
+import CopyClipboardButton from "../Atoms/CopyClipButton";
 
 ChartJS.register(
   CategoryScale,
@@ -53,7 +54,14 @@ export default function CpuChart() {
 
   const [visible, setVisible] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  // Metric states for selected period average calculation
   const [usrAvg, setUsrAvg] = useState(0);
+  const [niceAvg, setNiceAvg] = useState(0);
+  const [sysAvg, setSysAvg] = useState(0);
+  const [iowaitAvg, setIowaitAvg] = useState(0);
+  const [irqAvg, setIrqAvg] = useState(0);
+  const [softIrqAvg, setSoftIrqAvg] = useState(0);
+  const [idleAvg, setIdleAvg] = useState(0);
 
   //table details
   const tableColumns = [
@@ -152,16 +160,32 @@ export default function CpuChart() {
   }
 
   function fetchData(min, max, chart) {
-    const data = [];
-    chart.data.datasets[0].data.forEach((dataset) => {
-      if (dataset.x >= min && dataset.x <= max) {
-        data.push(dataset);
-      }
+    const dataAvgs = [];
+    chart.data.datasets.forEach((dataset) => {
+      // Iterates over the datasets of the current chart
+      const currentData = [];
+      dataset.data.forEach((data) => {
+        // Extracts the data based on the min/max x time values
+        if (data.x >= min && data.x <= max) {
+          currentData.push(data.y);
+        }
+      });
+      const avg =
+        Math.round(
+          (currentData.reduce((acc, curr) => acc + curr, 0) /
+            currentData.length) *
+            100
+        ) / 100; // Calculates the average of the data and round to two decimal places
+
+      dataAvgs.push(avg);
     });
-    const usrPrcntAvg = Math.round(
-      data.reduce((acc, curr) => acc + curr.y, 0) / data.length
-    );
-    setUsrAvg(usrPrcntAvg);
+    setUsrAvg(dataAvgs[0]);
+    setNiceAvg(dataAvgs[1]);
+    setSysAvg(dataAvgs[2]);
+    setIowaitAvg(dataAvgs[3]);
+    setIrqAvg(dataAvgs[4]);
+    setSoftIrqAvg(dataAvgs[5]);
+    setIdleAvg(dataAvgs[6]);
   }
 
   const chartRef = useRef();
@@ -396,8 +420,8 @@ export default function CpuChart() {
   const chartOptions = useMemo(() => createChartOptions(), [cpuData]);
 
   useEffect(() => {
-    
-    if (chartRef.current.scales) { // Update cpu data when selected CPU changes
+    if (chartRef.current.scales) {
+      // Update cpu data when selected CPU changes
       const xMin = chartRef.current.scales.x.min;
       const xMax = chartRef.current.scales.x.max;
       fetchData(xMin, xMax, chartRef.current);
@@ -425,13 +449,23 @@ export default function CpuChart() {
           Current level zoom: {zoomLevel}
         </Typography.Text>
         <Typography.Text type="secondary">
-          usr% Avg for selected period: {usrAvg}%
+          Averages for selected period:
         </Typography.Text>
+        <Typography.Text type="secondary">
+          usr: <b className="text-sky-600">{usrAvg}%</b>, 
+          nice: <b className="text-amber-500">{niceAvg}%</b>, 
+          sys: <b className="text-green-500">{sysAvg}%,</b>
+          iowait: <b className="text-red-600">{iowaitAvg}%</b>,
+          irq: <b className="text-violet-400">{irqAvg}%</b>, 
+          softIrq: <b className="text-pink-700">{softIrqAvg}%</b>,
+          idle: <b className="text-cyan-400">{idleAvg}%</b>
+        </Typography.Text>
+        <CopyClipboardButton />
       </Flex>
-      <p>
+      <Typography.Paragraph>
         Core with highest usr% usage is {cpuStats.cpuID}. Click on the button
         below for more details.
-      </p>
+      </Typography.Paragraph>
 
       <Button type="primary" onClick={showDrawer}>
         More Details
