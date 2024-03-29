@@ -445,6 +445,7 @@ export default function CpuChart() {
           setValue={setSelectedCPU}
         />
         <ResetButton chartRef={chartRef} />
+        <CopyClipboardButton chartRef={chartRef}/>
         <Typography.Text type="secondary">
           Current level zoom: {zoomLevel}
         </Typography.Text>
@@ -460,7 +461,6 @@ export default function CpuChart() {
           softIrq: <b className="text-pink-700">{softIrqAvg}%</b>,
           idle: <b className="text-cyan-400">{idleAvg}%</b>
         </Typography.Text>
-        <CopyClipboardButton />
       </Flex>
       <Typography.Paragraph>
         Core with highest usr% usage is {cpuStats.cpuID}. Click on the button
