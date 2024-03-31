@@ -169,6 +169,9 @@ export default function MemoryPercntChart() {
         legend: {
           labels: {
             color: "rgba(180, 180, 180, 1)",
+            font: {
+              size: 16,
+            }
           },
         },
         zoom: { // logic to enable zoom chart
