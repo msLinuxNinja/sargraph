@@ -5,7 +5,7 @@ import './Components/Styles/styles.css';
 import Appz from './App';
 import { ConfigProvider, theme, App } from "antd";
 
-const { defaultAlgorithm, darkAlgorithm } = theme;
+const { darkAlgorithm } = theme;
 
 
 

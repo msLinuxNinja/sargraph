@@ -139,12 +139,16 @@ export function parseCPUData(sarFileData) {
 
   const filteredArray = parsedData.filter((row) => {
     // After removing nested array, filter out rows with "CPU", "Average:" and that have 12 columns (only CPU section has 12 columns)
-    if (!row.includes("CPU") && !row.includes("Average:") && row.length == 12) {
+    if (
+      !row.includes("CPU") &&
+      !row.includes("Average:") &&
+      row.length === 12
+    ) {
       return true;
     }
     return false;
   });
-  
+
   const avgInterval = calculatePollInterval(sarFileData);
 
   if (avgInterval <= 10) {
@@ -210,7 +214,7 @@ export function parseMemoryData(sarFileData) {
     fileVersion = "rhel7";
   }
 
-  if (fileVersion == "rhel8+") {
+  if (fileVersion === "rhel8+") {
     filteredArray.forEach((row) => {
       //pushes values to the array
 
@@ -227,7 +231,7 @@ export function parseMemoryData(sarFileData) {
         y: parseInt(row[1] / 1048576) + parseInt(row[3] / 1048576),
       });
     });
-  } else if (fileVersion == "rhel7") {
+  } else if (fileVersion === "rhel7") {
     filteredArray.forEach((row) => {
       //pushes values to the array
       const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
@@ -255,6 +259,41 @@ export function parseMemoryData(sarFileData) {
     commitPrcnt,
     totalMemory,
   };
+}
+
+export function parseSwapData(sarFileData) {
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const kbSwapFree = [];
+  const kbSwapUsed = [];
+  const swapUsedPrcnt = [];
+  const totalSwap = [];
+  const header = sarFileData.filter((row) => row.includes("kbswpfree"));
+
+  const rowKbSwap = sarFileData
+    .map((row, index) => (row.includes("kbswpfree") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes kbswpfree and returns index of matching pattern. Returns the index of the ocurrences of 'kbswpfree'.
+  const firstIndex = rowKbSwap[0] + 1; // first index not including the first instance
+  const rowIncludesAvg = sarFileData
+    .map((row, index) => (row.includes("Average:") ? index : null))
+    .filter((index) => typeof index === "number");
+  const tempLastIndex = rowIncludesAvg.filter(
+    (number) => number > rowKbSwap[0]
+  ); // Last index from the array
+
+  const lastIndex = tempLastIndex[0];
+
+  const swapPortion = returnDataPortion(firstIndex, lastIndex, sarFileData);
+  const swapData = swapPortion.filter((row) => !row.includes("kbswpfree") && !row.includes("Average:"));
+
+  swapData.forEach((row) => {
+    const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+    kbSwapFree.push({ x: time, y: parseFloat(row[1] / 1048576) });
+    kbSwapUsed.push({ x: time, y: parseFloat(row[2] / 1048576) });
+    swapUsedPrcnt.push({ x: time, y: parseFloat(row[3]) });
+    totalSwap.push({ x: time, y: parseFloat(row[1] / 1048576) + parseFloat(row[2] / 1048576) });
+  });
+  
+  return { kbSwapFree, kbSwapUsed, swapUsedPrcnt, totalSwap };
 }
 
 export function parseDiskIO(sarFileData) {
@@ -300,10 +339,10 @@ export function parseDiskIO(sarFileData) {
   });
 
   uniqDev.forEach((block) => {
-    matchedData.push(returnMatch(`(^${block}$)`, sarFileData));
+    matchedData.push(returnMatch(`(^${block}$)`, diskData));
   });
 
-  uniqDev.sort();
+  uniqDev.sort(); // Sort block devices
 
   const diskArray = uniqDev.map(() => ({
     tps: [],
@@ -375,4 +414,157 @@ export function parseDiskIO(sarFileData) {
   }
 
   return { diskArray, uniqDev }; //export object with arrays
+}
+
+export function parseNetworkData(sarFileData) {
+  const [uniqIFACE, matchedData, parsedData] = [[], [], []];
+
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const header = sarFileData.filter((row) => row.includes("IFACE"));
+
+  if (header.length === 0) {
+    // verify if the file contains network data, if not return empty arrays
+    return { networkArray: [], uniqIFACE: [] };
+  }
+
+  const rowIncludesRXs = sarFileData
+    .map((row, index) => (row.includes("rxpck/s") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes rxpck and returns index of matching pattern. Returns the index of the ocurrences of 'rxpck'.
+  const firstIndex = rowIncludesRXs[0] + 1; // first index not including the first instance
+
+  const rowIncludesAvg = sarFileData
+    .map((row, index) => (row.includes("Average:") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes avg and returns index of matching pattern. Returns the index of the ocurrences of 'Average:'.
+
+  const lastIndex = rowIncludesAvg.filter(
+    (number) => number > rowIncludesRXs[0]
+  ); // Last index from the array
+
+  const netPortion = returnDataPortion(firstIndex, lastIndex[0], sarFileData); // Pass lastIndex[0] as it is the first element
+
+  const netData = netPortion.filter((row) => !row.includes("rxpck/s")); // Filters out rows that include "rxpck/s"
+
+  netData.forEach((row) => {
+    // Obtain list of unique interfaces to later use as an iterator and perform Regex
+    const iface = row[1];
+    if (!uniqIFACE.includes(iface)) {
+      uniqIFACE.push(iface);
+    }
+  });
+
+  uniqIFACE.forEach((eth) => {
+    matchedData.push(returnMatch(`(^${eth}$)`, netData));
+  });
+
+  uniqIFACE.sort(); // Sort eth devices
+
+  const netArray = uniqIFACE.map(() => ({
+    rxpck: [],
+    txpck: [],
+    rxkB: [],
+    txkB: [],
+    ifutil: [],
+  }));
+
+  matchedData.forEach((array) => {
+    array.forEach((entry) => {
+      parsedData.push(entry);
+    });
+  });
+  const filteredArray = parsedData.filter(
+    (row) => !row.includes("IFACE") && !row.includes("Average:")
+  ); // return everything that does not include the word "IFACE" which indicates a header or average
+
+  netArray.forEach((array, index) => {
+    filteredArray
+      .filter((row) => row[1] === uniqIFACE[index])
+      .forEach((row) => {
+        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+        array.rxpck.push({ x: time, y: parseFloat(row[2]) });
+        array.txpck.push({ x: time, y: parseFloat(row[3]) });
+        array.rxkB.push({ x: time, y: parseFloat(row[4]) / 1024 }); // Convert to MB/s
+        array.txkB.push({ x: time, y: parseFloat(row[5]) / 1024 }); // Convert to MB/s
+      });
+  });
+
+  return { netArray, uniqIFACE };
+}
+
+export function parseNetErrorData(sarFileData) {
+  const [uniqIFACE, matchedData, parsedData] = [[], [], []];
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const header = sarFileData.filter((row) => row.includes("rxerr/s"));
+
+  if (header.length === 0) {
+    // verify if the file contains network error data, if not return empty arrays
+    return { netErrorArray: [], uniqIFACE: [] };
+  }
+
+  const rowIncludesRXs = sarFileData
+    .map((row, index) => (row.includes("rxerr/s") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes rxerr/s and returns index of matching pattern. Returns the index of the ocurrences of 'rxerr/s'.
+  const firstIndex = rowIncludesRXs[0] + 1; // first index not including the first instance
+
+  const rowIncludesAvg = sarFileData
+    .map((row, index) => (row.includes("Average:") ? index : null))
+    .filter((index) => typeof index === "number"); // Verify if row includes avg and returns index of matching pattern. Returns the index of the ocurrences of 'Average:'.
+
+  const lastIndex = rowIncludesAvg.filter(
+    (number) => number > rowIncludesRXs[0]
+  ); // Last index from the array
+
+  const netErrPortion = returnDataPortion(
+    firstIndex,
+    lastIndex[0],
+    sarFileData
+  ); // Pass lastIndex[0] as it is the first element
+
+  const netErrData = netErrPortion.filter((row) => !row.includes("rxerr/s")); // Filters out rows that include "rxerr/s"
+
+  netErrData.forEach((row) => {
+    // Obtain list of unique interfaces to later use as an iterator and perform Regex
+    const iface = row[1];
+    if (!uniqIFACE.includes(iface)) {
+      uniqIFACE.push(iface);
+    }
+  });
+
+  uniqIFACE.forEach((eth) => {
+    matchedData.push(returnMatch(`(^${eth}$)`, netErrData));
+  });
+
+  uniqIFACE.sort(); // Sort eth devices
+
+  const netErrArray = uniqIFACE.map(() => ({
+    rxerr: [],
+    txerr: [],
+    coll: [],
+    rxdrop: [],
+    txdrop: [],
+  }));
+
+  matchedData.forEach((array) => {
+    array.forEach((entry) => {
+      parsedData.push(entry);
+    });
+  });
+
+  const filteredArray = parsedData.filter(
+    (row) => !row.includes("IFACE") && !row.includes("Average:")
+  ); // return everything that does not include the word "IFACE" which indicates a header or average
+
+  netErrArray.forEach((array, index) => {
+    filteredArray
+      .filter((row) => row[1] === uniqIFACE[index])
+      .forEach((row) => {
+        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+        array.rxerr.push({ x: time, y: parseFloat(row[2]) });
+        array.txerr.push({ x: time, y: parseFloat(row[3]) });
+        array.coll.push({ x: time, y: parseFloat(row[4]) });
+        array.rxdrop.push({ x: time, y: parseFloat(row[5]) });
+        array.txdrop.push({ x: time, y: parseFloat(row[6]) });
+      });
+  });
+
+  return { netErrArray, uniqIFACE };
 }

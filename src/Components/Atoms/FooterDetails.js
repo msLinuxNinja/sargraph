@@ -19,7 +19,7 @@ export default function FooterDetails() {
   return (
     <>
       <FontAwesomeIcon icon={faGithub} className="fa-2x" />
-      <a href="https://github.com/msLinuxNinja/sargraph" target="_blank" rel="noopener noreferrer" className="pl-3 text-blue-600">https://github.com/msLinuxNinja/sargraph</a>
+      <a href="https://github.com/msLinuxNinja/sargraph" target="_blank" rel="noopener noreferrer" className="pl-3 text-blue-600">msLinuxNinja/sargraph</a>
       <p className="pl-2 m-0">{footer}</p>
       <p className="ml-auto">Version: {process.env.REACT_APP_VERSION}</p>
     </>

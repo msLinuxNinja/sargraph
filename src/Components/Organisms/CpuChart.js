@@ -1,12 +1,12 @@
 import { useMemo, useEffect, useRef, useState } from "react";
-
 import { useDataContext } from "../Contexts/DataContext";
-import ItemList from "../Atoms/List";
-import TableDetails from "../Molecules/TableDetails";
-import { Button, Drawer, Flex } from "antd";
 
+// antd imports
+import { Button, Drawer, Flex, Typography } from "antd";
+
+// chart.js imports
 import "chartjs-adapter-date-fns";
-import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
+import zoomPlugin, { zoom } from "chartjs-plugin-zoom"; // import zoom plugin
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,7 +22,12 @@ import {
   Decimation,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+
+// Custom components
 import ResetButton from "../Atoms/ResetButton";
+import CopyClipboardButton from "../Atoms/CopyClipButton";
+import ItemList from "../Atoms/List";
+import TableDetails from "../Molecules/TableDetails";
 
 ChartJS.register(
   CategoryScale,
@@ -52,6 +57,15 @@ export default function CpuChart() {
   });
 
   const [visible, setVisible] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  // Metric states for selected period average calculation
+  const [usrAvg, setUsrAvg] = useState(0);
+  const [niceAvg, setNiceAvg] = useState(0);
+  const [sysAvg, setSysAvg] = useState(0);
+  const [iowaitAvg, setIowaitAvg] = useState(0);
+  const [irqAvg, setIrqAvg] = useState(0);
+  const [softIrqAvg, setSoftIrqAvg] = useState(0);
+  const [idleAvg, setIdleAvg] = useState(0);
 
   //table details
   const tableColumns = [
@@ -149,26 +163,43 @@ export default function CpuChart() {
     setVisible(false);
   }
 
-  const chartRef = useRef();
+  function fetchData(min, max, chart) {
+    const dataAvgs = [];
+    chart.data.datasets.forEach((dataset) => {
+      // Iterates over the datasets of the current chart
+      const currentData = [];
+      dataset.data.forEach((data) => {
+        // Extracts the data based on the min/max x time values
+        if (data.x >= min && data.x <= max) {
+          currentData.push(data.y);
+        }
+      });
+      const avg =
+        Math.round(
+          (currentData.reduce((acc, curr) => acc + curr, 0) /
+            currentData.length) *
+            100
+        ) / 100; // Calculates the average of the data and round to two decimal places
 
-  //chart generation and select
-  function changeDatasetData(chart) {
-    chart.data.datasets[0].data = cpuData.cpuArray[selectedCPU].cpuUsrData;
-    chart.data.datasets[1].data = cpuData.cpuArray[selectedCPU].cpuNiceData;
-    chart.data.datasets[2].data = cpuData.cpuArray[selectedCPU].cpuSysData;
-    chart.data.datasets[3].data = cpuData.cpuArray[selectedCPU].cpuIowaitData;
-    chart.data.datasets[4].data = cpuData.cpuArray[selectedCPU].cpuIrqData;
-    chart.data.datasets[5].data = cpuData.cpuArray[selectedCPU].cpuSoftData;
-    chart.data.datasets[6].data = cpuData.cpuArray[selectedCPU].cpuIdleData;
-    chart.update();
+      dataAvgs.push(avg);
+    });
+    setUsrAvg(dataAvgs[0]);
+    setNiceAvg(dataAvgs[1]);
+    setSysAvg(dataAvgs[2]);
+    setIowaitAvg(dataAvgs[3]);
+    setIrqAvg(dataAvgs[4]);
+    setSoftIrqAvg(dataAvgs[5]);
+    setIdleAvg(dataAvgs[6]);
   }
+
+  const chartRef = useRef();
 
   function createChartData() {
     return {
       datasets: [
         {
           label: "usr%",
-          data: cpuData.cpuArray[0].cpuUsrData,
+          data: cpuData.cpuArray[selectedCPU].cpuUsrData,
           // backgroundColor: "rgba(0, 132, 195, 0.1)",
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
@@ -195,7 +226,7 @@ export default function CpuChart() {
         },
         {
           label: "nice%",
-          data: cpuData.cpuArray[0].cpuNiceData,
+          data: cpuData.cpuArray[selectedCPU].cpuNiceData,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 1)",
           borderWidth: 2,
@@ -204,7 +235,7 @@ export default function CpuChart() {
         },
         {
           label: "sys%",
-          data: cpuData.cpuArray[0].cpuSysData,
+          data: cpuData.cpuArray[selectedCPU].cpuSysData,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -213,7 +244,7 @@ export default function CpuChart() {
         },
         {
           label: "iowait%",
-          data: cpuData.cpuArray[0].cpuIowaitData,
+          data: cpuData.cpuArray[selectedCPU].cpuIowaitData,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -222,7 +253,7 @@ export default function CpuChart() {
         },
         {
           label: "irq%",
-          data: cpuData.cpuArray[0].cpuIrqData,
+          data: cpuData.cpuArray[selectedCPU].cpuIrqData,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -231,7 +262,7 @@ export default function CpuChart() {
         },
         {
           label: "softIrq%",
-          data: cpuData.cpuArray[0].cpuSoftData,
+          data: cpuData.cpuArray[selectedCPU].cpuSoftData,
           backgroundColor: "rgba(177, 17, 82, 0.1)",
           borderColor: "rgba(177, 17, 82, 0.8)",
           borderWidth: 2,
@@ -240,7 +271,7 @@ export default function CpuChart() {
         },
         {
           label: "idle%",
-          data: cpuData.cpuArray[0].cpuIdleData,
+          data: cpuData.cpuArray[selectedCPU].cpuIdleData,
           backgroundColor: "rgba(0, 210, 255, 0.05)",
           borderColor: "rgba(0, 210, 255, 0.8)",
           borderWidth: 2,
@@ -292,6 +323,9 @@ export default function CpuChart() {
         legend: {
           labels: {
             color: "rgba(180, 180, 180, 1)",
+            font: {
+              size:16
+            }
           },
         },
         zoom: {
@@ -306,10 +340,23 @@ export default function CpuChart() {
             },
             mode: "x",
             speed: 0.05,
+            onZoomComplete: function ({ chart }) {
+              setZoomLevel(chart.getZoomLevel()); // Updates zoom level when zoom completes
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           pan: {
             enabled: true,
             mode: "x",
+            onPanComplete: function ({ chart }) {
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           limits: {
             x: {
@@ -371,19 +418,23 @@ export default function CpuChart() {
     setCpuStats(newCpuStats);
   }
 
-  // useMemo and effects
+  // Chart setup
   const chartData = useMemo(() => {
     setIsLoading(true);
     return createChartData();
-  }, []);
+  }, [selectedCPU]);
 
-  const chartOptions = useMemo(() => {
-    return createChartOptions();
-  }, []);
+  const chartOptions = useMemo(() => createChartOptions(), [cpuData]);
 
   useEffect(() => {
-    const chart = chartRef.current;
-    changeDatasetData(chart);
+    if (chartRef.current.scales) {
+      // Update cpu data when selected CPU changes
+      const xMin = chartRef.current.scales.x.min;
+      const xMax = chartRef.current.scales.x.max;
+      fetchData(xMin, xMax, chartRef.current);
+    }
+    chartRef.current.update(); // Update chart after selecting CPU
+    setIsLoading(false);
   }, [selectedCPU]);
 
   useEffect(() => {
@@ -401,11 +452,27 @@ export default function CpuChart() {
           setValue={setSelectedCPU}
         />
         <ResetButton chartRef={chartRef} />
+        <CopyClipboardButton chartRef={chartRef}/>
+        <Typography.Text type="primary">
+          Current level zoom: {zoomLevel}
+        </Typography.Text>
+        <Typography.Text type="primary">
+          Averages for selected period:
+        </Typography.Text>
+        <Typography.Text type="primary">
+          usr: <b className="text-sky-600">{usrAvg}%</b>, 
+          nice: <b className="text-amber-500">{niceAvg}%</b>, 
+          sys: <b className="text-green-500">{sysAvg}%</b>,
+          iowait: <b className="text-red-600">{iowaitAvg}%</b>,
+          irq: <b className="text-violet-400">{irqAvg}%</b>, 
+          softIrq: <b className="text-pink-700">{softIrqAvg}%</b>,
+          idle: <b className="text-cyan-400">{idleAvg}%</b>
+        </Typography.Text>
       </Flex>
-      <p>
+      <Typography.Paragraph>
         Core with highest usr% usage is {cpuStats.cpuID}. Click on the button
         below for more details.
-      </p>
+      </Typography.Paragraph>
 
       <Button type="primary" onClick={showDrawer}>
         More Details

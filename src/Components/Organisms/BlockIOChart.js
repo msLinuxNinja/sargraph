@@ -1,7 +1,8 @@
-import { useMemo, useRef, useEffect } from "react";
-
+import { useMemo, useRef, useEffect, useState } from "react";
 import { useDataContext } from "../Contexts/DataContext";
-import ItemList from "../Atoms/List";
+
+// antd imports
+import { Flex, Typography } from "antd";
 
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
@@ -20,8 +21,12 @@ import {
   Decimation,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+
+// Custom components
 import ResetButton from "../Atoms/ResetButton";
-import { Flex } from "antd";
+import ItemList from "../Atoms/List";
+import CopyClipboardButton from "../Atoms/CopyClipButton";
+
 
 ChartJS.register(
   CategoryScale,
@@ -43,14 +48,44 @@ export default function BlockIOChart() {
   const chartRef = useRef();
   let perfOptions = true;
 
-  function changeDatasetData(chart) {
-    chart.data.datasets[0].data = blockData.diskArray[selectedBlock].tps;
-    chart.data.datasets[1].data = blockData.diskArray[selectedBlock].readSec;
-    chart.data.datasets[2].data = blockData.diskArray[selectedBlock].writeSec;
-    chart.data.datasets[3].data = blockData.diskArray[selectedBlock].avgRQz;
-    chart.data.datasets[4].data = blockData.diskArray[selectedBlock].avgQz;
-    chart.data.datasets[5].data = blockData.diskArray[selectedBlock].awaitMS;
-    chart.update();
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  // Metric states for selected period average calculation
+  const [tpsAvg, setTpsAvg] = useState(0);
+  const [readSecAvg, setReadSecAvg] = useState(0);
+  const [writeSecAvg, setWriteSecAvg] = useState(0);
+  const [avgRQzAvg, setAvgRQzAvg] = useState(0);
+  const [avgQzAvg, setAvgQzAvg] = useState(0);
+  const [awaitMSAvg, setAwaitMSAvg] = useState(0);
+
+
+  function fetchData(min, max, chart) {
+    const dataAvgs = [];
+    chart.data.datasets.forEach((dataset) => {
+      // Iterates over the datasets of the current chart
+      const currentData = [];
+      dataset.data.forEach((data) => {
+        // Extracts the data based on the min/max x time values
+        if (data.x >= min && data.x <= max) {
+          currentData.push(data.y);
+        }
+      });
+      const avg =
+        Math.round(
+          (currentData.reduce((acc, curr) => acc + curr, 0) /
+            currentData.length) *
+            100
+        ) / 100; // Calculates the average of the data and round to two decimal places
+
+      dataAvgs.push(avg);
+    });
+
+    setTpsAvg(dataAvgs[0]);
+    setReadSecAvg(dataAvgs[1]);
+    setWriteSecAvg(dataAvgs[2]);
+    setAvgRQzAvg(dataAvgs[3]);
+    setAvgQzAvg(dataAvgs[4]);
+    setAwaitMSAvg(dataAvgs[5]);
   }
 
   function createChartData() {
@@ -58,7 +93,7 @@ export default function BlockIOChart() {
       datasets: [
         {
           label: "Transfers per second",
-          data: blockData.diskArray[0].tps,
+          data: blockData.diskArray[selectedBlock].tps,
           backgroundColor: "rgba(0, 132, 195, 0.1)",
           borderColor: "rgba(0, 132, 195, 0.8)",
           borderWidth: 2,
@@ -67,7 +102,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Read MB/s",
-          data: blockData.diskArray[0].readSec,
+          data: blockData.diskArray[selectedBlock].readSec,
           backgroundColor: "rgba(254, 140, 0, 0.1)",
           borderColor: "rgba(254, 140, 0, 0.8)",
           borderWidth: 2,
@@ -76,7 +111,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Write MB/s",
-          data: blockData.diskArray[0].writeSec,
+          data: blockData.diskArray[selectedBlock].writeSec,
           backgroundColor: "rgba(58, 245, 39, 0.1)",
           borderColor: "rgba(58, 245, 39, 0.8)",
           borderWidth: 2,
@@ -85,7 +120,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Average Request Size (KB)",
-          data: blockData.diskArray[0].avgRQz,
+          data: blockData.diskArray[selectedBlock].avgRQz,
           backgroundColor: "rgba(255, 0, 0, 0.1)",
           borderColor: "rgba(255, 0, 0, 0.8)",
           borderWidth: 2,
@@ -94,7 +129,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Average Queue Size",
-          data: blockData.diskArray[0].avgQz,
+          data: blockData.diskArray[selectedBlock].avgQz,
           backgroundColor: "rgba(95, 17, 177, 0.1)",
           borderColor: "rgba(95, 17, 177, 0.8)",
           borderWidth: 2,
@@ -103,7 +138,7 @@ export default function BlockIOChart() {
         },
         {
           label: "Latency in MS",
-          data: blockData.diskArray[0].awaitMS,
+          data: blockData.diskArray[selectedBlock].awaitMS,
           backgroundColor: "rgba(0, 175, 218, 0.1)",
           borderColor: "rgba(0, 175, 218, 0.8)",
           borderWidth: 2,
@@ -167,10 +202,23 @@ export default function BlockIOChart() {
             },
             mode: "x",
             speed: 0.05,
+            onZoomComplete: function ({ chart }) {
+              setZoomLevel(chart.getZoomLevel()); // Updates zoom level when zoom completes
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           pan: {
             enabled: true,
             mode: "x",
+            onPanComplete: function ({ chart }) {
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           limits: {
             x: {
@@ -196,7 +244,7 @@ export default function BlockIOChart() {
       return false;
     }
     return createChartData();
-  }, []);
+  }, [selectedBlock]);
 
   const chartOptions = useMemo(() => {
     if (blockData.diskArray.length === 0) {
@@ -209,8 +257,16 @@ export default function BlockIOChart() {
     if (blockData.diskArray.length === 0) {
       return;
     }
-    const chart = chartRef.current;
-    changeDatasetData(chart);
+
+    if (chartRef.current.scales) {
+      // Update cpu data when selected CPU changes
+      const xMin = chartRef.current.scales.x.min;
+      const xMax = chartRef.current.scales.x.max;
+      fetchData(xMin, xMax, chartRef.current);
+    }
+
+    chartRef.current.update();
+
   }, [selectedBlock]);
 
   return (
@@ -231,6 +287,21 @@ export default function BlockIOChart() {
             showSearch={true}
           />
           <ResetButton chartRef={chartRef}/>
+          <CopyClipboardButton chartRef={chartRef}/>
+          <Typography.Text type="primary">
+            Current level zoom: {zoomLevel}
+          </Typography.Text>
+          <Typography.Text type="primary">
+            Averages for selected period:
+          </Typography.Text>
+          <Typography.Text type="primary">
+            Transfers per second: <b className="text-sky-600">{tpsAvg}/s</b>, 
+            Read MB per second: <b className="text-amber-500">{readSecAvg}MB/s</b>, 
+            Write MB per second: <b className="text-green-500">{writeSecAvg}MB/s</b>,
+            Avg Request Size: <b className="text-red-600">{avgRQzAvg}KB</b>,
+            Avg Queue Size: <b className="text-violet-400">{avgQzAvg}</b>, 
+            Latency: <b className="text-cyan-400">{awaitMSAvg}ms</b>,
+          </Typography.Text>
         </Flex>
       ) : (
         <></>

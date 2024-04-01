@@ -9,10 +9,15 @@ import {
   Typography,
   Button,
 } from "antd";
+
+//Chart components imports
 import MemoryChart from "../Components/Organisms/MemoryChart";
 import MemoryPercntChart from "../Components/Organisms/MemoryPercntChart";
 import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
+import NetworkChart from "../Components/Organisms/NetworkChart";
+import NetworkErrChart from "../Components/Organisms/NetworkErrChart";
+
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
 import { useEffect, useState } from "react";
@@ -73,8 +78,26 @@ export const HomePage = () => {
       ),
     },
     {
-      label: "System Details",
+      label: "Network",
       key: "5",
+      children: (
+        <ChartContainer>
+          <NetworkChart />
+        </ChartContainer>
+      ),
+    },
+    {
+      label: "Network Errors",
+      key: "6",
+      children: (
+        <ChartContainer>
+          <NetworkErrChart />
+        </ChartContainer>
+      ),
+    },
+    {
+      label: "System Details",
+      key: "7",
       children: (
         <ChartContainer>
           <FileDetails />
@@ -111,7 +134,7 @@ export const HomePage = () => {
           {hasData && (
             <>
               <TabsContainer>
-                <Tabs type="card" items={tabItems} />
+                <Tabs className="h-full" type="card" items={tabItems}/>
               </TabsContainer>
               <FloatButton.Group
                 trigger="hover"
