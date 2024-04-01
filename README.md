@@ -26,7 +26,7 @@ Lastly, existing tools to graph sar data are either too old or files need to be 
 # Usage
 
 There are 3 main ways the application can be used:
-1. Use the site [https://sargraph.azurewebsites.net/](https://sargraph.azurewebsites.net/). (No data is sent to the server, server only returns javascript)
+1. Use the site [https://sargraph.xzy](https://sargraph.xzy). (No data is sent to the server, server only returns javascript)
 2. Use the docker image. For example, from [WSL 2 with docker](https://dev.to/bartr/install-docker-on-windows-subsystem-for-linux-v2-ubuntu-5dl7) installed or [docker desktop on Windows](https://docs.docker.com/desktop/install/windows-install/), run the command `docker run -d --name sargraph -p 8080:80 gjarllarhorn/sargraph`
 3. Clone the repo and run `npm install -f` and `npm run` (**slower, not recommended**, also node v16+ needs to be installed).
 
