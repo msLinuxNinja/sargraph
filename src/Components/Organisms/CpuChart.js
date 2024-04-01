@@ -449,16 +449,16 @@ export default function CpuChart() {
         />
         <ResetButton chartRef={chartRef} />
         <CopyClipboardButton chartRef={chartRef}/>
-        <Typography.Text type="secondary">
+        <Typography.Text type="primary">
           Current level zoom: {zoomLevel}
         </Typography.Text>
-        <Typography.Text type="secondary">
+        <Typography.Text type="primary">
           Averages for selected period:
         </Typography.Text>
-        <Typography.Text type="secondary">
+        <Typography.Text type="primary">
           usr: <b className="text-sky-600">{usrAvg}%</b>, 
           nice: <b className="text-amber-500">{niceAvg}%</b>, 
-          sys: <b className="text-green-500">{sysAvg}%,</b>
+          sys: <b className="text-green-500">{sysAvg}%</b>,
           iowait: <b className="text-red-600">{iowaitAvg}%</b>,
           irq: <b className="text-violet-400">{irqAvg}%</b>, 
           softIrq: <b className="text-pink-700">{softIrqAvg}%</b>,
