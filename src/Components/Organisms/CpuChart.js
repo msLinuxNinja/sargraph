@@ -1,10 +1,10 @@
 import { useMemo, useEffect, useRef, useState } from "react";
-
 import { useDataContext } from "../Contexts/DataContext";
-import ItemList from "../Atoms/List";
-import TableDetails from "../Molecules/TableDetails";
+
+// antd imports
 import { Button, Drawer, Flex, Typography } from "antd";
 
+// chart.js imports
 import "chartjs-adapter-date-fns";
 import zoomPlugin, { zoom } from "chartjs-plugin-zoom"; // import zoom plugin
 import {
@@ -22,8 +22,12 @@ import {
   Decimation,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+
+// Custom components
 import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
+import ItemList from "../Atoms/List";
+import TableDetails from "../Molecules/TableDetails";
 
 ChartJS.register(
   CategoryScale,
