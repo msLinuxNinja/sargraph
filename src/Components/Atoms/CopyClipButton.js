@@ -1,28 +1,36 @@
-import { useState } from 'react';
-import { Button } from 'antd';
+import { useState } from "react";
+import { Button } from "antd";
 
 export default function CopyClipboardButton(props) {
-  const [buttonText, setButtonText] = useState('Copy to Clipboard');
+  const [buttonText, setButtonText] = useState("Copy to Clipboard");
+
+  const supportedBrowser = navigator.clipboard && navigator.clipboard.write; // Verify if browser supports ClipboardItem API
 
   function handleCopy() {
     const canvas = props.chartRef.current.canvas; // Obtain current canvas
     canvas.toBlob(async (blob) => {
-      const items = [new ClipboardItem({ 'image/png': blob })];
+      const items = [new ClipboardItem({ 'image/png': blob })]; // Note: does not work in Firefox
       await navigator.clipboard.write(items);
     }); // Copy canvas to clipboard
 
     // Change button text to "Copied!"
-    setButtonText('Copied!');
+    setButtonText("Copied!");
 
     // Change it back to "Copy to Clipboard" after 3 seconds
     setTimeout(() => {
-      setButtonText('Copy to Clipboard');
+      setButtonText("Copy to Clipboard");
     }, 3000);
   }
 
   return (
-    <Button type="primary" onClick={handleCopy}>
-      {buttonText}
-    </Button>
+    <>
+      {supportedBrowser ? (
+          <Button type="primary" onClick={handleCopy}>
+            {buttonText}
+          </Button>
+      ) : (
+        null
+      )}
+    </>
   );
 }
