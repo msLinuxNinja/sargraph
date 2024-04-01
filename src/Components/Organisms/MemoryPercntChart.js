@@ -1,7 +1,11 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 
+// antd imports
 
+import { Flex, Typography } from "antd";
+
+// chart.js imports
 import 'chartjs-adapter-date-fns';
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
 import {
@@ -19,7 +23,10 @@ import {
   Decimation
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+
+// Custom components
 import ResetButton from "../Atoms/ResetButton";
+import CopyClipboardButton from "../Atoms/CopyClipButton";
 
 
 
@@ -41,6 +48,38 @@ ChartJS.register(
 export default function MemoryPercntChart() {
   const { memoryData, swapData } = useDataContext();
   const chartRef = useRef();
+
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [memUsedPrcntAvg, setMemUsedPrcntAvg] = useState(0);
+  const [commitPrcntAvg, setCommitPrcntAvg] = useState(0);
+  const [swapUsedPrcntAvg, setSwapUsedPrcntAvg] = useState(0);
+
+  function fetchData(min, max, chart) {
+    const dataAvgs = [];
+
+    chart.data.datasets.forEach((dataset) => {
+      // Iterates over the datasets of the current chart
+      const currentData = [];
+      dataset.data.forEach((data) => {
+        // Extracts the data based on the min/max x time values
+        if (data.x >= min && data.x <= max) {
+          currentData.push(data.y);
+        }
+      });
+      const avg =
+        Math.round(
+          (currentData.reduce((acc, curr) => acc + curr, 0) /
+            currentData.length) *
+            100
+        ) / 100; // Calculates the average of the data and round to two decimal places
+
+      dataAvgs.push(avg);
+    });
+
+    setMemUsedPrcntAvg(dataAvgs[0]);
+    setCommitPrcntAvg(dataAvgs[1]);
+    setSwapUsedPrcntAvg(dataAvgs[2]);
+  }
 
   function createChartData() {
     return {
@@ -185,10 +224,23 @@ export default function MemoryPercntChart() {
             },
             mode: "x",
             speed: 0.05,
+            onZoomComplete: function ({ chart }) {
+              setZoomLevel(chart.getZoomLevel()); // Updates zoom level when zoom completes
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           pan: {
             enabled: true,
             mode: "x",
+            onPanComplete: function ({ chart }) {
+              const xAxis = chart.scales.x;
+              const xMin = xAxis.min;
+              const xMax = xAxis.max;
+              fetchData(xMin, xMax, chart);
+            },
           },
           limits: {
             x: {
@@ -215,10 +267,33 @@ export default function MemoryPercntChart() {
     return createChartOptions();
   }, []);
 
+  useEffect(() => {
+    if (chartRef.current.scales) {
+      // Update memory data when component mounts
+      const xMin = chartRef.current.scales.x.min;
+      const xMax = chartRef.current.scales.x.max;
+      fetchData(xMin, xMax, chartRef.current);
+    }
+  }, []);
+
   return (
     <>
       <Line ref={chartRef} options={chartOptions} data={chartData} />
+      <Flex className="items-center gap-2">
       <ResetButton chartRef={chartRef} />
+      <CopyClipboardButton chartRef={chartRef} />
+        <Typography.Text type="primary">
+          Current level zoom: {zoomLevel}
+        </Typography.Text>
+        <Typography.Text type="primary">
+          Averages for selected period:
+        </Typography.Text>
+        <Typography.Text type="primary">
+          Memory Free: <b className="text-sky-600">{memUsedPrcntAvg}%</b>, 
+          Swap Free: <b className="text-teal-700">{commitPrcntAvg}%</b>, 
+          Memory Used: <b className="text-amber-500">{swapUsedPrcntAvg}%</b>,
+        </Typography.Text>
+      </Flex>
     </>
   );
 }

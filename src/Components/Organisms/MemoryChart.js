@@ -277,6 +277,15 @@ export default function MemoryChart() {
     return createChartOptions();
   }, []);
 
+  useEffect(() => {
+    if (chartRef.current.scales) {
+      // Update memory data when component mounts
+      const xMin = chartRef.current.scales.x.min;
+      const xMax = chartRef.current.scales.x.max;
+      fetchData(xMin, xMax, chartRef.current);
+    }
+  }, []);
+
 
   return (
     <>
