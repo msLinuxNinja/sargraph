@@ -188,6 +188,9 @@ export default function BlockIOChart() {
         legend: {
           labels: {
             color: "rgba(180, 180, 180, 1)",
+            font: {
+              size:16
+            }
           },
         },
         zoom: {
