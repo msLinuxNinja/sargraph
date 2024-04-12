@@ -29,6 +29,10 @@ import CopyClipboardButton from "../Atoms/CopyClipButton";
 import ItemList from "../Atoms/List";
 import TableDetails from "../Molecules/TableDetails";
 
+//Colors
+
+import {colorConfig} from "../../Utils/colors";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -227,8 +231,8 @@ export default function CpuChart() {
         {
           label: "nice%",
           data: cpuData.cpuArray[selectedCPU].cpuNiceData,
-          backgroundColor: "rgba(254, 140, 0, 0.1)",
-          borderColor: "rgba(254, 140, 0, 1)",
+          backgroundColor: colorConfig.chartColors.color2.background,
+          borderColor: colorConfig.chartColors.color2.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -236,8 +240,8 @@ export default function CpuChart() {
         {
           label: "sys%",
           data: cpuData.cpuArray[selectedCPU].cpuSysData,
-          backgroundColor: "rgba(58, 245, 39, 0.1)",
-          borderColor: "rgba(58, 245, 39, 0.8)",
+          backgroundColor: colorConfig.chartColors.color3.background,
+          borderColor: colorConfig.chartColors.color3.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -245,8 +249,8 @@ export default function CpuChart() {
         {
           label: "iowait%",
           data: cpuData.cpuArray[selectedCPU].cpuIowaitData,
-          backgroundColor: "rgba(255, 0, 0, 0.1)",
-          borderColor: "rgba(255, 0, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color4.background,
+          borderColor: colorConfig.chartColors.color4.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -254,8 +258,8 @@ export default function CpuChart() {
         {
           label: "irq%",
           data: cpuData.cpuArray[selectedCPU].cpuIrqData,
-          backgroundColor: "rgba(95, 17, 177, 0.1)",
-          borderColor: "rgba(95, 17, 177, 0.8)",
+          backgroundColor: colorConfig.chartColors.color5.background,
+          borderColor: colorConfig.chartColors.color5.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -263,8 +267,8 @@ export default function CpuChart() {
         {
           label: "softIrq%",
           data: cpuData.cpuArray[selectedCPU].cpuSoftData,
-          backgroundColor: "rgba(177, 17, 82, 0.1)",
-          borderColor: "rgba(177, 17, 82, 0.8)",
+          backgroundColor: colorConfig.chartColors.color6.background,
+          borderColor: colorConfig.chartColors.color6.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -272,8 +276,8 @@ export default function CpuChart() {
         {
           label: "idle%",
           data: cpuData.cpuArray[selectedCPU].cpuIdleData,
-          backgroundColor: "rgba(0, 210, 255, 0.05)",
-          borderColor: "rgba(0, 210, 255, 0.8)",
+          backgroundColor: colorConfig.chartColors.color7.background,
+          borderColor: colorConfig.chartColors.color7.border,
           borderWidth: 2,
           fill: false,
           tension: 0.2,
@@ -295,7 +299,7 @@ export default function CpuChart() {
             callback: function (value, index, ticks) {
               return value + "%";
             },
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
           },
           responsive: true,
           min: 0,
@@ -303,13 +307,13 @@ export default function CpuChart() {
         },
         x: {
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             source: "auto",
             autoSkip: true,
             maxRotation: 0,
           },
           grid: {
-            color: "rgba(0, 0, 0, 0.05)",
+            color: "rgba(0, 0, 0, 0.10)",
           },
           type: "time",
         },
@@ -322,7 +326,7 @@ export default function CpuChart() {
       plugins: {
         legend: {
           labels: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             font: {
               size:16
             }
