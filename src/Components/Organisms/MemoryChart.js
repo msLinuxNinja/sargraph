@@ -28,6 +28,10 @@ import { Line } from "react-chartjs-2";
 import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
+// Colors
+
+import { colorConfig } from "../../Utils/colors";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -95,8 +99,8 @@ export default function MemoryChart() {
         {
           label: "Memory Free GB",
           data: memoryData.kbMemFree,
-          backgroundColor: "rgba(0, 132, 195, 0.1)",
-          borderColor: "rgba(0, 132, 195, 0.8)",
+          backgroundColor: colorConfig.chartColors.color1.background,
+          borderColor: colorConfig.chartColors.color1.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -104,8 +108,8 @@ export default function MemoryChart() {
         {
           label: "Swap Free GB",
           data: swapData.kbSwapFree,
-          backgroundColor: "rgba(0, 128, 128, 0.1)",
-          borderColor: "rgba(0, 128, 128, 1)",
+          backgroundColor: colorConfig.chartColors.color1a.background,
+          borderColor: colorConfig.chartColors.color1a.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -113,8 +117,8 @@ export default function MemoryChart() {
         {
           label: "Memory Used GB",
           data: memoryData.kbMemUsed,
-          backgroundColor: "rgba(254, 140, 0, 0.1)",
-          borderColor: "rgba(254, 140, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color2.background,
+          borderColor: colorConfig.chartColors.color2.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -122,8 +126,8 @@ export default function MemoryChart() {
         {
           label: "Swap Used GB",
           data: swapData.kbSwapUsed,
-          backgroundColor: "rgba(202, 31, 123, 0.1)",
-          borderColor: "rgba(202, 31, 123, 0.8)",
+          backgroundColor: colorConfig.chartColors.color5.background,
+          borderColor: colorConfig.chartColors.color5.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -131,8 +135,8 @@ export default function MemoryChart() {
         {
           label: "Memory Buffers GB",
           data: memoryData.kbBuffers,
-          backgroundColor: "rgba(58, 245, 39, 0.1)",
-          borderColor: "rgba(58, 245, 39, 0.8)",
+          backgroundColor: colorConfig.chartColors.color3.background,
+          borderColor: colorConfig.chartColors.color3.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -140,8 +144,8 @@ export default function MemoryChart() {
         {
           label: "Memory Cache GB",
           data: memoryData.kbCached,
-          backgroundColor: "rgba(255, 0, 0, 0.1)",
-          borderColor: "rgba(255, 0, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color4.background,
+          borderColor: colorConfig.chartColors.color4.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -149,8 +153,8 @@ export default function MemoryChart() {
         {
           label: "Memory Commit GB",
           data: memoryData.kbCommit,
-          backgroundColor: "rgba(95, 17, 177, 0.1)",
-          borderColor: "rgba(95, 17, 177, 0.8)",
+          backgroundColor: colorConfig.chartColors.color6.background,
+          borderColor: colorConfig.chartColors.color6.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -158,8 +162,8 @@ export default function MemoryChart() {
         {
           label: "Total Memory",
           data: memoryData.totalMemory,
-          backgroundColor: "rgba(0, 175, 218, 0.1)",
-          borderColor: "rgba(0, 175, 218, 0.8)",
+          backgroundColor: colorConfig.chartColors.color7.background,
+          borderColor: colorConfig.chartColors.color7.border,
           borderWidth: 2,
           fill: false,
           tension: 0.2,
@@ -167,8 +171,8 @@ export default function MemoryChart() {
         {
           label: "Total Swap",
           data: swapData.totalSwap,
-          backgroundColor: "rgba(0, 175, 218, 0.1)",
-          borderColor: "rgba(0, 175, 218, 0.8)",
+          backgroundColor: colorConfig.chartColors.color7.background,
+          borderColor: colorConfig.chartColors.color7.border,
           borderWidth: 2,
           fill: false,
           tension: 0.2,
