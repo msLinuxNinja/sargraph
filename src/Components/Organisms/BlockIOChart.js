@@ -27,6 +27,9 @@ import ResetButton from "../Atoms/ResetButton";
 import ItemList from "../Atoms/List";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
+// Colors
+
+import { colorConfig } from "../../Utils/colors";
 
 ChartJS.register(
   CategoryScale,
@@ -94,8 +97,8 @@ export default function BlockIOChart() {
         {
           label: "Transfers per second",
           data: blockData.diskArray[selectedBlock].tps,
-          backgroundColor: "rgba(0, 132, 195, 0.1)",
-          borderColor: "rgba(0, 132, 195, 0.8)",
+          backgroundColor: colorConfig.chartColors.color1.background,
+          borderColor: colorConfig.chartColors.color1.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -103,8 +106,8 @@ export default function BlockIOChart() {
         {
           label: "Read MB/s",
           data: blockData.diskArray[selectedBlock].readSec,
-          backgroundColor: "rgba(254, 140, 0, 0.1)",
-          borderColor: "rgba(254, 140, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color2.background,
+          borderColor: colorConfig.chartColors.color2.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -112,8 +115,8 @@ export default function BlockIOChart() {
         {
           label: "Write MB/s",
           data: blockData.diskArray[selectedBlock].writeSec,
-          backgroundColor: "rgba(58, 245, 39, 0.1)",
-          borderColor: "rgba(58, 245, 39, 0.8)",
+          backgroundColor: colorConfig.chartColors.color3.background,
+          borderColor: colorConfig.chartColors.color3.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -121,8 +124,8 @@ export default function BlockIOChart() {
         {
           label: "Average Request Size (KB)",
           data: blockData.diskArray[selectedBlock].avgRQz,
-          backgroundColor: "rgba(255, 0, 0, 0.1)",
-          borderColor: "rgba(255, 0, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color4.background,
+          borderColor: colorConfig.chartColors.color4.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -130,8 +133,8 @@ export default function BlockIOChart() {
         {
           label: "Average Queue Size",
           data: blockData.diskArray[selectedBlock].avgQz,
-          backgroundColor: "rgba(95, 17, 177, 0.1)",
-          borderColor: "rgba(95, 17, 177, 0.8)",
+          backgroundColor: colorConfig.chartColors.color5.background,
+          borderColor: colorConfig.chartColors.color5.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -139,8 +142,8 @@ export default function BlockIOChart() {
         {
           label: "Latency in MS",
           data: blockData.diskArray[selectedBlock].awaitMS,
-          backgroundColor: "rgba(0, 175, 218, 0.1)",
-          borderColor: "rgba(0, 175, 218, 0.8)",
+          backgroundColor: colorConfig.chartColors.color7.background,
+          borderColor: colorConfig.chartColors.color7.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -282,7 +285,7 @@ export default function BlockIOChart() {
         </>
       )}
       {chartData ? (
-        <Flex className="gap-2 items-center">
+        <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
           <ItemList
             items={blockData.uniqDev}
             placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`}

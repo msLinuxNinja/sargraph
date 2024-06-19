@@ -114,7 +114,7 @@ export const HomePage = () => {
   }, [fileDetails]);
 
   const contentStyle = {
-    backgroundColor: "rgb(66, 66, 66)",
+    backgroundColor: "rgb(50, 50, 50)",
   };
 
   const footerStyle = {
@@ -197,7 +197,7 @@ export const HomePage = () => {
         </Drawer>
         <Footer
           style={footerStyle}
-          className="z-30 flex justify-start items-center content-center"
+          className="z-30 flex justify-start items-center content-center rounded-b-lg"
         >
           <FooterDetails />
         </Footer>

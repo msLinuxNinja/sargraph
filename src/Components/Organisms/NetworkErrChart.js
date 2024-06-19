@@ -28,6 +28,8 @@ import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 import ItemList from "../Atoms/List";
 
+// Colors
+import { colorConfig } from "../../Utils/colors";
 
 ChartJS.register(
   CategoryScale,
@@ -91,8 +93,8 @@ export default function NetworkErrChart() {
         {
           label: "Receive bad packets per second",
           data: netErrData.netErrArray[selectedInterface].rxerr,
-          backgroundColor: "rgba(0, 132, 195, 0.1)",
-          borderColor: "rgba(0, 132, 195, 0.8)",
+          backgroundColor: colorConfig.chartColors.color1.background,
+          borderColor: colorConfig.chartColors.color1.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -100,8 +102,8 @@ export default function NetworkErrChart() {
         {
           label: "Transmit bad packets per second",
           data: netErrData.netErrArray[selectedInterface].txerr,
-          backgroundColor: "rgba(254, 140, 0, 0.1)",
-          borderColor: "rgba(254, 140, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color2.background,
+          borderColor: colorConfig.chartColors.color2.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -109,8 +111,8 @@ export default function NetworkErrChart() {
         {
           label: "Collisions per second",
           data: netErrData.netErrArray[selectedInterface].coll,
-          backgroundColor: "rgba(58, 245, 39, 0.1)",
-          borderColor: "rgba(58, 245, 39, 0.8)",
+          backgroundColor: colorConfig.chartColors.color3.background,
+          borderColor: colorConfig.chartColors.color3.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -118,8 +120,8 @@ export default function NetworkErrChart() {
         {
           label: "Receive drop packets per second",
           data: netErrData.netErrArray[selectedInterface].rxdrop,
-          backgroundColor: "rgba(255, 0, 0, 0.1)",
-          borderColor: "rgba(255, 0, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color4.background,
+          borderColor: colorConfig.chartColors.color4.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -127,8 +129,8 @@ export default function NetworkErrChart() {
         {
           label: "Transmit drop packets per second",
           data: netErrData.netErrArray[selectedInterface].txdrop,
-          backgroundColor: "rgba(95, 17, 177, 0.1)",
-          borderColor: "rgba(95, 17, 177, 0.8)",
+          backgroundColor: colorConfig.chartColors.color5.background,
+          borderColor: colorConfig.chartColors.color5.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -243,7 +245,7 @@ export default function NetworkErrChart() {
         </>
       )}
       {chartData ? (
-        <Flex className="gap-2 items-center">
+        <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
           <ItemList
             items={netErrData.uniqIFACE}
             placeHolderText={`Select Interface (Selected ${netErrData.uniqIFACE[0]})`}

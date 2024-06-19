@@ -28,8 +28,6 @@ import { Line } from 'react-chartjs-2';
 import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
-
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -279,7 +277,7 @@ export default function MemoryPercntChart() {
   return (
     <>
       <Line ref={chartRef} options={chartOptions} data={chartData} />
-      <Flex className="items-center gap-2">
+      <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
       <ResetButton chartRef={chartRef} />
       <CopyClipboardButton chartRef={chartRef} />
         <Typography.Text type="primary">
