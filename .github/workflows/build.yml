@@ -1,0 +1,33 @@
+name: Release Docker Image
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile # Specify the path to your Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sargraph:latest
+      - name: Build and push Docker image archive
+        id: docker_build_archive
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile # Specify the path to your Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sargraph:${{ github.event.release.tag_name }}
