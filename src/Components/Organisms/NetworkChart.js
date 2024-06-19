@@ -28,6 +28,9 @@ import ResetButton from "../Atoms/ResetButton";
 import ItemList from "../Atoms/List";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
+// Colors
+import { colorConfig } from "../../Utils/colors";
+
 
 ChartJS.register(
   CategoryScale,
@@ -90,8 +93,8 @@ export default function NetworkChart() {
         {
           label: "Receive packets per second",
           data: netData.netArray[selectedInterface].rxpck,
-          backgroundColor: "rgba(0, 132, 195, 0.1)",
-          borderColor: "rgba(0, 132, 195, 0.8)",
+          backgroundColor: colorConfig.chartColors.color1.background,
+          borderColor: colorConfig.chartColors.color1.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -99,8 +102,8 @@ export default function NetworkChart() {
         {
           label: "Transmit packets per second",
           data: netData.netArray[selectedInterface].txpck,
-          backgroundColor: "rgba(254, 140, 0, 0.1)",
-          borderColor: "rgba(254, 140, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color2.background,
+          borderColor: colorConfig.chartColors.color2.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -108,8 +111,8 @@ export default function NetworkChart() {
         {
           label: "Receive Megabytes per second (MB/s)",
           data: netData.netArray[selectedInterface].rxkB,
-          backgroundColor: "rgba(58, 245, 39, 0.1)",
-          borderColor: "rgba(58, 245, 39, 0.8)",
+          backgroundColor: colorConfig.chartColors.color3.background,
+          borderColor: colorConfig.chartColors.color3.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,
@@ -117,8 +120,8 @@ export default function NetworkChart() {
         {
           label: "Transmit Megabytes per second (MB/s)",
           data: netData.netArray[selectedInterface].txkB,
-          backgroundColor: "rgba(255, 0, 0, 0.1)",
-          borderColor: "rgba(255, 0, 0, 0.8)",
+          backgroundColor: colorConfig.chartColors.color4.background,
+          borderColor: colorConfig.chartColors.color4.border,
           borderWidth: 2,
           fill: true,
           tension: 0.2,

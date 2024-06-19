@@ -5,6 +5,8 @@ export const colorConfig = {
       // CPU usr%
       // Mem Free
       // I/O tps
+      // Net RX packets
+      // Net Err RX packets
       background: "rgba(0, 132, 195, 0.1)",
       border: "rgba(0, 132, 195, 1)",
     },
@@ -17,6 +19,8 @@ export const colorConfig = {
       //CPU nice%
       // Mem Used
       // I/O read MB/s
+      // Net TX packets
+      // Net Err TX packets
       background: "rgba(254, 140, 0, 0.1)", 
       border: "rgba(254, 140, 0, 1)",
     },
@@ -24,6 +28,8 @@ export const colorConfig = {
       //CPU sys%
       // Mem Buffers
       // I/O write MB/s
+      // Net RX MB/s
+      // Net Err Collisions
       background: "rgba(58, 245, 39, 0.1)", 
       border: "rgba(58, 245, 39, 1)",
     },
@@ -31,6 +37,8 @@ export const colorConfig = {
       // CPU iowait%
       // Mem Cache
       // I/O avg request size
+      // Net TX MB/s
+      // Net Err RX drops
       background: "rgba(255, 0, 0, 0.1)", 
       border: "rgba(255, 0, 0, 1)",
     },
@@ -54,6 +62,5 @@ export const colorConfig = {
       background: "rgba(0, 210, 255, 0.05)", 
       border: "rgba(0, 210, 255, 1)",
     },
-
   },
 };

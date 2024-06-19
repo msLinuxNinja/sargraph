@@ -29,7 +29,6 @@ import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
 // Colors
-
 import { colorConfig } from "../../Utils/colors";
 
 ChartJS.register(

@@ -28,8 +28,6 @@ import { Line } from 'react-chartjs-2';
 import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
-
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
