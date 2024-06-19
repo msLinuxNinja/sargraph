@@ -235,7 +235,7 @@ export default function NetworkChart() {
         </>
       )}
       {chartData ? (
-        <Flex className="gap-2 items-center">
+        <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
           <ItemList
             items={netData.uniqIFACE}
             placeHolderText={`Select Interface (Selected ${netData.uniqIFACE[0]})`}

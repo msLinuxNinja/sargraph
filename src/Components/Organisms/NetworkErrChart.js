@@ -245,7 +245,7 @@ export default function NetworkErrChart() {
         </>
       )}
       {chartData ? (
-        <Flex className="gap-2 items-center">
+        <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
           <ItemList
             items={netErrData.uniqIFACE}
             placeHolderText={`Select Interface (Selected ${netErrData.uniqIFACE[0]})`}

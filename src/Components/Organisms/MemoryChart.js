@@ -293,7 +293,7 @@ export default function MemoryChart() {
   return (
     <>
       <Line ref={chartRef} options={chartOptions} data={chartData} />
-      <Flex className="items-center gap-2">
+      <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
         <ResetButton chartRef={chartRef} />
         <CopyClipboardButton chartRef={chartRef} />
         <Typography.Text type="primary">

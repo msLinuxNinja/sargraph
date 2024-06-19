@@ -449,7 +449,7 @@ export default function CpuChart() {
   return (
     <>
       <Line ref={chartRef} options={chartOptions} data={chartData} />
-      <Flex className="items-center gap-2">
+      <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
         <ItemList
           items={cpuData.uniqCPU}
           placeHolderText="Select CPU (selected All)"

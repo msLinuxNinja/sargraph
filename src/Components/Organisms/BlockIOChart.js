@@ -285,7 +285,7 @@ export default function BlockIOChart() {
         </>
       )}
       {chartData ? (
-        <Flex className="gap-2 items-center">
+        <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
           <ItemList
             items={blockData.uniqDev}
             placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`}
