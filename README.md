@@ -41,10 +41,8 @@ To use, drag & drop or click to select a sar file.
 
 # To Do
 - ✅Include other metrics like network, swap.
-- ✅Enhance performance on larger datasets.[PR#39 improves performance](https://github.com/msLinuxNinja/sargraph/pull/39)
+- ✅Enhance performance on larger datasets.[PR#39 improves performance](https://github.com/msLinuxNinja/sargraph/pull/39) [PR#49 WebWorkers](https://github.com/msLinuxNinja/sargraph/pull/49)
 - ✅Include tips on the different metrics.
-- ✅Learn to code and make good applications.
-
 # Feedback
 
 Feel free to open an [Issue](https://github.com/msLinuxNinja/sargraph/issues) and leave feedback, or head to the [Discussions](https://github.com/msLinuxNinja/sargraph/discussions) section if there’s any question.
