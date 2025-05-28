@@ -5,3 +5,4 @@ routes = [ {pattern = "sargraph.xyz", custom_domain = true}]
 
 [observability.logs]
 enabled = true
+invocation_logs = false
