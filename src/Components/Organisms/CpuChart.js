@@ -33,6 +33,31 @@ import TableDetails from "../Molecules/TableDetails";
 
 import {colorConfig} from "../../Utils/colors";
 
+// Plugin: draw a vertical guide line at the hovered x-position
+const verticalHoverLine = {
+  id: "verticalHoverLine",
+  afterDatasetsDraw(chart, args, pluginOptions) {
+    const { ctx, tooltip, chartArea } = chart;
+    if (!tooltip || typeof tooltip.getActiveElements !== "function") return;
+    const active = tooltip.getActiveElements();
+    if (!active || active.length === 0) return;
+
+    const { top, bottom, left, right } = chartArea || {};
+    const x = active[0]?.element?.x;
+    if (x == null || x < left || x > right) return;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, top);
+    ctx.lineTo(x, bottom);
+    ctx.lineWidth = pluginOptions?.lineWidth ?? 1;
+    ctx.strokeStyle = pluginOptions?.color ?? "rgba(255,255,255,0.35)";
+    if (pluginOptions?.dash) ctx.setLineDash(pluginOptions.dash);
+    ctx.stroke();
+    ctx.restore();
+  },
+};
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -45,7 +70,8 @@ ChartJS.register(
   Legend,
   Filler,
   zoomPlugin, // register zoom plugin
-  Decimation
+  Decimation,
+  verticalHoverLine
 );
 
 export default function CpuChart() {
@@ -292,6 +318,11 @@ export default function CpuChart() {
       perfOptions = false;
     }
     return {
+      interaction: {
+        mode: "index",
+        intersect: false,
+        axis: "x",
+      },
       scales: {
         y: {
           beginAtZero: true,
@@ -331,6 +362,11 @@ export default function CpuChart() {
               size:16
             }
           },
+        },
+        verticalHoverLine: {
+          lineWidth: 1,
+          color: "rgba(148,163,184,0.45)",
+          dash: [4, 4],
         },
         zoom: {
           // logic to enable zoom chart

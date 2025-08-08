@@ -223,6 +223,11 @@ export default function MemoryChart() {
             },
           },
         },
+        verticalHoverLine: {
+          lineWidth: 1,
+          color: "rgba(148,163,184,0.45)",
+          dash: [4, 4],
+        },
         zoom: {
           // logic to enable zoom chart
           zoom: {
