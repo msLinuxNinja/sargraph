@@ -342,7 +342,9 @@ export function parseDiskIO(sarFileData) {
     matchedData.push(returnMatch(`(^${block}$)`, diskData));
   });
 
-  uniqDev.sort(); // Sort block devices
+  uniqDev.sort((a, b) =>
+    a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
+  ); // Sort block devices in human order
 
   const diskArray = uniqDev.map(() => ({
     tps: [],
