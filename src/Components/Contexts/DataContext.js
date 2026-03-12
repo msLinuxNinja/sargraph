@@ -13,6 +13,8 @@ const DataContext = createContext({
   setNetData: () => {},
   netErrData: undefined,
   setNetErrData: () => {},
+  pagingData: undefined,
+  setPagingData: () => {},
   selectedCPU: undefined,
   setSelectedCPU: () => {},
   selectedBlock: undefined,
@@ -36,6 +38,7 @@ export const DataContextProvider = ({ children }) => {
   const [blockData, setBlockData] = useState(undefined);
   const [netData, setNetData] = useState(undefined);
   const [netErrData, setNetErrData] = useState(undefined);
+  const [pagingData, setPagingData] = useState(undefined);
   const [selectedCPU, setSelectedCPU] = useState(0);
   const [selectedBlock, setSelectedBlock] = useState(0);
   const [selectedInterface, setSelectedInterface] = useState(0);
@@ -58,6 +61,8 @@ export const DataContextProvider = ({ children }) => {
     setNetData,
     netErrData,
     setNetErrData,
+    pagingData,
+    setPagingData,
     selectedCPU,
     setSelectedCPU,
     selectedBlock,

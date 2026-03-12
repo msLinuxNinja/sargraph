@@ -570,3 +570,56 @@ export function parseNetErrorData(sarFileData) {
 
   return { netErrArray, uniqIFACE };
 }
+
+export function parsePagingData(sarFileData) {
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+
+  const pgpgin = [];
+  const pgpgout = [];
+  const fault = [];
+  const majflt = [];
+  const pgfree = [];
+  const pgscank = [];
+  const pgscand = [];
+  const pgsteal = [];
+  const vmeff = [];
+
+  const header = sarFileData.filter((row) => row.includes("pgpgin/s"));
+
+  if (header.length === 0) {
+    return { pgpgin, pgpgout, fault, majflt, pgfree, pgscank, pgscand, pgsteal, vmeff };
+  }
+
+  const rowIncludesPgpgin = sarFileData
+    .map((row, index) => (row.includes("pgpgin/s") ? index : null))
+    .filter((index) => typeof index === "number");
+  const firstIndex = rowIncludesPgpgin[0] + 1;
+
+  const rowIncludesAvg = sarFileData
+    .map((row, index) => (row.includes("Average:") ? index : null))
+    .filter((index) => typeof index === "number");
+  const tempLastIndex = rowIncludesAvg.filter(
+    (number) => number > rowIncludesPgpgin[0]
+  );
+  const lastIndex = tempLastIndex[0];
+
+  const pagingPortion = returnDataPortion(firstIndex, lastIndex, sarFileData);
+  const pagingData = pagingPortion.filter(
+    (row) => !row.includes("pgpgin/s") && !row.includes("Average:")
+  );
+
+  pagingData.forEach((row) => {
+    const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+    pgpgin.push({ x: time, y: parseFloat(row[1]) });
+    pgpgout.push({ x: time, y: parseFloat(row[2]) });
+    fault.push({ x: time, y: parseFloat(row[3]) });
+    majflt.push({ x: time, y: parseFloat(row[4]) });
+    pgfree.push({ x: time, y: parseFloat(row[5]) });
+    pgscank.push({ x: time, y: parseFloat(row[6]) });
+    pgscand.push({ x: time, y: parseFloat(row[7]) });
+    pgsteal.push({ x: time, y: parseFloat(row[8]) });
+    vmeff.push({ x: time, y: parseFloat(row[9]) });
+  });
+
+  return { pgpgin, pgpgout, fault, majflt, pgfree, pgscank, pgscand, pgsteal, vmeff };
+}

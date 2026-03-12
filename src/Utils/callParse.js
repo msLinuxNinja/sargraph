@@ -11,6 +11,7 @@ export async function callParse(fileContent) {
     blockObject,
     networkObject,
     networkErrObject,
+    pagingObject,
     fileDetails,
   } = results;
 
@@ -21,6 +22,7 @@ export async function callParse(fileContent) {
     blockObject,
     networkObject,
     networkErrObject,
+    pagingObject,
     fileDetails,
   };
 }

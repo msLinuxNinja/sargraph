@@ -17,6 +17,7 @@ import BlockIOChart from "../Components/Organisms/BlockIOChart";
 import CpuChart from "../Components/Organisms/CpuChart";
 import NetworkChart from "../Components/Organisms/NetworkChart";
 import NetworkErrChart from "../Components/Organisms/NetworkErrChart";
+import PagingChart from "../Components/Organisms/PagingChart";
 
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
@@ -69,6 +70,15 @@ export const HomePage = () => {
       ),
     },
     {
+      label: "Paging",
+      key: "7",
+      children: (
+        <ChartContainer>
+          <PagingChart />
+        </ChartContainer>
+      ),
+    },
+    {
       label: "IO",
       key: "4",
       children: (
@@ -97,7 +107,7 @@ export const HomePage = () => {
     },
     {
       label: "System Details",
-      key: "7",
+      key: "8",
       children: (
         <ChartContainer>
           <FileDetails />

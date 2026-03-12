@@ -5,6 +5,7 @@ import {
   parseSwapData,
   parseNetworkData,
   parseNetErrorData,
+  parsePagingData,
   parseFileDetails,
 } from "./parseData";
 
@@ -17,6 +18,7 @@ onmessage = ({ data }) => {
     swapObject: parseSwapData,
     networkObject: parseNetworkData,
     networkErrObject: parseNetErrorData,
+    pagingObject: parsePagingData,
     fileDetails: parseFileDetails,
   };
 

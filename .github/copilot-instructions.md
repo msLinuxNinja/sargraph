@@ -26,12 +26,12 @@ Components are organized following Atomic Design:
 
 - **Atoms** (`src/Components/Atoms/`): Small reusable UI elements — DropBox, CopyClipButton, LoadingSpin, ResetButton, List, FooterDetails
 - **Molecules** (`src/Components/Molecules/`): Composed atoms — ChartContainer, LineChart, FileDetails, TableDetails, TabsContainer
-- **Organisms** (`src/Components/Organisms/`): Feature-complete chart components — CpuChart, MemoryChart, MemoryPercntChart, BlockIOChart, NetworkChart, NetworkErrChart
+- **Organisms** (`src/Components/Organisms/`): Feature-complete chart components — CpuChart, MemoryChart, MemoryPercntChart, BlockIOChart, NetworkChart, NetworkErrChart, PagingChart
 
 ### State Management
 
 Global state uses React Context API via `DataContext.js`. Access state with the `useDataContext()` hook. State includes:
-- Metric datasets: cpuData, memoryData, swapData, blockData, netData, netErrData
+- Metric datasets: cpuData, memoryData, swapData, blockData, netData, netErrData, pagingData
 - Selection state: selectedCPU, selectedBlock, selectedInterface
 - File metadata: fileDetails (hostname, kernel, date, interval, arch, fileName)
 - UI state: isLoading, dataLoaded, hasData
