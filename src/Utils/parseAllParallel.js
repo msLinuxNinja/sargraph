@@ -7,6 +7,7 @@ export default function parseAllParallel(sarFileData) {
     "swapObject",
     "networkObject",
     "networkErrObject",
+    "pagingObject",
     "fileDetails",
   ];
 
