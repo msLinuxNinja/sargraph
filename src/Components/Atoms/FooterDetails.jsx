@@ -11,7 +11,7 @@ export default function FooterDetails() {
 
   useEffect(() => {
     if (hasData) {
-      setFooter(`SarGRAPH | ${fileDetails.date} | ${fileDetails.fileName}`)
+      setFooter(`SarGRAPH | ${fileDetails.hostname} | ${fileDetails.date} | ${fileDetails.fileName}`)
     }
 
   }, [hasData])

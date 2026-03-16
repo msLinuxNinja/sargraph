@@ -118,7 +118,7 @@ export const HomePage = () => {
   useEffect(() => {
     {
       hasData
-        ? (document.title = `${fileDetails.date}|${fileDetails.fileName}`)
+        ? (document.title = `${fileDetails.hostname} | ${fileDetails.date} | ${fileDetails.fileName}`)
         : (document.title = "SarGRAPH");
     }
   }, [fileDetails]);
