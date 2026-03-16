@@ -208,7 +208,7 @@ export default function PagingChart() {
         },
       },
       normalized: true,
-      mantainAspectRatio: false,
+      maintainAspectRatio: false,
       parsing: false,
       responsive: true,
       plugins: {
@@ -296,7 +296,9 @@ export default function PagingChart() {
   return (
     <>
       {hasData ? (
-        <Line ref={chartRef} options={chartOptions} data={chartData} />
+        <div className="relative w-full h-[60vh] md:h-[65vh] lg:h-[70vh]">
+          <Line ref={chartRef} options={chartOptions} data={chartData} />
+        </div>
       ) : (
         <>
           <h1>No data found</h1>

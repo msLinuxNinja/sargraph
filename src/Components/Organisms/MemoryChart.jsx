@@ -211,7 +211,7 @@ export default function MemoryChart() {
         },
       },
       normalized: true,
-      mantainAspectRatio: false,
+      maintainAspectRatio: false,
       parsing: false,
       responsive: true,
       plugins: {
@@ -297,7 +297,9 @@ export default function MemoryChart() {
 
   return (
     <>
-      <Line ref={chartRef} options={chartOptions} data={chartData} />
+      <div className="relative w-full h-[60vh] md:h-[65vh] lg:h-[70vh]">
+        <Line ref={chartRef} options={chartOptions} data={chartData} />
+      </div>
       <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
         <ResetButton chartRef={chartRef} />
         <CopyClipboardButton chartRef={chartRef} />
