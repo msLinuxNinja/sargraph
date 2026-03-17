@@ -11,7 +11,7 @@ export default function FooterDetails() {
 
   useEffect(() => {
     if (hasData) {
-      setFooter(`SarGRAPH | ${fileDetails.date} | ${fileDetails.fileName}`)
+      setFooter(`SarGRAPH | ${fileDetails.hostname} | ${fileDetails.date} | ${fileDetails.fileName}`)
     }
 
   }, [hasData])
@@ -21,7 +21,7 @@ export default function FooterDetails() {
       <FontAwesomeIcon icon={faGithub} className="fa-2x" />
       <a href="https://github.com/msLinuxNinja/sargraph" target="_blank" rel="noopener noreferrer" className="pl-3 text-blue-600">msLinuxNinja/sargraph</a>
       <p className="pl-2 m-0">{footer}</p>
-      <p className="ml-auto">Version: 0.4.0</p>
+      <p className="ml-auto">Version: 0.4.1</p>
     </>
   )
 }

@@ -186,7 +186,7 @@ export default function PagingChart() {
         y: {
           beginAtZero: true,
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
           },
           responsive: true,
           min: 0,
@@ -195,7 +195,7 @@ export default function PagingChart() {
 
         x: {
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             source: "auto",
             autoSkip: true,
             maxRotation: 0,
@@ -208,13 +208,13 @@ export default function PagingChart() {
         },
       },
       normalized: true,
-      mantainAspectRatio: false,
+      maintainAspectRatio: false,
       parsing: false,
       responsive: true,
       plugins: {
         legend: {
           labels: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             font: {
               size: 16,
             },
@@ -296,7 +296,9 @@ export default function PagingChart() {
   return (
     <>
       {hasData ? (
-        <Line ref={chartRef} options={chartOptions} data={chartData} />
+        <div className="relative w-full h-[60vh] md:h-[65vh] lg:h-[70vh]">
+          <Line ref={chartRef} options={chartOptions} data={chartData} />
+        </div>
       ) : (
         <>
           <h1>No data found</h1>

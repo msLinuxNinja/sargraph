@@ -28,6 +28,8 @@ import { Line } from 'react-chartjs-2';
 import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
+import { colorConfig } from "../../Utils/colors";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -172,7 +174,7 @@ export default function MemoryPercntChart() {
             callback: function (value, index, ticks) {
               return value + "%";
             },
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
           },
 
           grid: {
@@ -186,7 +188,7 @@ export default function MemoryPercntChart() {
 
         x: {
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             source: "auto",
             autoSkip: true,
             maxRotation: 0,
@@ -199,13 +201,13 @@ export default function MemoryPercntChart() {
         },
       },
       normalized: true,
-      mantainAspectRatio: false,
+      maintainAspectRatio: false,
       parsing: false,
       responsive: true,
       plugins: {
         legend: {
           labels: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             font: {
               size: 16,
             }
@@ -281,7 +283,9 @@ export default function MemoryPercntChart() {
 
   return (
     <>
-      <Line ref={chartRef} options={chartOptions} data={chartData} />
+      <div className="relative w-full h-[60vh] md:h-[65vh] lg:h-[70vh]">
+        <Line ref={chartRef} options={chartOptions} data={chartData} />
+      </div>
       <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
       <ResetButton chartRef={chartRef} />
       <CopyClipboardButton chartRef={chartRef} />

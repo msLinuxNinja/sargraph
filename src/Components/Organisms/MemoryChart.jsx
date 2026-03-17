@@ -189,7 +189,7 @@ export default function MemoryChart() {
             callback: function (value, index, ticks) {
               return value + "GB";
             },
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
           },
           responsive: true,
           min: 0,
@@ -198,7 +198,7 @@ export default function MemoryChart() {
 
         x: {
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             source: "auto",
             autoSkip: true,
             maxRotation: 0,
@@ -211,13 +211,13 @@ export default function MemoryChart() {
         },
       },
       normalized: true,
-      mantainAspectRatio: false,
+      maintainAspectRatio: false,
       parsing: false,
       responsive: true,
       plugins: {
         legend: {
           labels: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             font: {
               size: 16,
             },
@@ -297,7 +297,9 @@ export default function MemoryChart() {
 
   return (
     <>
-      <Line ref={chartRef} options={chartOptions} data={chartData} />
+      <div className="relative w-full h-[60vh] md:h-[65vh] lg:h-[70vh]">
+        <Line ref={chartRef} options={chartOptions} data={chartData} />
+      </div>
       <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
         <ResetButton chartRef={chartRef} />
         <CopyClipboardButton chartRef={chartRef} />

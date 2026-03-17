@@ -118,7 +118,7 @@ export const HomePage = () => {
   useEffect(() => {
     {
       hasData
-        ? (document.title = `${fileDetails.date}|${fileDetails.fileName}`)
+        ? (document.title = `${fileDetails.hostname} | ${fileDetails.date} | ${fileDetails.fileName}`)
         : (document.title = "SarGRAPH");
     }
   }, [fileDetails]);
@@ -207,7 +207,7 @@ export const HomePage = () => {
         </Drawer>
         <Footer
           style={footerStyle}
-          className="z-30 flex justify-start items-center content-center rounded-b-lg"
+          className="z-30 flex justify-start content-center rounded-b-lg"
         >
           <FooterDetails />
         </Footer>
