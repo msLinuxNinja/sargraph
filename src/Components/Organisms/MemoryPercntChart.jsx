@@ -28,6 +28,8 @@ import { Line } from 'react-chartjs-2';
 import ResetButton from "../Atoms/ResetButton";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
 
+import { colorConfig } from "../../Utils/colors";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -172,7 +174,7 @@ export default function MemoryPercntChart() {
             callback: function (value, index, ticks) {
               return value + "%";
             },
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
           },
 
           grid: {
@@ -186,7 +188,7 @@ export default function MemoryPercntChart() {
 
         x: {
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             source: "auto",
             autoSkip: true,
             maxRotation: 0,
@@ -205,7 +207,7 @@ export default function MemoryPercntChart() {
       plugins: {
         legend: {
           labels: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             font: {
               size: 16,
             }

@@ -136,7 +136,7 @@ export default function NetworkChart() {
         y: {
           beginAtZero: true,
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
           },
           responsive: true,
           min: 0,
@@ -145,7 +145,7 @@ export default function NetworkChart() {
 
         x: {
           ticks: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             source: "auto",
             autoSkip: true,
             maxRotation: 0,
@@ -165,7 +165,7 @@ export default function NetworkChart() {
       plugins: {
         legend: {
           labels: {
-            color: "rgba(180, 180, 180, 1)",
+            color: colorConfig.textColor,
             font: {
               size: 16,
             }
