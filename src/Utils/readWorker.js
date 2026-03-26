@@ -1,9 +1,7 @@
 function parseRow(row) {
   if (row.includes("RESTART")) return null;
 
-  const emptySplit = row.split(" ");
-  const commaSplit = emptySplit.toString().split(",");
-  let filtered = commaSplit.filter((e) => e.trim() !== "");
+  let filtered = row.split(/[\s,]+/).filter(Boolean);
 
   if (filtered[1] === "AM" || filtered[1] === "PM") {
     filtered[0] = filtered[0] + " " + filtered[1];

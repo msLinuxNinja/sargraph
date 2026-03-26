@@ -1,58 +1,103 @@
-const returnDataPortion = (firstIndex, lastIndex, array) => {
-  const resultingArray = array.slice(firstIndex, lastIndex);
-  return resultingArray;
-};
-
-const returnMatch = (re, array) => {
-  // returns new array from matched lines based on regex defined when calling the function
-  const regex = new RegExp(re);
-  return array.filter((element) => element[1].match(regex));
-};
+// --- Shared helpers ---
 
 function findMode(arr) {
-  const frequency = arr.reduce((count, num) => {
-    count[num] = (count[num] || 0) + 1;
-    return count;
-  }, {});
-
+  const frequency = {};
+  for (let i = 0; i < arr.length; i++) {
+    const num = arr[i];
+    frequency[num] = (frequency[num] || 0) + 1;
+  }
   let mode;
   let maxFrequency = 0;
   for (const key in frequency) {
-    if (frequency.hasOwnProperty(key)) {
-      if (frequency[key] > maxFrequency) {
-        maxFrequency = frequency[key];
-        mode = Number(key);
-      }
+    if (frequency[key] > maxFrequency) {
+      maxFrequency = frequency[key];
+      mode = Number(key);
     }
   }
-
   return mode;
 }
 
 function calculatePollInterval(sarData) {
-  const sarDataPortion = sarData.filter(
-    (row) =>
-      row.includes("all") && !row.includes("Average:") && !row.includes("CPU")
-  );
-  const dateRange = sarDataPortion.map((row) => {
-    return row[0];
-  });
-
-  const dates = dateRange.map((entry) => Date.parse(`01/01/2022 ${entry}`));
+  const timeCache = new Map();
+  let prevTime = null;
   const intervals = [];
-  dates.forEach((date, i) => {
-    if (i > 0) {
-      intervals.push((date - dates[i - 1]) / 1000);
+  for (let i = 0; i < sarData.length; i++) {
+    const row = sarData[i];
+    if (row.includes("all") && !row.includes("Average:") && !row.includes("CPU")) {
+      const timeStr = row[0];
+      let ts = timeCache.get(timeStr);
+      if (ts === undefined) {
+        ts = Date.parse(`01/01/2022 ${timeStr}`);
+        timeCache.set(timeStr, ts);
+      }
+      if (prevTime !== null) {
+        intervals.push((ts - prevTime) / 1000);
+      }
+      prevTime = ts;
     }
-  });
-
+  }
   const modeInterval = findMode(intervals);
-  const filterInterval = intervals.filter(
-    (interval) => interval === modeInterval
-  );
-  const avgInterval =
-    filterInterval.reduce((sum, num) => sum + num, 0) / filterInterval.length;
-  return avgInterval;
+  const modeMatches = intervals.filter((v) => v === modeInterval);
+  return modeMatches.reduce((sum, num) => sum + num, 0) / modeMatches.length;
+}
+
+// Timestamp cache: avoids redundant Date.parse() calls for the same time string
+function makeTimeCache(dateData) {
+  const cache = new Map();
+  return (timeStr) => {
+    let ts = cache.get(timeStr);
+    if (ts === undefined) {
+      ts = Date.parse(`${dateData} ${timeStr} GMT-0600`);
+      cache.set(timeStr, ts);
+    }
+    return ts;
+  };
+}
+
+// Adaptive downsampling based on polling interval
+function downsample(array, avgInterval) {
+  if (avgInterval <= 10) return array.filter((_, i) => i % 18 === 0);
+  if (avgInterval <= 20) return array.filter((_, i) => i % 15 === 0);
+  if (avgInterval <= 30) return array.filter((_, i) => i % 4 === 0);
+  if (avgInterval <= 60) return array.filter((_, i) => i % 2 === 0);
+  return array;
+}
+
+// Find section boundaries using early-exit search
+function findSectionBounds(sarFileData, headerKeyword) {
+  let firstHeaderIdx = -1;
+  for (let i = 0; i < sarFileData.length; i++) {
+    if (sarFileData[i].includes(headerKeyword)) {
+      firstHeaderIdx = i;
+      break;
+    }
+  }
+  if (firstHeaderIdx === -1) return null;
+  let avgIdx = -1;
+  for (let i = firstHeaderIdx + 1; i < sarFileData.length; i++) {
+    if (sarFileData[i].includes("Average:")) {
+      avgIdx = i;
+      break;
+    }
+  }
+  if (avgIdx === -1) avgIdx = sarFileData.length;
+  return { firstIndex: firstHeaderIdx + 1, lastIndex: avgIdx };
+}
+
+// Single-pass grouping: groups rows by identifier column (col 1) into a Map
+function groupByIdentifier(rows) {
+  const groups = new Map();
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const key = row[1];
+    let arr = groups.get(key);
+    if (!arr) {
+      arr = [];
+      groups.set(key, arr);
+    }
+    arr.push(row);
+  }
+  return groups;
 }
 
 export function parseFileDetails(sarFileData) {
@@ -86,105 +131,53 @@ export function parseFileDetails(sarFileData) {
 }
 
 export function parseCPUData(sarFileData) {
-  // Parse CPU details and return an object with 8 arrays
-  const [uniqCPU, matchedData, parsedData] = [[], [], []];
-  let dataArray = [];
+  const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const getTime = makeTimeCache(dateData);
 
-  const dateData = sarFileData[0][3].replace(/[-]/g, "/"); // for some reason Date doesn't understand 2023-05-25 🙃
-  const rowIncludesUsr = sarFileData
-    .map((row, index) => (row.includes("CPU") ? index : null))
-    .filter((index) => typeof index === "number"); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'CPU'.
-  const rowIncludesAvg = sarFileData
-    .map((row, index) => (row.includes("Average:") ? index : null))
-    .filter((index) => typeof index === "number");
-  const firstIndex = rowIncludesUsr[0] + 1; // first index not including the first instance
+  const bounds = findSectionBounds(sarFileData, "CPU");
+  if (!bounds) return { cpuArray: [], uniqCPU: [] };
 
-  const lastIndex = rowIncludesAvg[0]; // Last index from the array
+  // Extract CPU data rows (exclude headers)
+  const cpuData = sarFileData.slice(bounds.firstIndex, bounds.lastIndex);
+  const cpuRows = cpuData.filter((row) => !row.includes("%usr") && !row.includes("CPU") && !row.includes("Average:") && row.length === 12);
 
-  const cpuData = returnDataPortion(firstIndex, lastIndex, sarFileData); // returns the portion of the data from firstIndex to lastIndex
-  const cpuFilter = cpuData.filter((row) => !row.includes("%usr"));
-
-  cpuFilter.forEach((row) => {
-    // Obtain list of unique CPUs to later use as an iterator and perform Regex
-    const cpuNum = row[1];
-
-    if (!uniqCPU.includes(cpuNum)) {
-      uniqCPU.push(cpuNum);
-    }
-  });
-
-  const cpuArray = uniqCPU.map(() => ({
-    // Maps through the array of unique CPUs and returns an object with 8 arrays for each CPU metric
-    cpuUsrData: [],
-    cpuNiceData: [],
-    cpuSysData: [],
-    cpuIowaitData: [],
-    cpuIrqData: [],
-    cpuSoftData: [],
-    cpuIdleData: [],
-  }));
-
-  uniqCPU.forEach((cpu) => {
-    // With list of unique CPUs obtain data based on matched regex
-    matchedData.push(returnMatch(`(^${cpu}$)`, sarFileData));
-  });
-
-  matchedData.forEach((array) => {
-    // remove nested arrays
-
-    array.forEach((entry) => {
-      parsedData.push(entry);
-    });
-  });
-
-  const filteredArray = parsedData.filter((row) => {
-    // After removing nested array, filter out rows with "CPU", "Average:" and that have 12 columns (only CPU section has 12 columns)
-    if (
-      !row.includes("CPU") &&
-      !row.includes("Average:") &&
-      row.length === 12
-    ) {
-      return true;
-    }
-    return false;
-  });
+  // Single-pass: group rows by CPU identifier and collect unique CPUs
+  const grouped = groupByIdentifier(cpuRows);
 
   const avgInterval = calculatePollInterval(sarFileData);
 
-  if (avgInterval <= 10) {
-    // on large datasets, reduce the datapoints by filtering out by an 18th of the data based on the average polling interval
-    dataArray = filteredArray.filter((row, index) => index % 18 === 0);
-  } else if (avgInterval <= 20) {
-    dataArray = filteredArray.filter((row, index) => index % 15 === 0);
-  } else if (avgInterval <= 30) {
-    dataArray = filteredArray.filter((row, index) => index % 4 === 0);
-  } else if (avgInterval <= 60) {
-    dataArray = filteredArray.filter((row, index) => index % 2 === 0);
-  } else {
-    dataArray = filteredArray;
-  }
-
-  cpuArray.forEach((array, index) => {
-    // Logic to add data to the array of objects
-
-    dataArray
-      .filter((row) => row[1] === uniqCPU[index])
-      .forEach((row) => {
-        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-        array.cpuUsrData.push({ x: time, y: parseFloat(row[2]) });
-        array.cpuNiceData.push({ x: time, y: parseFloat(row[3]) });
-        array.cpuSysData.push({ x: time, y: parseFloat(row[4]) });
-        array.cpuIowaitData.push({ x: time, y: parseFloat(row[5]) });
-        array.cpuIrqData.push({ x: time, y: parseFloat(row[7]) });
-        array.cpuSoftData.push({ x: time, y: parseFloat(row[8]) });
-        array.cpuIdleData.push({ x: time, y: parseFloat(row[11]) });
-      });
+  const uniqCPU = [...grouped.keys()];
+  const cpuArray = uniqCPU.map((cpu) => {
+    const obj = {
+      cpuUsrData: [],
+      cpuNiceData: [],
+      cpuSysData: [],
+      cpuIowaitData: [],
+      cpuIrqData: [],
+      cpuSoftData: [],
+      cpuIdleData: [],
+    };
+    const rows = downsample(grouped.get(cpu), avgInterval);
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const time = getTime(row[0]);
+      obj.cpuUsrData.push({ x: time, y: parseFloat(row[2]) });
+      obj.cpuNiceData.push({ x: time, y: parseFloat(row[3]) });
+      obj.cpuSysData.push({ x: time, y: parseFloat(row[4]) });
+      obj.cpuIowaitData.push({ x: time, y: parseFloat(row[5]) });
+      obj.cpuIrqData.push({ x: time, y: parseFloat(row[7]) });
+      obj.cpuSoftData.push({ x: time, y: parseFloat(row[8]) });
+      obj.cpuIdleData.push({ x: time, y: parseFloat(row[11]) });
+    }
+    return obj;
   });
+
   return { cpuArray, uniqCPU };
 }
 
 export function parseMemoryData(sarFileData) {
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const getTime = makeTimeCache(dateData);
 
   const kbMemFree = [];
   const kbMemUsed = [];
@@ -195,58 +188,41 @@ export function parseMemoryData(sarFileData) {
   const commitPrcnt = [];
   const totalMemory = [];
 
-  let fileVersion = "";
-
   const header = sarFileData.filter((row) => row.includes("kbmemfree"));
-
-  const prasedData = sarFileData.filter((row) => {
-    if (row.length === header[0].length && !isNaN(row[1])) {
-      // Memory section is exactly 17 columns long, checks if the second column is not a number
-      return true;
-    }
-  }); // Note RHEL8+ sar files, memory section is 17 Columns
-
-  const filteredArray = prasedData.filter((row) => !row.includes("Average:")); // return everything that does not include the word "%usr" which indicates a header
-
-  if (header[0].length === 17) {
-    fileVersion = "rhel8+";
-  } else if (header[0].length === 11) {
-    fileVersion = "rhel7";
+  if (header.length === 0) {
+    return { kbMemFree, kbMemUsed, memUsedPrcnt, kbBuffers, kbCached, kbCommit, commitPrcnt, totalMemory };
   }
 
-  if (fileVersion === "rhel8+") {
-    filteredArray.forEach((row) => {
-      //pushes values to the array
+  const expectedLen = header[0].length;
+  const isRhel8 = expectedLen === 17;
+  // Column indices differ: RHEL8+ has extra columns shifting used/prcnt/buffers/cached/commit/commitprcnt
+  const usedIdx = isRhel8 ? 3 : 2;
+  const prcntIdx = isRhel8 ? 4 : 3;
+  const bufIdx = isRhel8 ? 5 : 4;
+  const cacheIdx = isRhel8 ? 6 : 5;
+  const commitIdx = isRhel8 ? 7 : 6;
+  const commitPIdx = isRhel8 ? 8 : 7;
 
-      const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-      kbMemFree.push({ x: time, y: parseInt(row[1] / 1048576) }); //Dividing by 1048576 gives number in GB instead of KB
-      kbMemUsed.push({ x: time, y: parseInt(row[3] / 1048576) });
-      memUsedPrcnt.push({ x: time, y: parseInt(row[4]) });
-      kbBuffers.push({ x: time, y: parseInt(row[5] / 1048576) });
-      kbCached.push({ x: time, y: parseInt(row[6] / 1048576) });
-      kbCommit.push({ x: time, y: parseInt(row[7] / 1048576) });
-      commitPrcnt.push({ x: time, y: parseInt(row[8]) });
-      totalMemory.push({
-        x: time,
-        y: parseInt(row[1] / 1048576) + parseInt(row[3] / 1048576),
-      });
-    });
-  } else if (fileVersion === "rhel7") {
-    filteredArray.forEach((row) => {
-      //pushes values to the array
-      const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-      kbMemFree.push({ x: time, y: parseInt(row[1] / 1048576) }); //Dividing by 1048576 gives number in GB instead of KB
-      kbMemUsed.push({ x: time, y: parseInt(row[2] / 1048576) });
-      memUsedPrcnt.push({ x: time, y: parseInt(row[3]) });
-      kbBuffers.push({ x: time, y: parseInt(row[4] / 1048576) });
-      kbCached.push({ x: time, y: parseInt(row[5] / 1048576) });
-      kbCommit.push({ x: time, y: parseInt(row[6] / 1048576) });
-      commitPrcnt.push({ x: time, y: parseInt(row[7]) });
-      totalMemory.push({
-        x: time,
-        y: parseInt(row[1] / 1048576) + parseInt(row[2] / 1048576),
-      });
-    });
+  const filteredArray = sarFileData.filter(
+    (row) => row.length === expectedLen && !isNaN(row[1]) && !row.includes("Average:")
+  );
+
+  const avgInterval = calculatePollInterval(sarFileData);
+  const dataArray = downsample(filteredArray, avgInterval);
+
+  for (let i = 0; i < dataArray.length; i++) {
+    const row = dataArray[i];
+    const time = getTime(row[0]);
+    const freeGB = parseInt(row[1] / 1048576);
+    const usedGB = parseInt(row[usedIdx] / 1048576);
+    kbMemFree.push({ x: time, y: freeGB });
+    kbMemUsed.push({ x: time, y: usedGB });
+    memUsedPrcnt.push({ x: time, y: parseInt(row[prcntIdx]) });
+    kbBuffers.push({ x: time, y: parseInt(row[bufIdx] / 1048576) });
+    kbCached.push({ x: time, y: parseInt(row[cacheIdx] / 1048576) });
+    kbCommit.push({ x: time, y: parseInt(row[commitIdx] / 1048576) });
+    commitPrcnt.push({ x: time, y: parseInt(row[commitPIdx]) });
+    totalMemory.push({ x: time, y: freeGB + usedGB });
   }
 
   return {
@@ -263,309 +239,150 @@ export function parseMemoryData(sarFileData) {
 
 export function parseSwapData(sarFileData) {
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const getTime = makeTimeCache(dateData);
   const kbSwapFree = [];
   const kbSwapUsed = [];
   const swapUsedPrcnt = [];
   const totalSwap = [];
-  const header = sarFileData.filter((row) => row.includes("kbswpfree"));
 
-  const rowKbSwap = sarFileData
-    .map((row, index) => (row.includes("kbswpfree") ? index : null))
-    .filter((index) => typeof index === "number"); // Verify if row includes kbswpfree and returns index of matching pattern. Returns the index of the ocurrences of 'kbswpfree'.
-  const firstIndex = rowKbSwap[0] + 1; // first index not including the first instance
-  const rowIncludesAvg = sarFileData
-    .map((row, index) => (row.includes("Average:") ? index : null))
-    .filter((index) => typeof index === "number");
-  const tempLastIndex = rowIncludesAvg.filter(
-    (number) => number > rowKbSwap[0]
-  ); // Last index from the array
+  const bounds = findSectionBounds(sarFileData, "kbswpfree");
+  if (!bounds) return { kbSwapFree, kbSwapUsed, swapUsedPrcnt, totalSwap };
 
-  const lastIndex = tempLastIndex[0];
-
-  const swapPortion = returnDataPortion(firstIndex, lastIndex, sarFileData);
+  const swapPortion = sarFileData.slice(bounds.firstIndex, bounds.lastIndex);
   const swapData = swapPortion.filter((row) => !row.includes("kbswpfree") && !row.includes("Average:"));
 
-  swapData.forEach((row) => {
-    const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-    kbSwapFree.push({ x: time, y: parseFloat(row[1] / 1048576) });
-    kbSwapUsed.push({ x: time, y: parseFloat(row[2] / 1048576) });
+  const avgInterval = calculatePollInterval(sarFileData);
+  const dataArray = downsample(swapData, avgInterval);
+
+  for (let i = 0; i < dataArray.length; i++) {
+    const row = dataArray[i];
+    const time = getTime(row[0]);
+    const freeGB = parseFloat(row[1] / 1048576);
+    const usedGB = parseFloat(row[2] / 1048576);
+    kbSwapFree.push({ x: time, y: freeGB });
+    kbSwapUsed.push({ x: time, y: usedGB });
     swapUsedPrcnt.push({ x: time, y: parseFloat(row[3]) });
-    totalSwap.push({ x: time, y: parseFloat(row[1] / 1048576) + parseFloat(row[2] / 1048576) });
-  });
+    totalSwap.push({ x: time, y: freeGB + usedGB });
+  }
   
   return { kbSwapFree, kbSwapUsed, swapUsedPrcnt, totalSwap };
 }
 
 export function parseDiskIO(sarFileData) {
-  const [uniqDev, matchedData, parsedData] = [[], [], []];
-  let dataArray = [];
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
-  const header = sarFileData.filter((row) => row.includes("DEV"));
+  const getTime = makeTimeCache(dateData);
 
-  if (header.length === 0) {
-    // verify if the file contains disk data, if not return empty arrays
-    return { diskArray: [], uniqDev: [] };
+  // Check for DEV header to detect disk section and version
+  let headerRow = null;
+  for (let i = 0; i < sarFileData.length; i++) {
+    if (sarFileData[i].includes("DEV")) { headerRow = sarFileData[i]; break; }
   }
-  const rowIncludesDev = sarFileData
-    .map((row, index) => (row.includes("DEV") ? index : null))
-    .filter((index) => typeof index === "number"); // Verify if row includes usr and returns index of matching pattern. Returns the index of the ocurrences of 'DEV'.
-  const firstIndex = rowIncludesDev[0] + 1; // first index not including the first instance
-  const rowIncludesAvg = sarFileData
-    .map((row, index) => (row.includes("Average:") ? index : null))
-    .filter((index) => typeof index === "number");
-  const tempLastIndex = rowIncludesAvg.filter(
-    (number) => number > rowIncludesDev[0]
-  ); // Last index from the array
+  if (!headerRow) return { diskArray: [], uniqDev: [] };
 
-  const lastIndex = tempLastIndex[0];
+  const isRhel7 = headerRow.includes("svctm");
 
-  const diskPortion = returnDataPortion(firstIndex, lastIndex, sarFileData);
-  const diskData = diskPortion.filter((row) => !row.includes("DEV"));
+  const bounds = findSectionBounds(sarFileData, "DEV");
+  const diskPortion = sarFileData.slice(bounds.firstIndex, bounds.lastIndex);
+  const diskData = diskPortion.filter((row) => !row.includes("DEV") && !row.includes("Average:"));
 
-  let fileVersion = "";
-  if (header[0].includes("svctm")) {
-    fileVersion = "rhel7";
-  } else {
-    fileVersion = "rhel8+";
-  }
+  // Single-pass grouping by device name
+  const grouped = groupByIdentifier(diskData);
 
-  diskData.forEach((row) => {
-    // Obtain list of unique block devices to later use as an iterator and perform Regex
-    const block = row[1];
-
-    if (!uniqDev.includes(block)) {
-      uniqDev.push(block);
-    }
-  });
-
-  uniqDev.forEach((block) => {
-    matchedData.push(returnMatch(`(^${block}$)`, diskData));
-  });
-
-  uniqDev.sort((a, b) =>
+  const uniqDev = [...grouped.keys()].sort((a, b) =>
     a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" })
-  ); // Sort block devices in human order
-
-  const diskArray = uniqDev.map(() => ({
-    tps: [],
-    readSec: [],
-    writeSec: [],
-    avgRQz: [],
-    avgQz: [],
-    awaitMS: [],
-  }));
-
-  matchedData.forEach((array) => {
-    array.forEach((entry) => {
-      parsedData.push(entry);
-    });
-  });
+  );
 
   const avgInterval = calculatePollInterval(sarFileData);
-  const filteredArray = parsedData.filter(
-    (row) => !row.includes("DEV") && !row.includes("Average:")
-  ); // return everything that does not include the word "%usr" which indicates a header
 
-  if (avgInterval <= 10) {
-    // on large datasets, reduce the datapoints by filtering out by an 18th of the data based on the average polling interval
-    dataArray = filteredArray.filter((row, index) => index % 18 === 0);
-  } else if (avgInterval <= 20) {
-    dataArray = filteredArray.filter((row, index) => index % 15 === 0);
-  } else if (avgInterval <= 30) {
-    dataArray = filteredArray.filter((row, index) => index % 4 === 0);
-  } else if (avgInterval <= 60) {
-    dataArray = filteredArray.filter((row, index) => index % 2 === 0);
-  } else {
-    dataArray = filteredArray;
-  }
+  const diskArray = uniqDev.map((dev) => {
+    const obj = { tps: [], readSec: [], writeSec: [], avgRQz: [], avgQz: [], awaitMS: [] };
+    const rows = downsample(grouped.get(dev), avgInterval);
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const time = getTime(row[0]);
+      obj.tps.push({ x: time, y: parseFloat(row[2]) });
+      if (isRhel7) {
+        obj.readSec.push({ x: time, y: parseInt((row[3] * 512) / 1048576) });
+        obj.writeSec.push({ x: time, y: parseInt((row[4] * 512) / 1048576) });
+        obj.avgRQz.push({ x: time, y: parseInt((row[5] * 512) / 1024) });
+        obj.avgQz.push({ x: time, y: parseInt(row[6]) });
+        obj.awaitMS.push({ x: time, y: parseFloat(row[7]) });
+      } else {
+        obj.readSec.push({ x: time, y: parseInt(row[3] / 1024) });
+        obj.writeSec.push({ x: time, y: parseInt(row[4] / 1024) });
+        obj.avgRQz.push({ x: time, y: parseInt((row[6] * 512) / 1024) });
+        obj.avgQz.push({ x: time, y: parseInt(row[7]) });
+        obj.awaitMS.push({ x: time, y: parseFloat(row[8]) });
+      }
+    }
+    return obj;
+  });
 
-  if (fileVersion === "rhel8+") {
-    diskArray.forEach((array, index) => {
-      dataArray
-        .filter((row) => row[1] === uniqDev[index])
-        .forEach((row) => {
-          const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-          array.tps.push({ x: time, y: parseFloat(row[2]) });
-          array.readSec.push({ x: time, y: parseInt(row[3] / 1024) }); // Calculate MB/s
-          array.writeSec.push({ x: time, y: parseInt(row[4] / 1024) }); // Calculate MB/s
-          array.avgRQz.push({ x: time, y: parseInt((row[6] * 512) / 1024) }); // Calculate blocksize in KB
-          array.avgQz.push({ x: time, y: parseInt(row[7]) });
-          array.awaitMS.push({ x: time, y: parseFloat(row[8]) });
-        });
-    });
-  } else if (fileVersion === "rhel7") {
-    diskArray.forEach((array, index) => {
-      dataArray
-        .filter((row) => row[1] === uniqDev[index])
-        .forEach((row) => {
-          const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-          array.tps.push({ x: time, y: parseFloat(row[2]) });
-          array.readSec.push({
-            x: time,
-            y: parseInt((row[3] * 512) / 1048576),
-          }); // Calculate MB/s
-          array.writeSec.push({
-            x: time,
-            y: parseInt((row[4] * 512) / 1048576),
-          }); // Calculate MB/s
-          array.avgRQz.push({ x: time, y: parseInt((row[5] * 512) / 1024) }); // Calculate blocksize in KB
-          array.avgQz.push({ x: time, y: parseInt(row[6]) });
-          array.awaitMS.push({ x: time, y: parseFloat(row[7]) });
-        });
-    });
-  }
-
-  return { diskArray, uniqDev }; //export object with arrays
+  return { diskArray, uniqDev };
 }
 
 export function parseNetworkData(sarFileData) {
-  const [uniqIFACE, matchedData, parsedData] = [[], [], []];
-
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
-  const header = sarFileData.filter((row) => row.includes("IFACE"));
+  const getTime = makeTimeCache(dateData);
 
-  if (header.length === 0) {
-    // verify if the file contains network data, if not return empty arrays
-    return { networkArray: [], uniqIFACE: [] };
-  }
+  const bounds = findSectionBounds(sarFileData, "rxpck/s");
+  if (!bounds) return { netArray: [], uniqIFACE: [] };
 
-  const rowIncludesRXs = sarFileData
-    .map((row, index) => (row.includes("rxpck/s") ? index : null))
-    .filter((index) => typeof index === "number"); // Verify if row includes rxpck and returns index of matching pattern. Returns the index of the ocurrences of 'rxpck'.
-  const firstIndex = rowIncludesRXs[0] + 1; // first index not including the first instance
+  const netPortion = sarFileData.slice(bounds.firstIndex, bounds.lastIndex);
+  const netData = netPortion.filter((row) => !row.includes("rxpck/s") && !row.includes("Average:"));
 
-  const rowIncludesAvg = sarFileData
-    .map((row, index) => (row.includes("Average:") ? index : null))
-    .filter((index) => typeof index === "number"); // Verify if row includes avg and returns index of matching pattern. Returns the index of the ocurrences of 'Average:'.
+  // Single-pass grouping by interface name
+  const grouped = groupByIdentifier(netData);
 
-  const lastIndex = rowIncludesAvg.filter(
-    (number) => number > rowIncludesRXs[0]
-  ); // Last index from the array
+  const avgInterval = calculatePollInterval(sarFileData);
 
-  const netPortion = returnDataPortion(firstIndex, lastIndex[0], sarFileData); // Pass lastIndex[0] as it is the first element
-
-  const netData = netPortion.filter((row) => !row.includes("rxpck/s")); // Filters out rows that include "rxpck/s"
-
-  netData.forEach((row) => {
-    // Obtain list of unique interfaces to later use as an iterator and perform Regex
-    const iface = row[1];
-    if (!uniqIFACE.includes(iface)) {
-      uniqIFACE.push(iface);
+  const uniqIFACE = [...grouped.keys()].sort();
+  const netArray = uniqIFACE.map((iface) => {
+    const obj = { rxpck: [], txpck: [], rxkB: [], txkB: [], ifutil: [] };
+    const rows = downsample(grouped.get(iface), avgInterval);
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const time = getTime(row[0]);
+      obj.rxpck.push({ x: time, y: parseFloat(row[2]) });
+      obj.txpck.push({ x: time, y: parseFloat(row[3]) });
+      obj.rxkB.push({ x: time, y: parseFloat(row[4]) / 1024 });
+      obj.txkB.push({ x: time, y: parseFloat(row[5]) / 1024 });
     }
-  });
-
-  uniqIFACE.forEach((eth) => {
-    matchedData.push(returnMatch(`(^${eth}$)`, netData));
-  });
-
-  uniqIFACE.sort(); // Sort eth devices
-
-  const netArray = uniqIFACE.map(() => ({
-    rxpck: [],
-    txpck: [],
-    rxkB: [],
-    txkB: [],
-    ifutil: [],
-  }));
-
-  matchedData.forEach((array) => {
-    array.forEach((entry) => {
-      parsedData.push(entry);
-    });
-  });
-  const filteredArray = parsedData.filter(
-    (row) => !row.includes("IFACE") && !row.includes("Average:")
-  ); // return everything that does not include the word "IFACE" which indicates a header or average
-
-  netArray.forEach((array, index) => {
-    filteredArray
-      .filter((row) => row[1] === uniqIFACE[index])
-      .forEach((row) => {
-        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-        array.rxpck.push({ x: time, y: parseFloat(row[2]) });
-        array.txpck.push({ x: time, y: parseFloat(row[3]) });
-        array.rxkB.push({ x: time, y: parseFloat(row[4]) / 1024 }); // Convert to MB/s
-        array.txkB.push({ x: time, y: parseFloat(row[5]) / 1024 }); // Convert to MB/s
-      });
+    return obj;
   });
 
   return { netArray, uniqIFACE };
 }
 
 export function parseNetErrorData(sarFileData) {
-  const [uniqIFACE, matchedData, parsedData] = [[], [], []];
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
-  const header = sarFileData.filter((row) => row.includes("rxerr/s"));
+  const getTime = makeTimeCache(dateData);
 
-  if (header.length === 0) {
-    // verify if the file contains network error data, if not return empty arrays
-    return { netErrorArray: [], uniqIFACE: [] };
-  }
+  const bounds = findSectionBounds(sarFileData, "rxerr/s");
+  if (!bounds) return { netErrArray: [], uniqIFACE: [] };
 
-  const rowIncludesRXs = sarFileData
-    .map((row, index) => (row.includes("rxerr/s") ? index : null))
-    .filter((index) => typeof index === "number"); // Verify if row includes rxerr/s and returns index of matching pattern. Returns the index of the ocurrences of 'rxerr/s'.
-  const firstIndex = rowIncludesRXs[0] + 1; // first index not including the first instance
+  const netErrPortion = sarFileData.slice(bounds.firstIndex, bounds.lastIndex);
+  const netErrData = netErrPortion.filter((row) => !row.includes("rxerr/s") && !row.includes("Average:"));
 
-  const rowIncludesAvg = sarFileData
-    .map((row, index) => (row.includes("Average:") ? index : null))
-    .filter((index) => typeof index === "number"); // Verify if row includes avg and returns index of matching pattern. Returns the index of the ocurrences of 'Average:'.
+  // Single-pass grouping by interface name
+  const grouped = groupByIdentifier(netErrData);
 
-  const lastIndex = rowIncludesAvg.filter(
-    (number) => number > rowIncludesRXs[0]
-  ); // Last index from the array
+  const avgInterval = calculatePollInterval(sarFileData);
 
-  const netErrPortion = returnDataPortion(
-    firstIndex,
-    lastIndex[0],
-    sarFileData
-  ); // Pass lastIndex[0] as it is the first element
-
-  const netErrData = netErrPortion.filter((row) => !row.includes("rxerr/s")); // Filters out rows that include "rxerr/s"
-
-  netErrData.forEach((row) => {
-    // Obtain list of unique interfaces to later use as an iterator and perform Regex
-    const iface = row[1];
-    if (!uniqIFACE.includes(iface)) {
-      uniqIFACE.push(iface);
+  const uniqIFACE = [...grouped.keys()].sort();
+  const netErrArray = uniqIFACE.map((iface) => {
+    const obj = { rxerr: [], txerr: [], coll: [], rxdrop: [], txdrop: [] };
+    const rows = downsample(grouped.get(iface), avgInterval);
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const time = getTime(row[0]);
+      obj.rxerr.push({ x: time, y: parseFloat(row[2]) });
+      obj.txerr.push({ x: time, y: parseFloat(row[3]) });
+      obj.coll.push({ x: time, y: parseFloat(row[4]) });
+      obj.rxdrop.push({ x: time, y: parseFloat(row[5]) });
+      obj.txdrop.push({ x: time, y: parseFloat(row[6]) });
     }
-  });
-
-  uniqIFACE.forEach((eth) => {
-    matchedData.push(returnMatch(`(^${eth}$)`, netErrData));
-  });
-
-  uniqIFACE.sort(); // Sort eth devices
-
-  const netErrArray = uniqIFACE.map(() => ({
-    rxerr: [],
-    txerr: [],
-    coll: [],
-    rxdrop: [],
-    txdrop: [],
-  }));
-
-  matchedData.forEach((array) => {
-    array.forEach((entry) => {
-      parsedData.push(entry);
-    });
-  });
-
-  const filteredArray = parsedData.filter(
-    (row) => !row.includes("IFACE") && !row.includes("Average:")
-  ); // return everything that does not include the word "IFACE" which indicates a header or average
-
-  netErrArray.forEach((array, index) => {
-    filteredArray
-      .filter((row) => row[1] === uniqIFACE[index])
-      .forEach((row) => {
-        const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
-        array.rxerr.push({ x: time, y: parseFloat(row[2]) });
-        array.txerr.push({ x: time, y: parseFloat(row[3]) });
-        array.coll.push({ x: time, y: parseFloat(row[4]) });
-        array.rxdrop.push({ x: time, y: parseFloat(row[5]) });
-        array.txdrop.push({ x: time, y: parseFloat(row[6]) });
-      });
+    return obj;
   });
 
   return { netErrArray, uniqIFACE };
@@ -573,6 +390,7 @@ export function parseNetErrorData(sarFileData) {
 
 export function parsePagingData(sarFileData) {
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
+  const getTime = makeTimeCache(dateData);
 
   const pgpgin = [];
   const pgpgout = [];
@@ -584,32 +402,22 @@ export function parsePagingData(sarFileData) {
   const pgsteal = [];
   const vmeff = [];
 
-  const header = sarFileData.filter((row) => row.includes("pgpgin/s"));
-
-  if (header.length === 0) {
+  const bounds = findSectionBounds(sarFileData, "pgpgin/s");
+  if (!bounds) {
     return { pgpgin, pgpgout, fault, majflt, pgfree, pgscank, pgscand, pgsteal, vmeff };
   }
 
-  const rowIncludesPgpgin = sarFileData
-    .map((row, index) => (row.includes("pgpgin/s") ? index : null))
-    .filter((index) => typeof index === "number");
-  const firstIndex = rowIncludesPgpgin[0] + 1;
-
-  const rowIncludesAvg = sarFileData
-    .map((row, index) => (row.includes("Average:") ? index : null))
-    .filter((index) => typeof index === "number");
-  const tempLastIndex = rowIncludesAvg.filter(
-    (number) => number > rowIncludesPgpgin[0]
-  );
-  const lastIndex = tempLastIndex[0];
-
-  const pagingPortion = returnDataPortion(firstIndex, lastIndex, sarFileData);
+  const pagingPortion = sarFileData.slice(bounds.firstIndex, bounds.lastIndex);
   const pagingData = pagingPortion.filter(
     (row) => !row.includes("pgpgin/s") && !row.includes("Average:")
   );
 
-  pagingData.forEach((row) => {
-    const time = Date.parse(`${dateData} ${row[0]} GMT-0600`);
+  const avgInterval = calculatePollInterval(sarFileData);
+  const dataArray = downsample(pagingData, avgInterval);
+
+  for (let i = 0; i < dataArray.length; i++) {
+    const row = dataArray[i];
+    const time = getTime(row[0]);
     pgpgin.push({ x: time, y: parseFloat(row[1]) });
     pgpgout.push({ x: time, y: parseFloat(row[2]) });
     fault.push({ x: time, y: parseFloat(row[3]) });
@@ -619,7 +427,7 @@ export function parsePagingData(sarFileData) {
     pgscand.push({ x: time, y: parseFloat(row[7]) });
     pgsteal.push({ x: time, y: parseFloat(row[8]) });
     vmeff.push({ x: time, y: parseFloat(row[9]) });
-  });
+  }
 
   return { pgpgin, pgpgout, fault, majflt, pgfree, pgscank, pgscand, pgsteal, vmeff };
 }
