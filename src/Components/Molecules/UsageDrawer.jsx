@@ -1,9 +1,12 @@
 import { Drawer, Typography, Button } from "antd";
 
+export const BLOCK_IO_TAB_KEY = "4";
 export const BLOCK_TIMELINE_TAB_KEY = "9";
 
 export default function UsageDrawer({ open, onClose, activeTabKey }) {
   const isTimelineTab = activeTabKey === BLOCK_TIMELINE_TAB_KEY;
+  const isBlockDeviceTab =
+    activeTabKey === BLOCK_IO_TAB_KEY || activeTabKey === BLOCK_TIMELINE_TAB_KEY;
 
   return (
     <Drawer
@@ -66,6 +69,37 @@ export default function UsageDrawer({ open, onClose, activeTabKey }) {
             Hold Ctrl (or Cmd on Mac) and click legend entries to toggle
             individual devices on or off, building up a custom selection of
             multiple devices to compare.
+          </Typography.Paragraph>
+        </>
+      )}
+
+      {isBlockDeviceTab && (
+        <>
+          <Typography.Title level={1}>Block Device Mapping</Typography.Title>
+          <Typography.Paragraph>
+            By default, block devices are shown as raw identifiers like{" "}
+            <Typography.Text code>dev253-0</Typography.Text> as reported by
+            sar. You can replace these with human-readable names by
+            providing the output of the{" "}
+            <Typography.Text code>lsblk</Typography.Text> command.
+          </Typography.Paragraph>
+          <Typography.Title level={2}>Getting lsblk output</Typography.Title>
+          <Typography.Paragraph>
+            Run <Typography.Text code>lsblk -o NAME,MAJ:MIN</Typography.Text>{" "}
+            on the source system and paste the output into the mapping
+            dialog. For sos reports, this is typically at{" "}
+            <Typography.Text code>
+              sos_commands/block/lsblk
+            </Typography.Text>
+            .
+          </Typography.Paragraph>
+          <Typography.Title level={2}>Using the mapping</Typography.Title>
+          <Typography.Paragraph>
+            In the IO tab, click the "Map Devices" button. Paste your lsblk
+            output and click Validate to check it, then Apply to update
+            device names across all charts, including the Block Timeline
+            legend. The mapping persists until you load a new file or clear
+            it.
           </Typography.Paragraph>
         </>
       )}

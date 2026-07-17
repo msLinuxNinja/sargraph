@@ -1,4 +1,5 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useMemo } from "react";
+import { getDeviceDisplayName } from "../../Utils/deviceName";
 
 const DataContext = createContext({
   cpuData: undefined,
@@ -21,6 +22,9 @@ const DataContext = createContext({
   setSelectedBlock: () => {},
   selectedInterface: undefined,
   setSelectedInterface: () => {},
+  deviceMap: {},
+  setDeviceMap: () => {},
+  displayDevices: [],
   hasData: false,
   fileDetails: undefined,
   setFileDetails: () => {},
@@ -42,11 +46,20 @@ export const DataContextProvider = ({ children }) => {
   const [selectedCPU, setSelectedCPU] = useState(0);
   const [selectedBlock, setSelectedBlock] = useState(0);
   const [selectedInterface, setSelectedInterface] = useState(0);
+  const [deviceMap, setDeviceMap] = useState({});
   const [fileDetails, setFileDetails] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
 
   const hasData = cpuData || memoryData || blockData ;
+
+  // Human-readable device names derived from the raw sar dev identifiers
+  // and the (optional) lsblk mapping. Kept in the same order/index as
+  // blockData.uniqDev / blockData.diskArray so lookups by index stay valid.
+  const displayDevices = useMemo(() => {
+    if (!blockData?.uniqDev) return [];
+    return blockData.uniqDev.map((d) => getDeviceDisplayName(d, deviceMap));
+  }, [blockData?.uniqDev, deviceMap]);
 
   const contextValue = {
     cpuData,
@@ -69,6 +82,9 @@ export const DataContextProvider = ({ children }) => {
     setSelectedBlock,
     selectedInterface,
     setSelectedInterface,
+    deviceMap,
+    setDeviceMap,
+    displayDevices,
     hasData,
     fileDetails,
     setFileDetails,
