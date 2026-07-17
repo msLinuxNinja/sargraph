@@ -14,6 +14,7 @@ import {
 import MemoryChart from "../Components/Organisms/MemoryChart";
 import MemoryPercntChart from "../Components/Organisms/MemoryPercntChart";
 import BlockIOChart from "../Components/Organisms/BlockIOChart";
+import BlockTimelineChart from "../Components/Organisms/BlockTimelineChart";
 import CpuChart from "../Components/Organisms/CpuChart";
 import NetworkChart from "../Components/Organisms/NetworkChart";
 import NetworkErrChart from "../Components/Organisms/NetworkErrChart";
@@ -84,6 +85,15 @@ export const HomePage = () => {
       children: (
         <ChartContainer>
           <BlockIOChart />
+        </ChartContainer>
+      ),
+    },
+    {
+      label: "Block Timeline",
+      key: "9",
+      children: (
+        <ChartContainer>
+          <BlockTimelineChart />
         </ChartContainer>
       ),
     },
