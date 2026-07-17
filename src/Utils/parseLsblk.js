@@ -15,6 +15,12 @@
  *   vda     253:0   disk   64G
  *   ├─vda1  253:1   part    1M /boot
  *
+ * Also handles multi-level nesting (e.g. LVM volumes on a partition on a
+ * disk), where deeper rows use a tree prefix made of multiple
+ * space-separated box-drawing characters, such as:
+ *   ├─nvme0n1p2   259:2   0  63G  0 part
+ *   │ ├─rootvg-tmplv 253:13 0  7G  0 lvm  /var/tmp
+ *
  * Returns: { "dev253-0": "vda", "dev253-1": "vda1", ... }
  *
  * Error handling: returns an empty object if parsing fails completely,
@@ -32,17 +38,23 @@ export function parseLsblkOutput(rawText) {
     const line = lines[i].trim();
     if (!line) continue;
 
+    // Strip the tree-drawing prefix from the whole line first. Nested rows
+    // (e.g. LVM volumes under a partition under a disk) use a prefix made
+    // of multiple box-drawing characters separated by spaces, such as
+    // "│ ├─rootvg-tmplv" — stripping only the first whitespace-split
+    // token would leave the NAME/MAJ:MIN columns misaligned.
+    const cleanedLine = line.replace(/^[\s│├└╰─]+/, "");
+    if (!cleanedLine) continue;
+
     // Split on whitespace. lsblk columns are separated by one or more spaces.
-    const columns = line.split(/\s+/);
+    const columns = cleanedLine.split(/\s+/);
 
     // We need at least NAME and MAJ:MIN (2 columns)
     if (columns.length < 2) {
       continue;
     }
 
-    // First column is NAME — strip Unicode tree-drawing prefixes
-    // ├─ └─ │ ╰─ (various Unicode box-drawing characters)
-    const name = columns[0].replace(/^[│├└╰─\s]+/, "").trim();
+    const name = columns[0].trim();
     if (!name) continue;
 
     // Second column is MAJ:MIN
