@@ -2,7 +2,7 @@ import { useMemo, useRef, useEffect, useState } from "react";
 import { useDataContext } from "../Contexts/DataContext";
 
 // antd imports
-import { Flex, Typography } from "antd";
+import { Button, Flex, Typography } from "antd";
 
 import "chartjs-adapter-date-fns";
 import zoomPlugin from "chartjs-plugin-zoom"; // import zoom plugin
@@ -26,6 +26,7 @@ import { Line } from "react-chartjs-2";
 import ResetButton from "../Atoms/ResetButton";
 import ItemList from "../Atoms/List";
 import CopyClipboardButton from "../Atoms/CopyClipButton";
+import LsblkInput from "../Molecules/LsblkInput";
 
 // Colors
 
@@ -47,11 +48,13 @@ ChartJS.register(
 );
 
 export default function BlockIOChart() {
-  const { blockData, selectedBlock, setSelectedBlock } = useDataContext();
+  const { blockData, selectedBlock, setSelectedBlock, displayDevices } =
+    useDataContext();
   const chartRef = useRef();
   let perfOptions = true;
 
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
 
   // Metric states for selected period average calculation
   const [tpsAvg, setTpsAvg] = useState(0);
@@ -294,10 +297,15 @@ export default function BlockIOChart() {
       {chartData ? (
         <Flex className="flex-col items-start gap-2 lg:flex-row lg:items-center">
           <ItemList
-            items={blockData.uniqDev}
-            placeHolderText={`Select Block Device (Selected ${blockData.uniqDev[0]})`}
+            items={displayDevices}
+            placeHolderText={`Select Block Device (Selected ${displayDevices[0]})`}
             setValue={setSelectedBlock}
             showSearch={true}
+          />
+          <Button onClick={() => setMapModalOpen(true)}>Map Devices</Button>
+          <LsblkInput
+            open={mapModalOpen}
+            onClose={() => setMapModalOpen(false)}
           />
           <ResetButton chartRef={chartRef}/>
           <CopyClipboardButton chartRef={chartRef}/>

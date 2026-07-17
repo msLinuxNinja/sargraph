@@ -64,7 +64,7 @@ function generatePalette(count) {
 }
 
 export default function BlockTimelineChart() {
-  const { blockData } = useDataContext();
+  const { blockData, displayDevices } = useDataContext();
   const chartRef = useRef();
 
   const [selectedMetric, setSelectedMetric] = useState("tps");
@@ -113,7 +113,7 @@ export default function BlockTimelineChart() {
     const palette = generatePalette(blockData.uniqDev.length);
     return {
       datasets: blockData.uniqDev.map((devName, idx) => ({
-        label: devName,
+        label: displayDevices[idx] || devName,
         data: blockData.diskArray[idx][selectedMetric],
         borderColor: palette[idx],
         backgroundColor: "transparent",
@@ -267,7 +267,7 @@ export default function BlockTimelineChart() {
       return false;
     }
     return createChartData();
-  }, [selectedMetric]);
+  }, [selectedMetric, displayDevices]);
 
   const chartOptions = useMemo(() => {
     if (!blockData || blockData.diskArray.length === 0) {

@@ -9,7 +9,7 @@ import { Upload, message } from 'antd';
 const { Dragger } = Upload;
 
 export function DropBox() {
-  const { setCpuData, setMemoryData, setSwapData, setBlockData, setNetData, setNetErrData, setPagingData, setFileDetails, setDataLoaded } = useDataContext();
+  const { setCpuData, setMemoryData, setSwapData, setBlockData, setNetData, setNetErrData, setPagingData, setFileDetails, setDataLoaded, setDeviceMap } = useDataContext();
 
   const props = { // props for antd upload component
     multiple: false,
@@ -38,6 +38,7 @@ export function DropBox() {
           fileName: file.name,
         }
       });
+      setDeviceMap({}); // Clear any lsblk device mapping from a previous file
       onSuccess()
 
     } catch (error) {

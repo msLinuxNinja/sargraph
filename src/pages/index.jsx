@@ -19,6 +19,7 @@ import FooterDetails from "../Components/Atoms/FooterDetails";
 import LoadingSpin from "../Components/Atoms/LoadingSpin";
 import TabsContainer from "../Components/Molecules/TabsContainer";
 import UsageDrawer, {
+  BLOCK_IO_TAB_KEY,
   BLOCK_TIMELINE_TAB_KEY,
 } from "../Components/Molecules/UsageDrawer";
 import { ReloadOutlined, QuestionOutlined } from "@ant-design/icons";
@@ -77,7 +78,7 @@ export const HomePage = () => {
     },
     {
       label: "IO",
-      key: "4",
+      key: BLOCK_IO_TAB_KEY,
       children: (
         <ChartContainer>
           <BlockIOChart />
