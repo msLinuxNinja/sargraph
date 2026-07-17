@@ -118,9 +118,9 @@ export default function BlockTimelineChart() {
         borderColor: palette[idx],
         backgroundColor: "transparent",
         borderWidth: 1.5,
-        pointRadius: 0,
-        pointHoverRadius: 3,
-        tension: 0,
+        // pointRadius: 2,
+        pointHoverRadius: 6,
+        tension: 0.2,
         spanGaps: true,
       })),
     };
