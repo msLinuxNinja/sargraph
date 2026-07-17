@@ -184,9 +184,19 @@ export default function BlockTimelineChart() {
             },
           },
           onClick: (e, legendItem, legend) => {
-            // Click a legend entry to isolate that device; click again to restore all
+            // Click a legend entry to isolate that device; click again to restore all.
+            // Ctrl/Cmd+click toggles that device on/off, adding it to the current selection.
             const chart = legend.chart;
             const index = legendItem.datasetIndex;
+            const multiSelect = e?.native?.ctrlKey || e?.native?.metaKey;
+
+            if (multiSelect) {
+              const meta = chart.getDatasetMeta(index);
+              meta.hidden = !meta.hidden;
+              chart.update();
+              return;
+            }
+
             const isolated = chart.data.datasets.every((ds, i) => {
               const meta = chart.getDatasetMeta(i);
               return i === index ? !meta.hidden : !!meta.hidden;
@@ -310,6 +320,10 @@ export default function BlockTimelineChart() {
           <CopyClipboardButton chartRef={chartRef} />
           <Typography.Text type="primary">
             Current level zoom: {zoomLevel}
+          </Typography.Text>
+          <Typography.Text type="secondary">
+            Click a legend entry to isolate a device, Ctrl/Cmd+click to
+            select multiple.
           </Typography.Text>
           <Typography.Text type="primary">
             Average for selected period:{" "}
