@@ -14,7 +14,8 @@ import PagingChart from "../Components/Organisms/PagingChart";
 
 import FileDetails from "../Components/Molecules/FileDetails";
 import { useDataContext } from "../Components/Contexts/DataContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { Helmet } from "react-helmet-async";
 import FooterDetails from "../Components/Atoms/FooterDetails";
 import LoadingSpin from "../Components/Atoms/LoadingSpin";
 import TabsContainer from "../Components/Molecules/TabsContainer";
@@ -130,6 +131,20 @@ export const HomePage = () => {
     }
   }, [fileDetails]);
 
+  const helmetTitle = useMemo(() => {
+    if (hasData && fileDetails) {
+      return `${fileDetails.hostname} | ${fileDetails.date} | ${fileDetails.fileName}`;
+    }
+    return "SarGRAPH — Linux Performance Visualization";
+  }, [hasData, fileDetails]);
+
+  const helmetDescription = useMemo(() => {
+    if (hasData && fileDetails) {
+      return `sar data visualization for ${fileDetails.hostname} — ${fileDetails.date}. CPU, memory, I/O, network, and block device metrics from ${fileDetails.fileName}.`;
+    }
+    return "Visualize sysstat/sar performance data with interactive charts. CPU, memory, I/O, network, block devices — drag, drop, explore.";
+  }, [hasData, fileDetails]);
+
   const contentStyle = {
     backgroundColor: "rgb(50, 50, 50)",
   };
@@ -141,7 +156,17 @@ export const HomePage = () => {
 
   return (
     <Space direction="vertical" className="h-screen w-screen" size={[48, 48]}>
+      <Helmet prioritizeSeoTags>
+        <title>{helmetTitle}</title>
+        <meta name="description" content={helmetDescription} />
+        <meta property="og:title" content={helmetTitle} />
+        <meta property="og:description" content={helmetDescription} />
+        <meta name="twitter:title" content={helmetTitle} />
+        <meta name="twitter:description" content={helmetDescription} />
+      </Helmet>
       <Layout className="h-screen w-screen">
+        {/* Visually-hidden heading for screen readers and crawlers */}
+        <h1 className="sr-only">SarGRAPH — Linux Performance Visualization</h1>
         <Content
           style={contentStyle}
           className="overflow-y-auto h-full w-full justify-center items-center flex-col flex"

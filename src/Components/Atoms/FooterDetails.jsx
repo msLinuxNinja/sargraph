@@ -18,10 +18,10 @@ export default function FooterDetails() {
 
   return (
     <>
-      <FontAwesomeIcon icon={faGithub} className="fa-2x" />
-      <a href="https://github.com/msLinuxNinja/sargraph" target="_blank" rel="noopener noreferrer" className="pl-3 text-blue-600">msLinuxNinja/sargraph</a>
+      <FontAwesomeIcon icon={faGithub} className="fa-2x" aria-hidden="true" />
+      <a href="https://github.com/msLinuxNinja/sargraph" target="_blank" rel="noopener noreferrer" className="pl-3 text-blue-600" aria-label="SarGRAPH on GitHub">msLinuxNinja/sargraph</a>
       <p className="pl-2 m-0">{footer}</p>
-      <p className="ml-auto">Version: 0.6.0</p>
+      <p className="ml-auto">Version: 0.6.1</p>
     </>
   )
 }

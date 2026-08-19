@@ -4,15 +4,56 @@
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="SarGRAPH"
-      content="Visualize sar data"
-    />
-    <title>SarGRAPH</title>
+    <meta name="theme-color" content="#0D1117" />
+    <meta name="description" content="SarGRAPH — Visualize, analyze, and explore sysstat/sar performance data. Interactive charts for CPU, memory, I/O, network, and block device metrics." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://sargraph.dev" />
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sargraph.dev" />
+    <meta property="og:title" content="SarGRAPH — Linux Performance Visualization" />
+    <meta property="og:description" content="Visualize sysstat/sar data with interactive charts. CPU, memory, I/O, network, block devices — drag, drop, explore." />
+    <meta property="og:image" content="https://sargraph.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="SarGRAPH" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://sargraph.dev" />
+    <meta name="twitter:title" content="SarGRAPH — Linux Performance Visualization" />
+    <meta name="twitter:description" content="Visualize sysstat/sar data with interactive charts. CPU, memory, I/O, network, block devices — drag, drop, explore." />
+    <meta name="twitter:image" content="https://sargraph.dev/og-image.png" />
+    <title>SarGRAPH — Linux Performance Visualization</title>
+    <!-- Preconnect to font/CDN origins for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Structured Data: WebApplication schema (crawler-readable, no JS needed) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "SarGRAPH",
+      "url": "https://sargraph.dev",
+      "description": "Visualize, analyze, and explore sysstat/sar performance data. Interactive charts for CPU, memory, I/O, network, and block device metrics.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": {
+        "@type": "Person",
+        "name": "msLinuxNinja",
+        "url": "https://github.com/msLinuxNinja"
+      }
+    }
+    </script>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!-- Critical: search engines and non-JS crawlers see this content -->
+    <noscript>
+      <h1>SarGRAPH — Linux Performance Visualization</h1>
+      <p>SarGRAPH is an open-source tool for visualizing sysstat/sar performance data. Upload a <code>sar</code> binary data file to explore interactive charts for CPU utilization, memory usage, I/O throughput, network traffic, block device activity, and paging metrics — all in a dark-themed dashboard.</p>
+      <p>Key features: drag-and-drop file upload, per-CPU core analysis, block device timeline, network error tracking, and lsblk device name mapping.</p>
+      <p>You need to enable JavaScript to run this app. <a href="https://github.com/msLinuxNinja/sargraph">View the source on GitHub →</a></p>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
   </body>
