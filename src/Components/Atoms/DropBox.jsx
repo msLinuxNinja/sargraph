@@ -53,7 +53,7 @@ export function DropBox() {
 
 
   return (
-    <div className="w-1/2 m-auto content-center ">
+    <div className="w-1/2 m-auto content-center" role="region" aria-label="Upload sar data file">
       <Dragger {...props}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />

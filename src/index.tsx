@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import 'antd/dist/reset.css';
 import './Components/Styles/styles.css';
 import Appz from './App';
@@ -14,29 +15,30 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <ConfigProvider
-      theme={{
-        algorithm: darkAlgorithm,
-        token: {
-          colorPrimary: "#006FB4",
-          colorPrimaryHover: "#21AAFF",
-          colorPrimaryActive: "#1DA57A",
-          colorBgContainer: "#1E1E1E",
-        },
-        components: {
-          Button: {
+    <HelmetProvider>
+      <ConfigProvider
+        theme={{
+          algorithm: darkAlgorithm,
+          token: {
             colorPrimary: "#006FB4",
             colorPrimaryHover: "#21AAFF",
-            colorBgContainerDisabled: "#006FB4",
-            colorBgContainer: "#21AAFF",
+            colorPrimaryActive: "#1DA57A",
+            colorBgContainer: "#1E1E1E",
           },
-        },
-      }}
-    >
-      <App>
-        <Appz />
-      </App>
-    </ConfigProvider>
+          components: {
+            Button: {
+              colorPrimary: "#006FB4",
+              colorPrimaryHover: "#21AAFF",
+              colorBgContainerDisabled: "#006FB4",
+              colorBgContainer: "#21AAFF",
+            },
+          },
+        }}
+      >
+        <App>
+          <Appz />
+        </App>
+      </ConfigProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );
-
