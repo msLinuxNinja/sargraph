@@ -30,7 +30,7 @@ function calculatePollInterval(sarData) {
         ts = Date.parse(`01/01/2022 ${timeStr}`);
         timeCache.set(timeStr, ts);
       }
-      if (prevTime !== null) {
+      if (prevTime !== null && ts > prevTime) {
         intervals.push((ts - prevTime) / 1000);
       }
       prevTime = ts;
@@ -41,16 +41,26 @@ function calculatePollInterval(sarData) {
   return modeMatches.reduce((sum, num) => sum + num, 0) / modeMatches.length;
 }
 
-// Timestamp cache: avoids redundant Date.parse() calls for the same time string
+const DAY_MS = 86400000;
+
+// Timestamp resolver: caches time-of-day offsets and rolls the date forward
+// whenever the clock wraps past midnight, so files spanning multiple days
+// produce monotonically increasing timestamps.
+// Must be called with rows in chronological order (one resolver per series).
 function makeTimeCache(dateData) {
   const cache = new Map();
+  const baseDate = Date.parse(`${dateData} 00:00:00 GMT-0600`);
+  let dayOffset = 0;
+  let prevOffset = null;
   return (timeStr) => {
-    let ts = cache.get(timeStr);
-    if (ts === undefined) {
-      ts = Date.parse(`${dateData} ${timeStr} GMT-0600`);
-      cache.set(timeStr, ts);
+    let offset = cache.get(timeStr);
+    if (offset === undefined) {
+      offset = Date.parse(`${dateData} ${timeStr} GMT-0600`) - baseDate;
+      cache.set(timeStr, offset);
     }
-    return ts;
+    if (prevOffset !== null && offset < prevOffset) dayOffset += DAY_MS;
+    prevOffset = offset;
+    return baseDate + dayOffset + offset;
   };
 }
 
@@ -132,7 +142,6 @@ export function parseFileDetails(sarFileData) {
 
 export function parseCPUData(sarFileData) {
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
-  const getTime = makeTimeCache(dateData);
 
   const bounds = findSectionBounds(sarFileData, "CPU");
   if (!bounds) return { cpuArray: [], uniqCPU: [] };
@@ -157,6 +166,7 @@ export function parseCPUData(sarFileData) {
       cpuSoftData: [],
       cpuIdleData: [],
     };
+    const getTime = makeTimeCache(dateData);
     const rows = downsample(grouped.get(cpu), avgInterval);
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -270,7 +280,6 @@ export function parseSwapData(sarFileData) {
 
 export function parseDiskIO(sarFileData) {
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
-  const getTime = makeTimeCache(dateData);
 
   // Check for DEV header to detect disk section and version
   let headerRow = null;
@@ -296,6 +305,7 @@ export function parseDiskIO(sarFileData) {
 
   const diskArray = uniqDev.map((dev) => {
     const obj = { tps: [], readSec: [], writeSec: [], avgRQz: [], avgQz: [], awaitMS: [] };
+    const getTime = makeTimeCache(dateData);
     const rows = downsample(grouped.get(dev), avgInterval);
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -323,7 +333,6 @@ export function parseDiskIO(sarFileData) {
 
 export function parseNetworkData(sarFileData) {
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
-  const getTime = makeTimeCache(dateData);
 
   const bounds = findSectionBounds(sarFileData, "rxpck/s");
   if (!bounds) return { netArray: [], uniqIFACE: [] };
@@ -339,6 +348,7 @@ export function parseNetworkData(sarFileData) {
   const uniqIFACE = [...grouped.keys()].sort();
   const netArray = uniqIFACE.map((iface) => {
     const obj = { rxpck: [], txpck: [], rxkB: [], txkB: [], ifutil: [] };
+    const getTime = makeTimeCache(dateData);
     const rows = downsample(grouped.get(iface), avgInterval);
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -356,7 +366,6 @@ export function parseNetworkData(sarFileData) {
 
 export function parseNetErrorData(sarFileData) {
   const dateData = sarFileData[0][3].replace(/[-]/g, "/");
-  const getTime = makeTimeCache(dateData);
 
   const bounds = findSectionBounds(sarFileData, "rxerr/s");
   if (!bounds) return { netErrArray: [], uniqIFACE: [] };
@@ -372,6 +381,7 @@ export function parseNetErrorData(sarFileData) {
   const uniqIFACE = [...grouped.keys()].sort();
   const netErrArray = uniqIFACE.map((iface) => {
     const obj = { rxerr: [], txerr: [], coll: [], rxdrop: [], txdrop: [] };
+    const getTime = makeTimeCache(dateData);
     const rows = downsample(grouped.get(iface), avgInterval);
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
